@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { DriverController } from './controllers/driver.controller';
+import { DriverService } from './service/driver.service';
+import { DriverRepository } from './repository/driver.repository';
 
 @Module({
   imports: [
@@ -17,8 +18,9 @@ import { AppService } from './app.service';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    TypeOrmModule.forFeature([DriverRepository]),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [DriverController],
+  providers: [DriverService],
 })
 export class AppModule {}
