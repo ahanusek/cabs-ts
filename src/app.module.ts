@@ -4,6 +4,10 @@ import { ConfigModule } from '@nestjs/config';
 import { DriverController } from './controllers/driver.controller';
 import { DriverService } from './service/driver.service';
 import { DriverRepository } from './repository/driver.repository';
+import { AppProperties } from './config/app-properties.config';
+import { CarTypeRepository } from './repository/car-type.repository';
+import { CarTypeController } from './controllers/car-type.controller';
+import { CarTypeService } from './service/car-type.service';
 
 @Module({
   imports: [
@@ -18,9 +22,9 @@ import { DriverRepository } from './repository/driver.repository';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([DriverRepository]),
+    TypeOrmModule.forFeature([DriverRepository, CarTypeRepository]),
   ],
-  controllers: [DriverController],
-  providers: [DriverService],
+  controllers: [DriverController, CarTypeController],
+  providers: [AppProperties, DriverService, CarTypeService],
 })
 export class AppModule {}
