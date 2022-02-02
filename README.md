@@ -1,4 +1,4 @@
-### Port of legacyfighter/cabs-java to TypeScript
+### Fork of legacyfighter/cabs-java to Nest.js (TypeScript / Node)
 ____
 
 # Rozwój kodu

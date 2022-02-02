@@ -19,7 +19,10 @@ export class ClaimNumberGenerator {
     }
     const DATE_TIME_FORMAT = 'dd/MM/yyyy';
     return (
-      count + '---' + dayjs(claim.getCreationDate()).format(DATE_TIME_FORMAT)
+      prefix +
+      count +
+      '---' +
+      dayjs(claim.getCreationDate()).format(DATE_TIME_FORMAT)
     );
   }
 }
