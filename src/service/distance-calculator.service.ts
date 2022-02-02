@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class DistanceCalculator {
-  private static degreesToRadians(degrees: number) {
+  public static degreesToRadians(degrees: number) {
     return degrees * (Math.PI / 180);
   }
 

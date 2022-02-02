@@ -22,13 +22,18 @@ export class DriverFeeService {
       return transit.getDriversFee();
     }
     const transitPrice = transit.getPrice() ?? 0;
-    const driverFee = await this.driverFeeRepository.findByDriver(
-      transit.getDriver(),
-    );
+
+    const driver = transit.getDriver();
+
+    if (!driver) {
+      throw new NotFoundException(
+        'driver not exist for transit = ' + transitId,
+      );
+    }
+    const driverFee = await this.driverFeeRepository.findByDriver(driver);
     if (!driverFee) {
       throw new NotFoundException(
-        'driver Fees not defined for driver, driver id = ' +
-          transit.getDriver().getId(),
+        'driver Fees not defined for driver, driver id = ' + driver.getId(),
       );
     }
     let finalFee;

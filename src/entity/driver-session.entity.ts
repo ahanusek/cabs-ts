@@ -20,8 +20,8 @@ export class DriverSession extends BaseEntity {
   @Column()
   private carClass: CarClass;
 
-  @Column({ nullable: true, type: 'varchar' })
-  private carBrand: string | null;
+  @Column()
+  private carBrand: string;
 
   public getLoggedAt() {
     return this.loggedAt;

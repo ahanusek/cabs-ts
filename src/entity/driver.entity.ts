@@ -116,4 +116,12 @@ export class Driver extends BaseEntity {
   public setFee(fee: DriverFee) {
     this.fee = fee;
   }
+
+  public getOccupied() {
+    return this.isOccupied;
+  }
+
+  public setOccupied(isOccupied: boolean) {
+    this.isOccupied = isOccupied;
+  }
 }

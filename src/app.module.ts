@@ -39,6 +39,7 @@ import { TransitAnalyzerService } from './service/transit-analyzer.service';
 import { AwardsService } from './service/awards.service';
 import { ClaimService } from './service/claim.service';
 import { ContractService } from './service/contract.service';
+import { TransitService } from './service/transit.service';
 
 @Module({
   imports: [
@@ -99,6 +100,7 @@ import { ContractService } from './service/contract.service';
     AwardsService,
     ClaimService,
     ContractService,
+    TransitService,
   ],
 })
 export class AppModule {}

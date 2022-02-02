@@ -126,10 +126,13 @@ export class ClaimService {
         claim.setCompletionDate(Date.now());
         claim.setChangeDate(Date.now());
         claim.setCompletionMode(CompletionMode.MANUAL);
-        await this.driverNotificationService.askDriverForDetailsAboutClaim(
-          claim.getClaimNo(),
-          claim.getTransit().getDriver().getId(),
-        );
+        const driver = claim.getTransit().getDriver();
+        if (driver) {
+          await this.driverNotificationService.askDriverForDetailsAboutClaim(
+            claim.getClaimNo(),
+            driver.getId(),
+          );
+        }
       }
     } else {
       if (

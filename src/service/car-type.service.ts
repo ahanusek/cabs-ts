@@ -95,7 +95,8 @@ export class CarTypeService {
   }
 
   public async findActiveCarClasses() {
-    return this.carTypeRepository.findByStatus(CarStatus.ACTIVE);
+    const cars = await this.carTypeRepository.findByStatus(CarStatus.ACTIVE);
+    return cars.map((car) => car.getCarClass());
   }
 
   public async removeCarType(carClass: CarClass) {

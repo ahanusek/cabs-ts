@@ -4,7 +4,7 @@ import { Column, Entity, ManyToMany, ManyToOne, OneToOne } from 'typeorm';
 import { Driver } from './driver.entity';
 import { Client, PaymentType } from './client.entity';
 import { Address } from './address.entity';
-import { CarType } from './car-type.entity';
+import { CarClass } from './car-type.entity';
 
 export enum Status {
   DRAFT = 'draft',
@@ -59,7 +59,7 @@ export class Transit extends BaseEntity {
   public static readonly BASE_FEE = 8;
 
   @ManyToOne(() => Driver, (driver) => driver.transits)
-  public driver: Driver;
+  public driver: Driver | null;
 
   @Column()
   private driverPaymentStatus: DriverPaymentStatus;
@@ -127,11 +127,10 @@ export class Transit extends BaseEntity {
 
   @Column({
     type: 'enum',
-    enum: CarType,
-    default: null,
-    nullable: true,
+    enum: CarClass,
+    nullable: false,
   })
-  private carType: CarType | null;
+  private carType: CarClass;
 
   @Column()
   private completeAt: number;
@@ -140,7 +139,7 @@ export class Transit extends BaseEntity {
     return this.carType;
   }
 
-  public setCarType(carType: CarType) {
+  public setCarType(carType: CarClass) {
     this.carType = carType;
   }
 
@@ -193,7 +192,7 @@ export class Transit extends BaseEntity {
     this.published = published;
   }
 
-  public setDriver(driver: Driver) {
+  public setDriver(driver: Driver | null) {
     this.driver = driver;
   }
 

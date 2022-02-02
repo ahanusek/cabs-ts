@@ -56,7 +56,7 @@ export class Address extends BaseEntity {
     return this.district;
   }
 
-  public setDistrict(district: string) {
+  public setDistrict(district: string | null) {
     this.district = district;
   }
 
@@ -88,7 +88,7 @@ export class Address extends BaseEntity {
     return this.additionalNumber;
   }
 
-  public setAdditionalNumber(additionalNumber: number) {
+  public setAdditionalNumber(additionalNumber: number | null) {
     this.additionalNumber = additionalNumber;
   }
 
