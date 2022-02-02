@@ -25,6 +25,9 @@ import { ClientNotificationService } from './service/client-notification.service
 import { ClientService } from './service/client.service';
 import { ClientRepository } from './repository/client.repository';
 import { ClientController } from './controllers/client.controller';
+import { DriverSessionService } from './service/driver-session.service';
+import { DriverSessionRepository } from './repository/driver-session.repository';
+import { DriverSessionController } from './controllers/driver-session.controller';
 
 @Module({
   imports: [
@@ -47,6 +50,7 @@ import { ClientController } from './controllers/client.controller';
       InvoiceRepository,
       ClaimRepository,
       ClientRepository,
+      DriverSessionRepository,
       DriverFee,
       DriverAttribute,
       Transit,
@@ -55,7 +59,12 @@ import { ClientController } from './controllers/client.controller';
       Claim,
     ]),
   ],
-  controllers: [DriverController, CarTypeController, ClientController],
+  controllers: [
+    DriverController,
+    CarTypeController,
+    ClientController,
+    DriverSessionController,
+  ],
   providers: [
     AppProperties,
     DriverService,
@@ -67,6 +76,7 @@ import { ClientController } from './controllers/client.controller';
     ClaimNumberGenerator,
     ClientNotificationService,
     ClientService,
+    DriverSessionService,
   ],
 })
 export class AppModule {}

@@ -8,7 +8,7 @@ export class DriverSession extends BaseEntity {
   @Column()
   private loggedAt: number;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'integer' })
   private loggedOutAt: number | null;
 
   @ManyToOne(() => Driver)
@@ -20,7 +20,7 @@ export class DriverSession extends BaseEntity {
   @Column()
   private carClass: CarClass;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'varchar' })
   private carBrand: string | null;
 
   public getLoggedAt() {
