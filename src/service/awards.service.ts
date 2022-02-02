@@ -46,7 +46,7 @@ export interface IAwardsService {
 }
 
 @Injectable()
-export class AwardService implements IAwardsService {
+export class AwardsService implements IAwardsService {
   constructor(
     @InjectRepository(ClientRepository)
     private clientRepository: ClientRepository,

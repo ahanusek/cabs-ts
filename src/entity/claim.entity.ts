@@ -94,7 +94,7 @@ export class Claim extends BaseEntity {
     return this.incidentDescription;
   }
 
-  public setIncidentDescription(incidentDescription: string) {
+  public setIncidentDescription(incidentDescription: string | null) {
     this.incidentDescription = incidentDescription;
   }
 
