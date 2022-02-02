@@ -33,6 +33,7 @@ export class TransitRepository extends Repository<Transit> {
     status: Status,
   ): Promise<Transit[]> {
     //TODO: implement query
+    console.log({ client, from, when, status });
     return [];
   }
 
