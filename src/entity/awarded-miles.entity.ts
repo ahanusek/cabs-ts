@@ -27,7 +27,7 @@ export class AwardedMiles extends BaseEntity {
   private isSpecial: boolean | null;
 
   @ManyToOne(() => Transit)
-  public transit: Transit;
+  public transit: Transit | null;
 
   public getClient() {
     return this.client;
@@ -69,7 +69,7 @@ export class AwardedMiles extends BaseEntity {
     this.isSpecial = special;
   }
 
-  public setTransit(transit: Transit) {
+  public setTransit(transit: Transit | null) {
     this.transit = transit;
   }
 }
