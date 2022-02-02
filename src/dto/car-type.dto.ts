@@ -4,7 +4,7 @@ export class CarTypeDto {
   private id: string;
   private carClass: CarClass;
 
-  private description: string;
+  private description: string | null;
 
   private status: CarStatus;
 

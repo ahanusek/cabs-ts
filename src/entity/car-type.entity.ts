@@ -20,7 +20,7 @@ export class CarType extends BaseEntity {
   private carClass: CarClass;
 
   @Column({ nullable: true })
-  private description: string;
+  private description: string | null;
 
   @Column({ default: CarStatus.INACTIVE })
   private status: CarStatus;

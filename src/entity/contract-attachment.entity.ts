@@ -20,13 +20,13 @@ export class ContractAttachment extends BaseEntity {
   @Column({ default: Date.now() })
   private creationDate: number;
 
-  @Column()
-  private acceptedAt: number;
+  @Column({ nullable: true })
+  private acceptedAt: number | null;
 
-  @Column()
-  private rejectedAt: number;
+  @Column({ nullable: true })
+  private rejectedAt: number | null;
 
-  @Column()
+  @Column({ nullable: true })
   private changeDate: number;
 
   @Column({ default: ContractAttachmentStatus.PROPOSED })

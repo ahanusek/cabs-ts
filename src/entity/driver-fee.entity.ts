@@ -16,7 +16,7 @@ export class DriverFee extends BaseEntity {
   private amount: number;
 
   @Column({ nullable: true })
-  private min: number;
+  private min: number | null;
 
   @OneToOne(() => Driver, (driver) => driver.fee)
   public driver: Driver;

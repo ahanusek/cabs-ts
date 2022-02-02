@@ -11,7 +11,7 @@ export class DriverDto {
 
   private driverLicense: string;
 
-  private photo: string;
+  private photo: string | null;
 
   private type: DriverType;
 

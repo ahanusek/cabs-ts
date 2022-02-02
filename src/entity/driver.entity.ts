@@ -28,8 +28,8 @@ export class Driver extends BaseEntity {
   @Column()
   private driverLicense: string;
 
-  @Column()
-  private photo: string;
+  @Column({ nullable: true })
+  private photo: string | null;
 
   @Column()
   private type: DriverType;
@@ -37,7 +37,7 @@ export class Driver extends BaseEntity {
   @Column({ default: false })
   private isOccupied: boolean;
 
-  @OneToOne(() => DriverFee, (fee) => fee.driver, { eager: false })
+  @OneToOne(() => DriverFee, (fee) => fee.driver)
   @JoinColumn()
   public fee: DriverFee;
 

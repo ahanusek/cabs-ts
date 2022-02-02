@@ -10,8 +10,8 @@ export class ClaimAttachment extends BaseEntity {
   @Column()
   private creationDate: number;
 
-  @Column()
-  private description: string;
+  @Column({ nullable: true })
+  private description: string | null;
 
   @Column({ type: 'blob' })
   private data: Blob;

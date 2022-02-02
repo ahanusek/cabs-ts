@@ -29,20 +29,20 @@ export class Claim extends BaseEntity {
   @Column()
   private creationDate: number;
 
-  @Column()
-  private completionDate: number;
+  @Column({ nullable: true })
+  private completionDate: number | null;
 
-  @Column()
-  private changeDate: number;
+  @Column({ nullable: true })
+  private changeDate: number | null;
 
   @Column()
   private reason: string;
 
-  @Column()
-  private incidentDescription: string;
+  @Column({ nullable: true })
+  private incidentDescription: string | null;
 
-  @Column()
-  private completionMode: CompletionMode;
+  @Column({ nullable: true })
+  private completionMode: CompletionMode | null;
 
   @Column()
   private status: ClaimStatus;

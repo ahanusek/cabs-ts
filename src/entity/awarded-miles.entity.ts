@@ -20,11 +20,11 @@ export class AwardedMiles extends BaseEntity {
   @Column({ default: Date.now() })
   private date: number;
 
-  @Column()
-  private expirationDate: number;
+  @Column({ nullable: true })
+  private expirationDate: number | null;
 
-  @Column()
-  private isSpecial: boolean;
+  @Column({ nullable: true })
+  private isSpecial: boolean | null;
 
   @ManyToOne(() => Transit)
   public transit: Transit;

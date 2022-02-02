@@ -25,14 +25,14 @@ export class Contract extends BaseEntity {
   @Column({ default: Date.now() })
   private creationDate: number;
 
-  @Column()
-  private acceptedAt: number;
+  @Column({ nullable: true })
+  private acceptedAt: number | null;
 
-  @Column()
-  private rejectedAt: number;
+  @Column({ nullable: true })
+  private rejectedAt: number | null;
 
-  @Column()
-  private changeDate: number;
+  @Column({ nullable: true })
+  private changeDate: number | null;
 
   @Column({ default: ContractStatus.NEGOTIATIONS_IN_PROGRESS })
   private status: ContractStatus;
