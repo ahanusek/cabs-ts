@@ -33,6 +33,8 @@ import { AddressRepository } from './repository/address.repository';
 import { DriverAttributeRepository } from './repository/driver-attribute.repository';
 import { AwardedMilesRepository } from './repository/awarded-miles.repository';
 import { AwardsAccountRepository } from './repository/awards-account.repository';
+import { ContractAttachmentRepository } from './repository/contract-attachment.repository';
+import { Contract } from './entity/contract.entity';
 
 @Module({
   imports: [
@@ -64,6 +66,8 @@ import { AwardsAccountRepository } from './repository/awards-account.repository'
       DriverAttributeRepository,
       AwardedMilesRepository,
       AwardsAccountRepository,
+      ContractAttachmentRepository,
+      Contract,
     ]),
   ],
   controllers: [

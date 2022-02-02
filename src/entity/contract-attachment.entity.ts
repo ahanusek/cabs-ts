@@ -14,8 +14,8 @@ export class ContractAttachment extends BaseEntity {
   @ManyToOne(() => Contract, (contract) => contract.attachments)
   public contract: Contract;
 
-  @Column({ type: 'blob' })
-  private data: Blob;
+  @Column({ type: 'bytea' })
+  private data: Buffer;
 
   @Column({ default: Date.now(), type: 'bigint' })
   private creationDate: number;
@@ -36,8 +36,10 @@ export class ContractAttachment extends BaseEntity {
     return this.data;
   }
 
-  public setData(data: Blob) {
-    this.data = data;
+  public setData(data: string) {
+    this.data = Buffer.from(
+      '\\x' + Buffer.from(data, 'base64').toString('hex'),
+    );
   }
 
   public getCreationDate() {
