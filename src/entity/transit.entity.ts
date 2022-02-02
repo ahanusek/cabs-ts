@@ -73,7 +73,7 @@ export class Transit extends BaseEntity {
   @Column()
   private status: Status;
 
-  @Column()
+  @Column({ type: 'bigint' })
   private date: number;
 
   @OneToOne(() => Address)
@@ -82,10 +82,10 @@ export class Transit extends BaseEntity {
   @OneToOne(() => Address)
   private to: Address;
 
-  @Column({ nullable: true, type: 'integer' })
+  @Column({ nullable: true, type: 'bigint' })
   public acceptedAt: number | null;
 
-  @Column({ nullable: true, type: 'integer' })
+  @Column({ nullable: true, type: 'bigint' })
   public started: number | null;
 
   @Column({ default: 0 })

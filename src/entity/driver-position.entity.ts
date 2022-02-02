@@ -13,7 +13,7 @@ export class DriverPosition extends BaseEntity {
   @Column()
   private longitude: number;
 
-  @Column()
+  @Column({ type: 'bigint' })
   private seenAt: number;
 
   public getDriver() {

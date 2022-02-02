@@ -26,13 +26,13 @@ export class Claim extends BaseEntity {
   @JoinColumn()
   private transit: Transit;
 
-  @Column()
+  @Column({ type: 'bigint' })
   private creationDate: number;
 
-  @Column({ nullable: true, type: 'integer' })
+  @Column({ nullable: true, type: 'bigint' })
   private completionDate: number | null;
 
-  @Column({ nullable: true, type: 'integer' })
+  @Column({ nullable: true, type: 'bigint' })
   private changeDate: number | null;
 
   @Column()

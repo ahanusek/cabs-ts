@@ -8,7 +8,7 @@ export class DriverSession extends BaseEntity {
   @Column()
   private loggedAt: number;
 
-  @Column({ nullable: true, type: 'integer' })
+  @Column({ nullable: true, type: 'bigint' })
   private loggedOutAt: number | null;
 
   @ManyToOne(() => Driver)

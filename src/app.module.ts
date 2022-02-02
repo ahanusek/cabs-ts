@@ -32,6 +32,7 @@ import { ClaimAttachmentRepository } from './repository/claim-attachment.reposit
 import { AddressRepository } from './repository/address.repository';
 import { DriverAttributeRepository } from './repository/driver-attribute.repository';
 import { AwardedMilesRepository } from './repository/awarded-miles.repository';
+import { AwardsAccountRepository } from './repository/awards-account.repository';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { AwardedMilesRepository } from './repository/awarded-miles.repository';
       AddressRepository,
       DriverAttributeRepository,
       AwardedMilesRepository,
+      AwardsAccountRepository,
     ]),
   ],
   controllers: [
