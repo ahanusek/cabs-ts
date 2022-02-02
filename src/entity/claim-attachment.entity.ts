@@ -10,11 +10,11 @@ export class ClaimAttachment extends BaseEntity {
   @Column()
   private creationDate: number;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'varchar' })
   private description: string | null;
 
-  @Column({ type: 'blob' })
-  private data: Blob;
+  @Column({ type: 'bytea' })
+  private data: Buffer;
 
   public getClient() {
     return this.claim.getOwner();
@@ -48,7 +48,9 @@ export class ClaimAttachment extends BaseEntity {
     return this.data;
   }
 
-  public setData(data: Blob) {
-    this.data = data;
+  public setData(data: string) {
+    this.data = Buffer.from(
+      '\\x' + Buffer.from(data, 'base64').toString('hex'),
+    );
   }
 }

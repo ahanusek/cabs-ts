@@ -8,10 +8,6 @@ import { AppProperties } from './config/app-properties.config';
 import { CarTypeRepository } from './repository/car-type.repository';
 import { CarTypeController } from './controllers/car-type.controller';
 import { CarTypeService } from './service/car-type.service';
-import { DriverAttribute } from './entity/driver-attribute.entity';
-import { Address } from './entity/address.entity';
-import { Client } from './entity/client.entity';
-import { Claim } from './entity/claim.entity';
 import { DistanceCalculator } from './service/distance-calculator.service';
 import { InvoiceRepository } from './repository/invoice.repository';
 import { InvoiceGenerator } from './service/invoice-generator.service';
@@ -33,6 +29,8 @@ import { DriverPositionRepository } from './repository/driver-position.repositor
 import { DriverTrackingService } from './service/driver-tracking.service';
 import { DriverTrackingController } from './controllers/driver-tracking.controller';
 import { ClaimAttachmentRepository } from './repository/claim-attachment.repository';
+import { AddressRepository } from './repository/address.repository';
+import { DriverAttributeRepository } from './repository/driver-attribute.repository';
 
 @Module({
   imports: [
@@ -60,10 +58,8 @@ import { ClaimAttachmentRepository } from './repository/claim-attachment.reposit
       TransitRepository,
       DriverPositionRepository,
       ClaimAttachmentRepository,
-      DriverAttribute,
-      Address,
-      Client,
-      Claim,
+      AddressRepository,
+      DriverAttributeRepository,
     ]),
   ],
   controllers: [
