@@ -15,6 +15,8 @@ import { Address } from './entity/address.entity';
 import { Client } from './entity/client.entity';
 import { Claim } from './entity/claim.entity';
 import { DistanceCalculator } from './service/distance-calculator.service';
+import { InvoiceRepository } from './repository/invoice.repository';
+import { InvoiceGenerator } from './service/invoice-generator.service';
 
 @Module({
   imports: [
@@ -34,6 +36,7 @@ import { DistanceCalculator } from './service/distance-calculator.service';
     TypeOrmModule.forFeature([
       DriverRepository,
       CarTypeRepository,
+      InvoiceRepository,
       DriverFee,
       DriverAttribute,
       Transit,
@@ -43,6 +46,12 @@ import { DistanceCalculator } from './service/distance-calculator.service';
     ]),
   ],
   controllers: [DriverController, CarTypeController],
-  providers: [AppProperties, DriverService, CarTypeService, DistanceCalculator],
+  providers: [
+    AppProperties,
+    DriverService,
+    CarTypeService,
+    DistanceCalculator,
+    InvoiceGenerator,
+  ],
 })
 export class AppModule {}
