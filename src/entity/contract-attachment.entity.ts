@@ -17,7 +17,7 @@ export class ContractAttachment extends BaseEntity {
   @Column({ type: 'blob' })
   private data: Blob;
 
-  @Column({ default: Date.now() })
+  @Column({ default: Date.now(), type: 'bigint' })
   private creationDate: number;
 
   @Column({ nullable: true })

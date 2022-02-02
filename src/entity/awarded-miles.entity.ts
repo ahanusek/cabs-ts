@@ -17,13 +17,13 @@ export class AwardedMiles extends BaseEntity {
   @Column()
   private miles: number;
 
-  @Column({ default: Date.now() })
+  @Column({ default: Date.now(), type: 'bigint' })
   private date: number;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'bigint' })
   private expirationDate: number | null;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'boolean' })
   private isSpecial: boolean | null;
 
   @ManyToOne(() => Transit)

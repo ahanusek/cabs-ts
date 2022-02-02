@@ -4,7 +4,7 @@ import { Client } from './client.entity';
 
 @Entity()
 export class AwardsAccount extends BaseEntity {
-  @Column({ default: Date.now() })
+  @Column({ default: Date.now(), type: 'bigint' })
   private date: number;
 
   @Column({ default: false })

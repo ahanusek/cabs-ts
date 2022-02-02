@@ -31,6 +31,7 @@ import { DriverTrackingController } from './controllers/driver-tracking.controll
 import { ClaimAttachmentRepository } from './repository/claim-attachment.repository';
 import { AddressRepository } from './repository/address.repository';
 import { DriverAttributeRepository } from './repository/driver-attribute.repository';
+import { AwardedMilesRepository } from './repository/awarded-miles.repository';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { DriverAttributeRepository } from './repository/driver-attribute.reposit
       ClaimAttachmentRepository,
       AddressRepository,
       DriverAttributeRepository,
+      AwardedMilesRepository,
     ]),
   ],
   controllers: [
