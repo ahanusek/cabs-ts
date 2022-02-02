@@ -18,6 +18,7 @@ import { DistanceCalculator } from './service/distance-calculator.service';
 import { InvoiceRepository } from './repository/invoice.repository';
 import { InvoiceGenerator } from './service/invoice-generator.service';
 import { DriverNotificationService } from './service/driver-notification.service';
+import { GeocodingService } from './service/geocoding.service';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { DriverNotificationService } from './service/driver-notification.service
     DistanceCalculator,
     InvoiceGenerator,
     DriverNotificationService,
+    GeocodingService,
   ],
 })
 export class AppModule {}
