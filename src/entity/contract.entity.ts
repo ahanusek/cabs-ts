@@ -73,7 +73,7 @@ export class Contract extends BaseEntity {
   }
 
   public getStatus() {
-    return status;
+    return this.status;
   }
 
   public setStatus(status: ContractStatus) {

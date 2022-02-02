@@ -165,7 +165,7 @@ export class AwardsService implements IAwardsService {
           await this.transitRepository.findByClient(client)
         ).length;
 
-        //TODO:add sorter implementation in TS
+        // TODO:add sorter implementation in TS
         if (client.getClaims().length >= 3) {
           // milesList.sort(Comparator.comparing(AwardedMiles::getExpirationDate, Comparators.nullsHigh()).reversed().thenComparing(Comparators.nullsHigh()));
         } else if (client.getType() === Type.VIP) {

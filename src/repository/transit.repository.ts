@@ -11,7 +11,7 @@ export class TransitRepository extends Repository<Transit> {
     from: number,
     to: number,
   ): Promise<Transit[]> {
-    //TODO: implement query
+    // TODO: implement query
     console.log({ driver, from, to });
     return [];
   }
@@ -21,7 +21,7 @@ export class TransitRepository extends Repository<Transit> {
     from: Address,
     status: Status,
   ): Promise<Transit[]> {
-    //TODO: implement query
+    // TODO: implement query
     console.log({ client, from, status });
     return [];
   }
@@ -32,7 +32,7 @@ export class TransitRepository extends Repository<Transit> {
     when: number,
     status: Status,
   ): Promise<Transit[]> {
-    //TODO: implement query
+    // TODO: implement query
     console.log({ client, from, when, status });
     return [];
   }

@@ -38,6 +38,7 @@ import { ContractRepository } from './repository/contract.repository';
 import { TransitAnalyzerService } from './service/transit-analyzer.service';
 import { AwardsService } from './service/awards.service';
 import { ClaimService } from './service/claim.service';
+import { ContractService } from './service/contract.service';
 
 @Module({
   imports: [
@@ -97,6 +98,7 @@ import { ClaimService } from './service/claim.service';
     TransitAnalyzerService,
     AwardsService,
     ClaimService,
+    ContractService,
   ],
 })
 export class AppModule {}
