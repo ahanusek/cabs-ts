@@ -21,6 +21,10 @@ import { DriverNotificationService } from './service/driver-notification.service
 import { GeocodingService } from './service/geocoding.service';
 import { ClaimNumberGenerator } from './service/claim-number-generator.service';
 import { ClaimRepository } from './repository/claim.repository';
+import { ClientNotificationService } from './service/client-notification.service';
+import { ClientService } from './service/client.service';
+import { ClientRepository } from './repository/client.repository';
+import { ClientController } from './controllers/client.controller';
 
 @Module({
   imports: [
@@ -42,6 +46,7 @@ import { ClaimRepository } from './repository/claim.repository';
       CarTypeRepository,
       InvoiceRepository,
       ClaimRepository,
+      ClientRepository,
       DriverFee,
       DriverAttribute,
       Transit,
@@ -50,7 +55,7 @@ import { ClaimRepository } from './repository/claim.repository';
       Claim,
     ]),
   ],
-  controllers: [DriverController, CarTypeController],
+  controllers: [DriverController, CarTypeController, ClientController],
   providers: [
     AppProperties,
     DriverService,
@@ -60,6 +65,8 @@ import { ClaimRepository } from './repository/claim.repository';
     DriverNotificationService,
     GeocodingService,
     ClaimNumberGenerator,
+    ClientNotificationService,
+    ClientService,
   ],
 })
 export class AppModule {}

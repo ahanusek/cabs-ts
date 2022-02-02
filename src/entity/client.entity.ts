@@ -32,7 +32,7 @@ export class Client extends BaseEntity {
   @Column()
   private defaultPaymentType: PaymentType;
 
-  @Column()
+  @Column({ type: 'enum', enum: ClientType, default: ClientType.INDIVIDUAL })
   private clientType: ClientType;
 
   @OneToMany(() => Claim, (claim) => claim.owner)
