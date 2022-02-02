@@ -35,6 +35,7 @@ import { AwardedMilesRepository } from './repository/awarded-miles.repository';
 import { AwardsAccountRepository } from './repository/awards-account.repository';
 import { ContractAttachmentRepository } from './repository/contract-attachment.repository';
 import { ContractRepository } from './repository/contract.repository';
+import { TransitAnalyzerService } from './service/transit-analyzer.service';
 
 @Module({
   imports: [
@@ -91,6 +92,7 @@ import { ContractRepository } from './repository/contract.repository';
     DriverSessionService,
     DriverFeeService,
     DriverTrackingService,
+    TransitAnalyzerService,
   ],
 })
 export class AppModule {}
