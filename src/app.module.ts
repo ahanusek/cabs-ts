@@ -19,6 +19,8 @@ import { InvoiceRepository } from './repository/invoice.repository';
 import { InvoiceGenerator } from './service/invoice-generator.service';
 import { DriverNotificationService } from './service/driver-notification.service';
 import { GeocodingService } from './service/geocoding.service';
+import { ClaimNumberGenerator } from './service/claim-number-generator.service';
+import { ClaimRepository } from './repository/claim.repository';
 
 @Module({
   imports: [
@@ -39,6 +41,7 @@ import { GeocodingService } from './service/geocoding.service';
       DriverRepository,
       CarTypeRepository,
       InvoiceRepository,
+      ClaimRepository,
       DriverFee,
       DriverAttribute,
       Transit,
@@ -56,6 +59,7 @@ import { GeocodingService } from './service/geocoding.service';
     InvoiceGenerator,
     DriverNotificationService,
     GeocodingService,
+    ClaimNumberGenerator,
   ],
 })
 export class AppModule {}
