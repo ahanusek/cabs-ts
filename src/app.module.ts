@@ -32,6 +32,7 @@ import { DriverFeeService } from './service/driver-fee.service';
 import { DriverPositionRepository } from './repository/driver-position.repository';
 import { DriverTrackingService } from './service/driver-tracking.service';
 import { DriverTrackingController } from './controllers/driver-tracking.controller';
+import { ClaimAttachmentRepository } from './repository/claim-attachment.repository';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { DriverTrackingController } from './controllers/driver-tracking.controll
       DriverFeeRepository,
       TransitRepository,
       DriverPositionRepository,
+      ClaimAttachmentRepository,
       DriverAttribute,
       Address,
       Client,
