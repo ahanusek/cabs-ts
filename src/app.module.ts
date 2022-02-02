@@ -29,6 +29,9 @@ import { DriverSessionController } from './controllers/driver-session.controller
 import { DriverFeeRepository } from './repository/driver-fee.repository';
 import { TransitRepository } from './repository/transit.repository';
 import { DriverFeeService } from './service/driver-fee.service';
+import { DriverPositionRepository } from './repository/driver-position.repository';
+import { DriverTrackingService } from './service/driver-tracking.service';
+import { DriverTrackingController } from './controllers/driver-tracking.controller';
 
 @Module({
   imports: [
@@ -54,6 +57,7 @@ import { DriverFeeService } from './service/driver-fee.service';
       DriverSessionRepository,
       DriverFeeRepository,
       TransitRepository,
+      DriverPositionRepository,
       DriverAttribute,
       Address,
       Client,
@@ -65,6 +69,7 @@ import { DriverFeeService } from './service/driver-fee.service';
     CarTypeController,
     ClientController,
     DriverSessionController,
+    DriverTrackingController,
   ],
   providers: [
     AppProperties,
@@ -79,6 +84,7 @@ import { DriverFeeService } from './service/driver-fee.service';
     ClientService,
     DriverSessionService,
     DriverFeeService,
+    DriverTrackingService,
   ],
 })
 export class AppModule {}
