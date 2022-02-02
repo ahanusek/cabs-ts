@@ -7,7 +7,7 @@ export class Address extends BaseEntity {
   @Column()
   private country: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'varchar' })
   private district: string | null;
 
   @Column()
@@ -19,7 +19,7 @@ export class Address extends BaseEntity {
   @Column()
   private buildingNumber: number;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'integer' })
   private additionalNumber: number | null;
 
   @Column()

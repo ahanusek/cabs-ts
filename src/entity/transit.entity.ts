@@ -82,10 +82,10 @@ export class Transit extends BaseEntity {
   @OneToOne(() => Address)
   private to: Address;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'integer' })
   public acceptedAt: number | null;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'integer' })
   public started: number | null;
 
   @Column({ default: 0 })
@@ -103,8 +103,8 @@ export class Transit extends BaseEntity {
   @Column({ nullable: true, type: 'varchar' })
   public factor: number | null;
 
-  @Column({ nullable: true })
-  private km: number | null;
+  @Column({ nullable: false, default: 0 })
+  private km: number;
 
   // https://stackoverflow.com/questions/37107123/sould-i-store-price-as-decimal-or-integer-in-mysql
   @Column({ nullable: true, type: 'integer' })
@@ -364,7 +364,7 @@ export class Transit extends BaseEntity {
       }
     }
     const priceBigDecimal = Number(
-      ((this.km ?? 0) * kmRate * factorToCalculate + baseFee).toFixed(2),
+      (this.km * kmRate * factorToCalculate + baseFee).toFixed(2),
     );
     this.price = priceBigDecimal;
     return this.price;

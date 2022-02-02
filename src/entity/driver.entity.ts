@@ -28,7 +28,7 @@ export class Driver extends BaseEntity {
   @Column()
   private driverLicense: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'varchar' })
   private photo: string | null;
 
   @Column()

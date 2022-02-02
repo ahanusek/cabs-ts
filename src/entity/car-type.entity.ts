@@ -19,7 +19,7 @@ export class CarType extends BaseEntity {
   @Column()
   private carClass: CarClass;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'varchar' })
   private description: string | null;
 
   @Column({ default: CarStatus.INACTIVE })
