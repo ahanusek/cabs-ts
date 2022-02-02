@@ -4,13 +4,11 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { Driver } from '../entity/driver.entity';
+import { Driver, DriverStatus, DriverType } from '../entity/driver.entity';
 import { DriverDto } from '../dto/driver.dto';
-import { DriverStatus, DriverType } from '../models/driver.model';
 import { CreateDriverDto } from '../dto/create-driver.dto';
 import { DriverRepository } from '../repository/driver.repository';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Transaction } from 'typeorm';
 
 @Injectable()
 export class DriverService {

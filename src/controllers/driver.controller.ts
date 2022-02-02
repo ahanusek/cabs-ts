@@ -10,7 +10,7 @@ import {
 import { DriverService } from '../service/driver.service';
 import { CreateDriverDto } from '../dto/create-driver.dto';
 import { DriverDto } from '../dto/driver.dto';
-import { DriverStatus } from '../models/driver.model';
+import { DriverStatus } from '../entity/driver.entity';
 
 @Controller('drivers')
 export class DriverController {

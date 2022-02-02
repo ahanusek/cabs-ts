@@ -1,6 +1,18 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from '../common/base.entity';
-import { DriverStatus, DriverType } from '../models/driver.model';
+import { Transit } from './transit.entity';
+import { DriverAttribute } from './driver-attribute.entity';
+import { DriverFee } from './driver-fee.entity';
+
+export enum DriverStatus {
+  INACTIVE = 'inactive',
+  ACTIVE = 'active',
+}
+
+export enum DriverType {
+  CANDIDATE = 'candidate',
+  REGULAR = 'regular',
+}
 
 @Entity()
 export class Driver extends BaseEntity {
@@ -24,6 +36,30 @@ export class Driver extends BaseEntity {
 
   @Column({ default: false })
   private isOccupied: boolean;
+
+  @OneToOne(() => DriverFee, (fee) => fee.driver, { eager: false })
+  @JoinColumn()
+  public fee: DriverFee;
+
+  public getAttributes() {
+    return this.attributes;
+  }
+
+  public setAttributes(attributes: Set<DriverAttribute>) {
+    this.attributes = attributes;
+  }
+
+  @OneToMany(() => DriverAttribute, (driverAttribute) => driverAttribute.driver)
+  public attributes: Set<DriverAttribute>;
+
+  @OneToMany(() => Transit, (transit) => transit.driver)
+  public transits: Set<Transit>;
+
+  public calculateEarningsForTransit(transit: Transit) {
+    console.log(transit);
+    return null;
+    // zdublować kod wyliczenia kosztu przejazdu
+  }
 
   public setLastName(lastName: string) {
     this.lastName = lastName;
@@ -71,5 +107,13 @@ export class Driver extends BaseEntity {
 
   public getPhoto() {
     return this.photo;
+  }
+
+  public getFee() {
+    return this.fee;
+  }
+
+  public setFee(fee: DriverFee) {
+    this.fee = fee;
   }
 }

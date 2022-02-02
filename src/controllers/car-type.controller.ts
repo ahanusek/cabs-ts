@@ -13,7 +13,7 @@ import { Response } from 'express';
 import { CarTypeService } from '../service/car-type.service';
 import { CreateCarTypeDto } from '../dto/create-car-type.dto';
 import { CarTypeDto } from '../dto/car-type.dto';
-import { CarClass } from '../models/car-type.model';
+import { CarClass } from '../entity/car-type.entity';
 
 @Controller('cartypes')
 export class CarTypeController {

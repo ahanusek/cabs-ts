@@ -1,7 +1,18 @@
 import { NotAcceptableException } from '@nestjs/common';
 import { Column, Entity } from 'typeorm';
 import { BaseEntity } from '../common/base.entity';
-import { CarClass, CarStatus } from '../models/car-type.model';
+
+export enum CarClass {
+  ECO = 'eco',
+  REGULAR = 'regular',
+  VAN = 'van',
+  PREMIUM = 'premium',
+}
+
+export enum CarStatus {
+  INACTIVE = 'inactive',
+  ACTIVE = 'active',
+}
 
 @Entity()
 export class CarType extends BaseEntity {
