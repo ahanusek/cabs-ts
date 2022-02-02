@@ -8,9 +8,7 @@ import { AppProperties } from './config/app-properties.config';
 import { CarTypeRepository } from './repository/car-type.repository';
 import { CarTypeController } from './controllers/car-type.controller';
 import { CarTypeService } from './service/car-type.service';
-import { DriverFee } from './entity/driver-fee.entity';
 import { DriverAttribute } from './entity/driver-attribute.entity';
-import { Transit } from './entity/transit.entity';
 import { Address } from './entity/address.entity';
 import { Client } from './entity/client.entity';
 import { Claim } from './entity/claim.entity';
@@ -28,6 +26,9 @@ import { ClientController } from './controllers/client.controller';
 import { DriverSessionService } from './service/driver-session.service';
 import { DriverSessionRepository } from './repository/driver-session.repository';
 import { DriverSessionController } from './controllers/driver-session.controller';
+import { DriverFeeRepository } from './repository/driver-fee.repository';
+import { TransitRepository } from './repository/transit.repository';
+import { DriverFeeService } from './service/driver-fee.service';
 
 @Module({
   imports: [
@@ -51,9 +52,9 @@ import { DriverSessionController } from './controllers/driver-session.controller
       ClaimRepository,
       ClientRepository,
       DriverSessionRepository,
-      DriverFee,
+      DriverFeeRepository,
+      TransitRepository,
       DriverAttribute,
-      Transit,
       Address,
       Client,
       Claim,
@@ -77,6 +78,7 @@ import { DriverSessionController } from './controllers/driver-session.controller
     ClientNotificationService,
     ClientService,
     DriverSessionService,
+    DriverFeeService,
   ],
 })
 export class AppModule {}
