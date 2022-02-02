@@ -14,6 +14,7 @@ import { Transit } from './entity/transit.entity';
 import { Address } from './entity/address.entity';
 import { Client } from './entity/client.entity';
 import { Claim } from './entity/claim.entity';
+import { DistanceCalculator } from './service/distance-calculator.service';
 
 @Module({
   imports: [
@@ -42,6 +43,6 @@ import { Claim } from './entity/claim.entity';
     ]),
   ],
   controllers: [DriverController, CarTypeController],
-  providers: [AppProperties, DriverService, CarTypeService],
+  providers: [AppProperties, DriverService, CarTypeService, DistanceCalculator],
 })
 export class AppModule {}
