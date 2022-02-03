@@ -601,6 +601,16 @@ export class TransitService {
     }
   }
 
+  public async loadTransit(transitId: string) {
+    const transit = await this.transitRepository.findOne(transitId);
+
+    if (!transit) {
+      throw new NotFoundException('Transit does not exist, id = ' + transitId);
+    }
+
+    return new TransitDto(transit);
+  }
+
   private async addressFromDto(addressDTO: AddressDto) {
     const address = addressDTO.toAddressEntity();
     return this.addressRepository.save(address);

@@ -4,8 +4,8 @@ import { ClaimDto } from './claim.dto';
 import { AddressDto } from './address.dto';
 import { CarClass } from '../entity/car-type.entity';
 import { ClientDto } from './client.dto';
-import dayjs from 'dayjs';
-import dayOfYear from 'dayjs/plugin/dayOfYear';
+import * as dayjs from 'dayjs';
+import * as dayOfYear from 'dayjs/plugin/dayOfYear';
 import { NotAcceptableException } from '@nestjs/common';
 
 dayjs.extend(dayOfYear);

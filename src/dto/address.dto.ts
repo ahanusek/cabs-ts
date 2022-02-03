@@ -17,29 +17,34 @@ export class AddressDto {
 
   public name: string;
 
-  public constructor(a: Address) {
-    this.country = a.getCountry();
-    this.district = a.getDistrict();
-    this.city = a.getCity();
-    this.street = a.getStreet();
-    this.buildingNumber = a.getBuildingNumber();
-    this.additionalNumber = a.getAdditionalNumber();
-    this.postalCode = a.getPostalCode();
-    this.name = a.getName();
-  }
-
-  public fromDto(
-    country: string,
-    city: string,
-    street: string,
-    buildingNumber: number,
+  public constructor(
+    a:
+      | Address
+      | {
+          country: string;
+          city: string;
+          street: string;
+          buildingNumber: number;
+          postalCode: string;
+        },
   ) {
-    this.country = country;
-    this.city = city;
-    this.street = street;
-    this.buildingNumber = buildingNumber;
+    if (a instanceof Address) {
+      this.country = a.getCountry();
+      this.district = a.getDistrict();
+      this.city = a.getCity();
+      this.street = a.getStreet();
+      this.buildingNumber = a.getBuildingNumber();
+      this.additionalNumber = a.getAdditionalNumber();
+      this.postalCode = a.getPostalCode();
+      this.name = a.getName();
+    } else {
+      this.country = a.country;
+      this.city = a.city;
+      this.street = a.street;
+      this.buildingNumber = a.buildingNumber;
+      this.postalCode = a.postalCode;
+    }
   }
-
   public getCountry() {
     return this.country;
   }

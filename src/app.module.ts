@@ -41,6 +41,7 @@ import { ClaimService } from './service/claim.service';
 import { ContractService } from './service/contract.service';
 import { TransitService } from './service/transit.service';
 import { TransitAnalyzerController } from './controllers/transit-analyzer.controller';
+import { TransitController } from './controllers/transit.controller';
 
 @Module({
   imports: [
@@ -83,6 +84,7 @@ import { TransitAnalyzerController } from './controllers/transit-analyzer.contro
     DriverSessionController,
     DriverTrackingController,
     TransitAnalyzerController,
+    TransitController,
   ],
   providers: [
     AppProperties,
