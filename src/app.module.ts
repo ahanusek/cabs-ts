@@ -42,6 +42,7 @@ import { ContractService } from './service/contract.service';
 import { TransitService } from './service/transit.service';
 import { TransitAnalyzerController } from './controllers/transit-analyzer.controller';
 import { TransitController } from './controllers/transit.controller';
+import { AwardsAccountController } from './controllers/awards-account.controller';
 
 @Module({
   imports: [
@@ -85,6 +86,7 @@ import { TransitController } from './controllers/transit.controller';
     DriverTrackingController,
     TransitAnalyzerController,
     TransitController,
+    AwardsAccountController,
   ],
   providers: [
     AppProperties,
