@@ -45,6 +45,7 @@ import { TransitController } from './controllers/transit.controller';
 import { AwardsAccountController } from './controllers/awards-account.controller';
 import { ClaimController } from './controllers/claim.controller';
 import { ContractController } from './controllers/contract.controller';
+import { DriverReportController } from './controllers/driver-report.controller';
 
 @Module({
   imports: [
@@ -91,6 +92,7 @@ import { ContractController } from './controllers/contract.controller';
     AwardsAccountController,
     ClaimController,
     ContractController,
+    DriverReportController,
   ],
   providers: [
     AppProperties,

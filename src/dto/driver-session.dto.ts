@@ -12,7 +12,7 @@ export class DriverSessionDto {
 
   private carBrand: string;
 
-  public DriverSessionDTO(session: DriverSession) {
+  constructor(session: DriverSession) {
     this.carBrand = session.getCarBrand();
     this.platesNumber = session.getPlatesNumber();
     this.loggedAt = session.getLoggedAt();

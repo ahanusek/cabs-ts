@@ -3,7 +3,7 @@ import { DriverAttributeDto } from './driver-attribute.dto';
 import { DriverSessionDto } from './driver-session.dto';
 import { TransitDto } from './transit.dto';
 
-export class DriverReportDto {
+export class DriverReport {
   public driverDto: DriverDto;
 
   public attributes: DriverAttributeDto[] = [];

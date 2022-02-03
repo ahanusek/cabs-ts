@@ -124,4 +124,8 @@ export class Driver extends BaseEntity {
   public setOccupied(isOccupied: boolean) {
     this.isOccupied = isOccupied;
   }
+
+  public getTransits() {
+    return this.transits;
+  }
 }
