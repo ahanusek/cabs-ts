@@ -17,7 +17,7 @@ export class DriverSessionRepository extends Repository<DriverSession> {
   public async findTopByDriverAndLoggedOutAtIsNullOrderByLoggedAtDesc(
     driver: Driver,
   ): Promise<DriverSession> {
-    // TODO: fix to proper query
+    // TODO: fix to proper query (comment for fork)
     const session = await this.findOne({ where: { driver } });
 
     if (!session) {
@@ -30,7 +30,7 @@ export class DriverSessionRepository extends Repository<DriverSession> {
     driver: Driver,
     since: number,
   ): Promise<DriverSession[]> {
-    // TODO: implement query
+    // TODO: implement query (comment for fork)
     console.log('To implement...', driver, since);
     return [];
   }

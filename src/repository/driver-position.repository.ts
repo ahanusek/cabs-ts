@@ -12,7 +12,7 @@ export class DriverPositionRepository extends Repository<DriverPosition> {
     longitudeMax: number,
     date: number,
   ): Promise<DriverPositionV2Dto[]> {
-    //TODO: implement query
+    //TODO: implement query (comment for fork)
     //SELECT new io.legacyfighter.cabs.dto.DriverPositionDTOV2(p.driver, avg(p.latitude), avg(p.longitude), max(p.seenAt)) FROM DriverPosition p where p.latitude between ?1 and ?2 and p.longitude between ?3 and ?4 and p.seenAt >= ?5 group by p.driver.id
     console.log({ latitudeMin, latitudeMax, longitudeMin, longitudeMax, date });
     return [];
@@ -23,7 +23,7 @@ export class DriverPositionRepository extends Repository<DriverPosition> {
     from: number,
     to: number,
   ): Promise<DriverPosition[]> {
-    //TODO: implement query
+    //TODO: implement query (comment for fork)
     console.log({ driver, from, to });
     return [];
   }

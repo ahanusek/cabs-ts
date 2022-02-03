@@ -24,6 +24,7 @@ import { Status, Transit } from '../entity/transit.entity';
 import { DriverNotificationService } from './driver-notification.service';
 import dayjs from 'dayjs';
 import { DriverStatus } from '../entity/driver.entity';
+import { DriverPositionV2Dto } from '../dto/driver-position-v2.dto';
 
 @Injectable()
 export class TransitService {
@@ -353,12 +354,27 @@ export class TransitService {
             );
 
           if (driversAvgPositions.length) {
-            // TODO: fix sorting
-            // const comparator = (d1: DriverPositionV2Dto, d2: DriverPositionV2Dto) => Double.compare(
-            //   Math.sqrt(Math.pow(latitude - d1.getLatitude(), 2) + Math.pow(longitude - d1.getLongitude(), 2)),
-            //   Math.sqrt(Math.pow(latitude - d2.getLatitude(), 2) + Math.pow(longitude - d2.getLongitude(), 2))
-            // );
-            // driversAvgPositions.sort(comparator);
+            const comparator = (
+              d1: DriverPositionV2Dto,
+              d2: DriverPositionV2Dto,
+            ) => {
+              const a = Math.sqrt(
+                Math.pow(latitude - d1.getLatitude(), 2) +
+                  Math.pow(longitude - d1.getLongitude(), 2),
+              );
+              const b = Math.sqrt(
+                Math.pow(latitude - d2.getLatitude(), 2) +
+                  Math.pow(longitude - d2.getLongitude(), 2),
+              );
+              if (a < b) {
+                return -1;
+              }
+              if (a > b) {
+                return 1;
+              }
+              return 0;
+            };
+            driversAvgPositions.sort(comparator);
             driversAvgPositions = driversAvgPositions.slice(0, 20);
 
             const carClasses: CarClass[] = [];

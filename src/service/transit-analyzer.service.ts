@@ -82,8 +82,6 @@ export class TransitAnalyzerService {
       return [t.getTo()];
     }
 
-    // TODO:verify ts solution
-    // https://github.com/legacyfighter/cabs-java/blob/start/src/main/java/io/legacyfighter/cabs/service/TransitAnalyzer.java#L76
     const mappedTs: Address[][] = [];
 
     for (const _t of ts) {

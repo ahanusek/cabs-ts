@@ -14,6 +14,7 @@ import { AwardedMilesRepository } from '../repository/awarded-miles.repository';
 import { AwardsAccount } from '../entity/awards-account.entity';
 import dayjs from 'dayjs';
 import { Client, Type } from '../entity/client.entity';
+import orderBy from 'lodash.orderby';
 
 export interface IAwardsService {
   findBy: (clientId: string) => Promise<AwardsAccountDto>;
@@ -160,22 +161,36 @@ export class AwardsService implements IAwardsService {
     } else {
       const balance = await this.calculateBalance(clientId);
       if (balance >= miles && account.isAwardActive()) {
-        const milesList = await this.milesRepository.findAllByClient(client);
+        let milesList = await this.milesRepository.findAllByClient(client);
         const transitsCounter = (
           await this.transitRepository.findByClient(client)
         ).length;
 
-        // TODO:add sorter implementation in TS
+        // TODO: verify below sorter
         if (client.getClaims().length >= 3) {
           // milesList.sort(Comparator.comparing(AwardedMiles::getExpirationDate, Comparators.nullsHigh()).reversed().thenComparing(Comparators.nullsHigh()));
+          milesList = orderBy(milesList, [(item) => item.getExpirationDate()]);
         } else if (client.getType() === Type.VIP) {
           // milesList.sort(Comparator.comparing(AwardedMiles::isSpecial).thenComparing(AwardedMiles::getExpirationDate, Comparators.nullsLow()));
+          milesList = orderBy(milesList, [
+            (item) => item.getSpecial(),
+            (item) => item.getExpirationDate(),
+          ]);
         } else if (transitsCounter >= 15 && this.isSunday()) {
           // milesList.sort(Comparator.comparing(AwardedMiles::isSpecial).thenComparing(AwardedMiles::getExpirationDate, Comparators.nullsLow()));
+          milesList = orderBy(milesList, [
+            (item) => item.getSpecial(),
+            (item) => item.getExpirationDate(),
+          ]);
         } else if (transitsCounter >= 15) {
           // milesList.sort(Comparator.comparing(AwardedMiles::isSpecial).thenComparing(AwardedMiles::getDate));
+          milesList = orderBy(milesList, [
+            (item) => item.getSpecial(),
+            (item) => item.getDate(),
+          ]);
         } else {
           // milesList.sort(Comparator.comparing(AwardedMiles::getDate));
+          milesList = orderBy(milesList, (item) => item.getDate());
         }
         for (const iter of milesList) {
           if (miles <= 0) {
