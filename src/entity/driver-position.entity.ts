@@ -2,19 +2,21 @@ import { BaseEntity } from '../common/base.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { Driver } from './driver.entity';
 
+/* eslint-disable @typescript-eslint/explicit-member-accessibility */
+
 @Entity()
 export class DriverPosition extends BaseEntity {
   @ManyToOne(() => Driver)
-  private driver: Driver;
+  driver: Driver;
 
   @Column()
-  private latitude: number;
+  latitude: number;
 
   @Column()
-  private longitude: number;
+  longitude: number;
 
   @Column({ type: 'bigint' })
-  private seenAt: number;
+  seenAt: number;
 
   public getDriver() {
     return this.driver;

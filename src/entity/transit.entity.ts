@@ -54,6 +54,8 @@ export enum DayOfWeek {
   SATURDAY,
 }
 
+/* eslint-disable @typescript-eslint/explicit-member-accessibility */
+
 @Entity()
 export class Transit extends BaseEntity {
   public static readonly BASE_FEE = 8;
@@ -117,7 +119,7 @@ export class Transit extends BaseEntity {
   private driversFee: number;
 
   @Column()
-  private dateTime: number;
+  dateTime: number;
 
   @Column()
   private published: number;

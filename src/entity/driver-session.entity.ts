@@ -3,10 +3,12 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 import { Driver } from './driver.entity';
 import { CarClass } from './car-type.entity';
 
+/* eslint-disable @typescript-eslint/explicit-member-accessibility */
+
 @Entity()
 export class DriverSession extends BaseEntity {
   @Column()
-  private loggedAt: number;
+  loggedAt: number;
 
   @Column({ nullable: true, type: 'bigint' })
   private loggedOutAt: number | null;
