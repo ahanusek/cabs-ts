@@ -1,4 +1,4 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { Between, EntityRepository, Repository } from 'typeorm';
 import { Status, Transit } from '../entity/transit.entity';
 import { Driver } from '../entity/driver.entity';
 import { Client } from '../entity/client.entity';
@@ -11,9 +11,12 @@ export class TransitRepository extends Repository<Transit> {
     from: number,
     to: number,
   ): Promise<Transit[]> {
-    // TODO: implement query (comment for fork)
-    console.log({ driver, from, to });
-    return [];
+    return await this.find({
+      where: {
+        driver,
+        dateTime: Between(from, to),
+      },
+    });
   }
 
   public async findAllByClientAndFromAndStatusOrderByDateTimeDesc(
@@ -21,9 +24,16 @@ export class TransitRepository extends Repository<Transit> {
     from: Address,
     status: Status,
   ): Promise<Transit[]> {
-    // TODO: implement query (comment for fork)
-    console.log({ client, from, status });
-    return [];
+    return await this.find({
+      where: {
+        client,
+        address: from,
+        status,
+      },
+      order: {
+        dateTime: 'DESC',
+      },
+    });
   }
 
   public async findAllByClientAndFromAndPublishedAfterAndStatusOrderByDateTimeDesc(
@@ -32,14 +42,24 @@ export class TransitRepository extends Repository<Transit> {
     when: number,
     status: Status,
   ): Promise<Transit[]> {
-    // TODO: implement query (comment for fork)
-    console.log({ client, from, when, status });
-    return [];
+    return this.find({
+      where: {
+        client,
+        from,
+        status,
+        published: when,
+      },
+      order: {
+        dateTime: 'DESC',
+      },
+    });
   }
 
   public async findByClient(client: Client): Promise<Transit[]> {
-    // TODO: implement query (comment for fork)
-    console.log({ client });
-    return [];
+    return this.find({
+      where: {
+        client,
+      },
+    });
   }
 }

@@ -6,7 +6,7 @@ import { CarClass } from './car-type.entity';
 @Entity()
 export class DriverSession extends BaseEntity {
   @Column()
-  private loggedAt: number;
+  public loggedAt: number;
 
   @Column({ nullable: true, type: 'bigint' })
   private loggedOutAt: number | null;

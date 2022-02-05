@@ -1,4 +1,4 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository, MoreThan, Repository, IsNull } from 'typeorm';
 import { DriverSession } from '../entity/driver-session.entity';
 import { CarClass } from '../entity/car-type.entity';
 import { Driver } from '../entity/driver.entity';
@@ -17,8 +17,12 @@ export class DriverSessionRepository extends Repository<DriverSession> {
   public async findTopByDriverAndLoggedOutAtIsNullOrderByLoggedAtDesc(
     driver: Driver,
   ): Promise<DriverSession> {
-    // TODO: fix to proper query (comment for fork)
-    const session = await this.findOne({ where: { driver } });
+    const session = await this.findOne({
+      where: { driver, loggedOutAt: IsNull() },
+      order: {
+        loggedAt: 'DESC',
+      },
+    });
 
     if (!session) {
       throw new NotFoundException(`Session for ${driver.getId()} not exists`);
@@ -30,9 +34,12 @@ export class DriverSessionRepository extends Repository<DriverSession> {
     driver: Driver,
     since: number,
   ): Promise<DriverSession[]> {
-    // TODO: implement query (comment for fork)
-    console.log('To implement...', driver, since);
-    return [];
+    return this.find({
+      where: {
+        driver,
+        loggedAt: MoreThan(since),
+      },
+    });
   }
 
   public async findByDriver(driver: Driver): Promise<DriverSession[]> {

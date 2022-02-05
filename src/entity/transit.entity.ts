@@ -117,7 +117,7 @@ export class Transit extends BaseEntity {
   private driversFee: number;
 
   @Column()
-  private dateTime: number;
+  public dateTime: number;
 
   @Column()
   private published: number;

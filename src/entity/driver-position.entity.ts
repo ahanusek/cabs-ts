@@ -5,16 +5,16 @@ import { Driver } from './driver.entity';
 @Entity()
 export class DriverPosition extends BaseEntity {
   @ManyToOne(() => Driver)
-  private driver: Driver;
+  public driver: Driver;
 
   @Column()
-  private latitude: number;
+  public latitude!: number;
 
   @Column()
-  private longitude: number;
+  public longitude: number;
 
   @Column({ type: 'bigint' })
-  private seenAt: number;
+  public seenAt: number;
 
   public getDriver() {
     return this.driver;
