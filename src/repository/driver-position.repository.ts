@@ -27,12 +27,14 @@ export class DriverPositionRepository extends EntityRepository<DriverPosition> {
         seenAt: { $gte: date },
       })
       .groupBy('dp.driver')
-      .execute<{
-        driver: Driver;
-        avgLatitude: number;
-        avgLongitude: number;
-        maxSeenAt: number;
-      }[]>();
+      .execute<
+        {
+          driver: Driver;
+          avgLatitude: number;
+          avgLongitude: number;
+          maxSeenAt: number;
+        }[]
+      >();
 
     return results.map(
       (dp) =>
