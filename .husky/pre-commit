@@ -1,6 +1,3 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-yarn tsc
-yarn format
-yarn lint
+npm run check-types
+npm run format
+npm run lint
