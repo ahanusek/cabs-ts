@@ -35,12 +35,16 @@ export class DriverSessionService {
     session.setPlatesNumber(plateNumber);
     session.setCarBrand(carBrand);
     await this.carTypeService.registerActiveCar(session.getCarClass());
-    await this.driverSessionRepository.getEntityManager().persistAndFlush(session);
+    await this.driverSessionRepository
+      .getEntityManager()
+      .persistAndFlush(session);
     return session;
   }
 
   public async logOut(sessionId: string) {
-    const session = await this.driverSessionRepository.findOne({ id: sessionId });
+    const session = await this.driverSessionRepository.findOne({
+      id: sessionId,
+    });
     if (!session) {
       throw new NotFoundException('Session does not exist');
     }

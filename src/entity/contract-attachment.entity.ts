@@ -30,7 +30,10 @@ export class ContractAttachment extends BaseEntity {
   @Property({ nullable: true, type: 'bigint' })
   private changeDate?: number;
 
-  @Enum({ items: () => ContractAttachmentStatus, default: ContractAttachmentStatus.PROPOSED })
+  @Enum({
+    items: () => ContractAttachmentStatus,
+    default: ContractAttachmentStatus.PROPOSED,
+  })
   private status: ContractAttachmentStatus = ContractAttachmentStatus.PROPOSED;
 
   public getData() {

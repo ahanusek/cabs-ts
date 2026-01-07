@@ -1,4 +1,11 @@
-import { Entity, Property, OneToMany, OneToOne, Collection, Enum } from '@mikro-orm/core';
+import {
+  Entity,
+  Property,
+  OneToMany,
+  OneToOne,
+  Collection,
+  Enum,
+} from '@mikro-orm/core';
 import { BaseEntity } from '../common/base.entity';
 import { Transit } from './transit.entity';
 import { DriverAttribute } from './driver-attribute.entity';
@@ -38,7 +45,10 @@ export class Driver extends BaseEntity {
   @Property({ default: false })
   private isOccupied: boolean = false;
 
-  @OneToOne(() => DriverFee, (fee) => fee.driver, { owner: true, nullable: true })
+  @OneToOne(() => DriverFee, (fee) => fee.driver, {
+    owner: true,
+    nullable: true,
+  })
   public fee?: DriverFee;
 
   @OneToMany(() => DriverAttribute, (driverAttribute) => driverAttribute.driver)

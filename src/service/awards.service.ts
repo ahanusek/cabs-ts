@@ -251,7 +251,9 @@ export class AwardsService implements IAwardsService {
     toClientId: string,
     miles: number,
   ) {
-    const fromClient = await this.clientRepository.findOne({ id: fromClientId });
+    const fromClient = await this.clientRepository.findOne({
+      id: fromClientId,
+    });
     if (!fromClient) {
       throw new NotFoundException(
         `Client with id ${fromClientId} doest not exists`,

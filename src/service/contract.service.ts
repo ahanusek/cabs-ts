@@ -45,9 +45,8 @@ export class ContractService {
 
   public async acceptContract(id: string) {
     const contract = await this.find(id);
-    const attachments = await this.contractAttachmentRepository.findByContract(
-      contract,
-    );
+    const attachments =
+      await this.contractAttachmentRepository.findByContract(contract);
     if (
       attachments.every(
         (a) =>
@@ -71,7 +70,9 @@ export class ContractService {
   }
 
   public async rejectAttachment(attachmentId: string) {
-    const contractAttachment = await this.contractAttachmentRepository.findOne({ id: attachmentId });
+    const contractAttachment = await this.contractAttachmentRepository.findOne({
+      id: attachmentId,
+    });
     if (!contractAttachment) {
       throw new NotFoundException('Contract attachment does not exist');
     }
@@ -81,7 +82,9 @@ export class ContractService {
   }
 
   public async acceptAttachment(attachmentId: string) {
-    const contractAttachment = await this.contractAttachmentRepository.findOne({ id: attachmentId });
+    const contractAttachment = await this.contractAttachmentRepository.findOne({
+      id: attachmentId,
+    });
     if (!contractAttachment) {
       throw new NotFoundException('Contract attachment does not exist');
     }
@@ -126,7 +129,9 @@ export class ContractService {
     const contractAttachment = new ContractAttachment();
     contractAttachment.setContract(contract);
     contractAttachment.setData(contractAttachmentDto.data);
-    await this.contractAttachmentRepository.getEntityManager().persistAndFlush(contractAttachment);
+    await this.contractAttachmentRepository
+      .getEntityManager()
+      .persistAndFlush(contractAttachment);
     contract.getAttachments().push(contractAttachment);
     await this.contractRepository.getEntityManager().flush();
     return new ContractAttachmentDto(contractAttachment);
@@ -134,9 +139,13 @@ export class ContractService {
 
   public async removeAttachment(contractId: string, attachmentId: string) {
     //TODO sprawdzenie czy nalezy do kontraktu (JIRA: II-14455)
-    const attachment = await this.contractAttachmentRepository.findOne({ id: attachmentId });
+    const attachment = await this.contractAttachmentRepository.findOne({
+      id: attachmentId,
+    });
     if (attachment) {
-      await this.contractAttachmentRepository.getEntityManager().removeAndFlush(attachment);
+      await this.contractAttachmentRepository
+        .getEntityManager()
+        .removeAndFlush(attachment);
     }
   }
 }

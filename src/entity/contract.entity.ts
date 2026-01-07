@@ -36,7 +36,10 @@ export class Contract extends BaseEntity {
   @Property({ nullable: true, type: 'bigint' })
   public changeDate: number | null = null;
 
-  @Enum({ items: () => ContractStatus, default: ContractStatus.NEGOTIATIONS_IN_PROGRESS })
+  @Enum({
+    items: () => ContractStatus,
+    default: ContractStatus.NEGOTIATIONS_IN_PROGRESS,
+  })
   public status: ContractStatus = ContractStatus.NEGOTIATIONS_IN_PROGRESS;
 
   @Property()

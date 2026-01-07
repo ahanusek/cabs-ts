@@ -10,9 +10,8 @@ export class ContractController {
 
   @Post()
   public async create(@Body() createContractDto: CreateContractDto) {
-    const created = await this.contractService.createContract(
-      createContractDto,
-    );
+    const created =
+      await this.contractService.createContract(createContractDto);
     return new ContractDto(created);
   }
 

@@ -43,7 +43,8 @@ export class CarType extends BaseEntity {
     super();
     if (carClass) this.carClass = carClass;
     if (description) this.description = description;
-    if (minNoOfCarsToActivateClass) this.minNoOfCarsToActivateClass = minNoOfCarsToActivateClass;
+    if (minNoOfCarsToActivateClass)
+      this.minNoOfCarsToActivateClass = minNoOfCarsToActivateClass;
   }
 
   public registerActiveCar() {

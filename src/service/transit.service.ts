@@ -330,7 +330,7 @@ export class TransitService {
 
           try {
             geocoded = this.geocodingService.geocodeAddress(transit.getFrom());
-          } catch (e) {
+          } catch (_e) {
             // Geocoding failed! Ask Jessica or Bryan for some help if needed.
           }
 
@@ -597,9 +597,8 @@ export class TransitService {
       transit.calculateFinalCosts();
       driver.setOccupied(false);
       transit.setCompleteAt(Date.now());
-      const driverFee = await this.driverFeeService.calculateDriverFee(
-        transitId,
-      );
+      const driverFee =
+        await this.driverFeeService.calculateDriverFee(transitId);
       transit.setDriversFee(driverFee ?? 0);
       await this.awardsService.registerMiles(
         transit.getClient().getId(),

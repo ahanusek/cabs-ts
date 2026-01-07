@@ -8,7 +8,10 @@ export class ClaimRepository extends EntityRepository<Claim> {
     return this.find({ owner });
   }
 
-  public async findByOwnerAndTransit(owner: Client, transit: Transit): Promise<Claim[]> {
+  public async findByOwnerAndTransit(
+    owner: Client,
+    transit: Transit,
+  ): Promise<Claim[]> {
     return this.find({ owner, transit });
   }
 }

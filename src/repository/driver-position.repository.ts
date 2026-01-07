@@ -14,7 +14,12 @@ export class DriverPositionRepository extends EntityRepository<DriverPosition> {
     const qb = this.getEntityManager().createQueryBuilder(DriverPosition, 'dp');
 
     const results = await qb
-      .select(['dp.driver', 'avg(dp.latitude) as avgLatitude', 'avg(dp.longitude) as avgLongitude', 'max(dp.seenAt) as maxSeenAt'])
+      .select([
+        'dp.driver',
+        'avg(dp.latitude) as avgLatitude',
+        'avg(dp.longitude) as avgLongitude',
+        'max(dp.seenAt) as maxSeenAt',
+      ])
       .leftJoinAndSelect('dp.driver', 'd')
       .where({
         longitude: { $gte: longitudeMin, $lte: longitudeMax },
@@ -22,10 +27,15 @@ export class DriverPositionRepository extends EntityRepository<DriverPosition> {
         seenAt: { $gte: date },
       })
       .groupBy('dp.driver')
-      .execute();
+      .execute<{
+        driver: Driver;
+        avgLatitude: number;
+        avgLongitude: number;
+        maxSeenAt: number;
+      }[]>();
 
     return results.map(
-      (dp: any) =>
+      (dp) =>
         new DriverPositionV2Dto(
           dp.driver,
           dp.avgLatitude,

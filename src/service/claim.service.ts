@@ -46,8 +46,12 @@ export class ClaimService {
   }
 
   public async update(claimDTO: ClaimDto, claim: Claim) {
-    const client = await this.clientRepository.findOne({ id: claimDTO.getClientId() });
-    const transit = await this.transitRepository.findOne({ id: claimDTO.getTransitId() });
+    const client = await this.clientRepository.findOne({
+      id: claimDTO.getClientId(),
+    });
+    const transit = await this.transitRepository.findOne({
+      id: claimDTO.getTransitId(),
+    });
     if (client == null) {
       throw new NotFoundException('Client does not exists');
     }

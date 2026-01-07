@@ -22,7 +22,12 @@ export class DriverFee extends BaseEntity {
   @OneToOne(() => Driver, (driver) => driver.fee)
   public driver!: Driver;
 
-  constructor(feeType?: FeeType, driver?: Driver, amount?: number, min?: number) {
+  constructor(
+    feeType?: FeeType,
+    driver?: Driver,
+    amount?: number,
+    min?: number,
+  ) {
     super();
     if (feeType) this.feeType = feeType;
     if (driver) this.driver = driver;
