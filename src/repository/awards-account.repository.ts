@@ -1,10 +1,9 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository } from '@mikro-orm/postgresql';
 import { AwardsAccount } from '../entity/awards-account.entity';
 import { Client } from '../entity/client.entity';
 
-@EntityRepository(AwardsAccount)
-export class AwardsAccountRepository extends Repository<AwardsAccount> {
-  public async findByClient(client: Client) {
-    return this.findOne({ where: { client } });
+export class AwardsAccountRepository extends EntityRepository<AwardsAccount> {
+  public async findByClient(client: Client): Promise<AwardsAccount | null> {
+    return this.findOne({ client });
   }
 }

@@ -3,7 +3,7 @@ import {
   NotFoundException,
   NotAcceptableException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@mikro-orm/nestjs';
 import { ContractRepository } from '../repository/contract.repository';
 import { ContractAttachmentRepository } from '../repository/contract-attachment.repository';
 import { ContractDto } from '../dto/contract.dto';
@@ -19,9 +19,9 @@ import { CreateContractAttachmentDto } from '../dto/create-contract-attachment.d
 @Injectable()
 export class ContractService {
   constructor(
-    @InjectRepository(ContractRepository)
+    @InjectRepository(Contract)
     private contractRepository: ContractRepository,
-    @InjectRepository(ContractAttachmentRepository)
+    @InjectRepository(ContractAttachment)
     private contractAttachmentRepository: ContractAttachmentRepository,
   ) {}
 
@@ -39,7 +39,8 @@ export class ContractService {
     contract.setContractNo(
       'C/' + partnerContractsCount + '/' + createContractDto.partnerName,
     );
-    return this.contractRepository.save(contract);
+    await this.contractRepository.getEntityManager().persistAndFlush(contract);
+    return contract;
   }
 
   public async acceptContract(id: string) {
@@ -55,8 +56,7 @@ export class ContractService {
     ) {
       contract.setStatus(ContractStatus.ACCEPTED);
       contract.setAcceptedAt(Date.now());
-      await this.contractAttachmentRepository.save(attachments);
-      await this.contractRepository.save(contract);
+      await this.contractRepository.getEntityManager().flush();
     } else {
       throw new NotAcceptableException(
         'Not all attachments accepted by both sides',
@@ -67,25 +67,21 @@ export class ContractService {
   public async rejectContract(id: string) {
     const contract = await this.find(id);
     contract.setStatus(ContractStatus.REJECTED);
-    await this.contractRepository.save(contract);
+    await this.contractRepository.getEntityManager().flush();
   }
 
   public async rejectAttachment(attachmentId: string) {
-    const contractAttachment = await this.contractAttachmentRepository.findOne(
-      attachmentId,
-    );
+    const contractAttachment = await this.contractAttachmentRepository.findOne({ id: attachmentId });
     if (!contractAttachment) {
       throw new NotFoundException('Contract attachment does not exist');
     }
     contractAttachment.setStatus(ContractAttachmentStatus.REJECTED);
     contractAttachment.setRejectedAt(Date.now());
-    await this.contractAttachmentRepository.save(contractAttachment);
+    await this.contractAttachmentRepository.getEntityManager().flush();
   }
 
   public async acceptAttachment(attachmentId: string) {
-    const contractAttachment = await this.contractAttachmentRepository.findOne(
-      attachmentId,
-    );
+    const contractAttachment = await this.contractAttachmentRepository.findOne({ id: attachmentId });
     if (!contractAttachment) {
       throw new NotFoundException('Contract attachment does not exist');
     }
@@ -107,11 +103,11 @@ export class ContractService {
 
     contractAttachment.setAcceptedAt(Date.now());
 
-    await this.contractAttachmentRepository.save(contractAttachment);
+    await this.contractAttachmentRepository.getEntityManager().flush();
   }
 
   public async find(id: string) {
-    const contract = await this.contractRepository.findOne(id);
+    const contract = await this.contractRepository.findOne({ id });
     if (!contract) {
       throw new NotFoundException('Contract does not exist');
     }
@@ -130,14 +126,17 @@ export class ContractService {
     const contractAttachment = new ContractAttachment();
     contractAttachment.setContract(contract);
     contractAttachment.setData(contractAttachmentDto.data);
-    await this.contractAttachmentRepository.save(contractAttachment);
+    await this.contractAttachmentRepository.getEntityManager().persistAndFlush(contractAttachment);
     contract.getAttachments().push(contractAttachment);
-    await this.contractRepository.save(contract);
+    await this.contractRepository.getEntityManager().flush();
     return new ContractAttachmentDto(contractAttachment);
   }
 
   public async removeAttachment(contractId: string, attachmentId: string) {
     //TODO sprawdzenie czy nalezy do kontraktu (JIRA: II-14455)
-    await this.contractAttachmentRepository.delete(attachmentId);
+    const attachment = await this.contractAttachmentRepository.findOne({ id: attachmentId });
+    if (attachment) {
+      await this.contractAttachmentRepository.getEntityManager().removeAndFlush(attachment);
+    }
   }
 }

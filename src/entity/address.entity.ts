@@ -1,47 +1,48 @@
 import { BaseEntity } from '../common/base.entity';
-import { Column, Entity } from 'typeorm';
+import { Entity, Property } from '@mikro-orm/core';
 import * as objectHash from 'object-hash';
+import { AddressRepository } from '../repository/address.repository';
 
-@Entity()
+@Entity({ repository: () => AddressRepository })
 export class Address extends BaseEntity {
-  @Column()
-  private country: string;
+  @Property()
+  public country!: string;
 
-  @Column({ nullable: true, type: 'varchar' })
-  private district: string | null;
+  @Property({ nullable: true, type: 'varchar' })
+  public district: string | null = null;
 
-  @Column()
-  private city: string;
+  @Property()
+  public city!: string;
 
-  @Column()
-  private street: string;
+  @Property()
+  public street!: string;
 
-  @Column()
-  private buildingNumber: number;
+  @Property()
+  public buildingNumber!: number;
 
-  @Column({ nullable: true, type: 'integer' })
-  private additionalNumber: number | null;
+  @Property({ nullable: true, type: 'integer' })
+  public additionalNumber: number | null = null;
 
-  @Column()
-  private postalCode: string;
+  @Property()
+  public postalCode!: string;
 
-  @Column()
-  private name: string;
+  @Property()
+  public name!: string;
 
-  @Column({ unique: true })
-  private hash: string;
+  @Property({ unique: true })
+  public hash!: string;
 
   constructor(
-    country: string,
-    city: string,
-    street: string,
-    buildingNumber: number,
+    country?: string,
+    city?: string,
+    street?: string,
+    buildingNumber?: number,
   ) {
     super();
-    this.country = country;
-    this.city = city;
-    this.street = street;
-    this.buildingNumber = buildingNumber;
+    if (country) this.country = country;
+    if (city) this.city = city;
+    if (street) this.street = street;
+    if (buildingNumber) this.buildingNumber = buildingNumber;
   }
 
   public getCountry() {

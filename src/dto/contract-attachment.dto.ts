@@ -27,7 +27,7 @@ export class ContractAttachmentDto {
     this.creationDate = attachment.getCreationDate();
     this.rejectedAt = attachment.getRejectedAt();
     this.acceptedAt = attachment.getAcceptedAt();
-    this.changeDate = attachment.getChangeDate();
+    this.changeDate = attachment.getChangeDate() ?? null;
     this.status = attachment.getStatus();
   }
 

@@ -1,6 +1,7 @@
 import { NotAcceptableException } from '@nestjs/common';
-import { Column, Entity } from 'typeorm';
+import { Entity, Property, Enum } from '@mikro-orm/core';
 import { BaseEntity } from '../common/base.entity';
+import { CarTypeRepository } from '../repository/car-type.repository';
 
 export enum CarClass {
   ECO = 'eco',
@@ -14,35 +15,35 @@ export enum CarStatus {
   ACTIVE = 'active',
 }
 
-@Entity()
+@Entity({ repository: () => CarTypeRepository })
 export class CarType extends BaseEntity {
-  @Column({ enum: CarClass, type: 'enum' })
-  private carClass: CarClass;
+  @Enum(() => CarClass)
+  public carClass!: CarClass;
 
-  @Column({ nullable: true, type: 'varchar' })
-  private description: string | null;
+  @Property({ nullable: true, type: 'varchar' })
+  public description: string | null = null;
 
-  @Column({ default: CarStatus.INACTIVE })
-  private status: CarStatus;
+  @Enum({ items: () => CarStatus, default: CarStatus.INACTIVE })
+  public status: CarStatus = CarStatus.INACTIVE;
 
-  @Column({ type: 'int', default: 0 })
-  private carsCounter: number;
+  @Property({ type: 'int', default: 0 })
+  public carsCounter: number = 0;
 
-  @Column({ type: 'int', default: 0 })
-  private minNoOfCarsToActivateClass: number;
+  @Property({ type: 'int', default: 0 })
+  public minNoOfCarsToActivateClass: number = 0;
 
-  @Column({ type: 'int', default: 0 })
-  private activeCarsCounter: number;
+  @Property({ type: 'int', default: 0 })
+  public activeCarsCounter: number = 0;
 
   constructor(
-    carClass: CarClass,
-    description: string,
-    minNoOfCarsToActivateClass: number,
+    carClass?: CarClass,
+    description?: string,
+    minNoOfCarsToActivateClass?: number,
   ) {
     super();
-    this.carClass = carClass;
-    this.description = description;
-    this.minNoOfCarsToActivateClass = minNoOfCarsToActivateClass;
+    if (carClass) this.carClass = carClass;
+    if (description) this.description = description;
+    if (minNoOfCarsToActivateClass) this.minNoOfCarsToActivateClass = minNoOfCarsToActivateClass;
   }
 
   public registerActiveCar() {

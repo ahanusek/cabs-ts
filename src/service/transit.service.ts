@@ -3,7 +3,7 @@ import {
   NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@mikro-orm/nestjs';
 import { ClientRepository } from '../repository/client.repository';
 import { TransitRepository } from '../repository/transit.repository';
 import { DriverRepository } from '../repository/driver.repository';
@@ -23,24 +23,28 @@ import { Address } from '../entity/address.entity';
 import { Status, Transit } from '../entity/transit.entity';
 import { DriverNotificationService } from './driver-notification.service';
 import * as dayjs from 'dayjs';
-import { DriverStatus } from '../entity/driver.entity';
+import { Driver, DriverStatus } from '../entity/driver.entity';
 import { DriverPositionV2Dto } from '../dto/driver-position-v2.dto';
 import { CreateTransitDto } from '../dto/create-transit.dto';
+import { Client } from '../entity/client.entity';
+import { DriverSession } from '../entity/driver-session.entity';
+import { DriverPosition } from '../entity/driver-position.entity';
+import { Transactional } from '@mikro-orm/core';
 
 @Injectable()
 export class TransitService {
   constructor(
-    @InjectRepository(ClientRepository)
+    @InjectRepository(Client)
     private clientRepository: ClientRepository,
-    @InjectRepository(TransitRepository)
+    @InjectRepository(Transit)
     private transitRepository: TransitRepository,
-    @InjectRepository(DriverRepository)
+    @InjectRepository(Driver)
     private driverRepository: DriverRepository,
-    @InjectRepository(DriverPositionRepository)
+    @InjectRepository(DriverPosition)
     private driverPositionRepository: DriverPositionRepository,
-    @InjectRepository(DriverSessionRepository)
+    @InjectRepository(DriverSession)
     private driverSessionRepository: DriverSessionRepository,
-    @InjectRepository(AddressRepository)
+    @InjectRepository(Address)
     private addressRepository: AddressRepository,
     private awardsService: AwardsService,
     private driverFeeService: DriverFeeService,
@@ -51,6 +55,7 @@ export class TransitService {
     private notificationService: DriverNotificationService,
   ) {}
 
+  @Transactional()
   public async createTransit(transitDto: CreateTransitDto) {
     const from = await this.addressFromDto(new AddressDto(transitDto.from));
     const to = await this.addressFromDto(new AddressDto(transitDto.to));
@@ -68,13 +73,14 @@ export class TransitService {
     );
   }
 
+  @Transactional()
   public async _createTransit(
     clientId: string,
     from: Address,
     to: Address,
     carClass: CarClass,
   ) {
-    const client = await this.clientRepository.findOne(clientId);
+    const client = await this.clientRepository.findOne({ id: clientId });
 
     if (!client) {
       throw new NotFoundException('Client does not exist, id = ' + clientId);
@@ -101,12 +107,14 @@ export class TransitService {
       ),
     );
 
-    return this.transitRepository.save(transit);
+    await this.transitRepository.getEntityManager().persistAndFlush(transit);
+    return transit;
   }
 
+  @Transactional()
   public async _changeTransitAddressFrom(transitId: string, address: Address) {
-    const newAddress = await this.addressRepository.save(address);
-    const transit = await this.transitRepository.findOne(transitId);
+    const newAddress = await this.addressRepository.saveAddress(address);
+    const transit = await this.transitRepository.findOne({ id: transitId });
 
     if (!transit) {
       throw new NotFoundException('Transit does not exist, id = ' + transitId);
@@ -167,7 +175,7 @@ export class TransitService {
     transit.setPickupAddressChangeCounter(
       transit.getPickupAddressChangeCounter() + 1,
     );
-    await this.transitRepository.save(transit);
+    await this.transitRepository.getEntityManager().flush();
 
     for (const driver of transit.getProposedDrivers()) {
       await this.notificationService.notifyAboutChangedTransitAddress(
@@ -187,12 +195,13 @@ export class TransitService {
     );
   }
 
+  @Transactional()
   private async _changeTransitAddressTo(
     transitId: string,
     newAddress: Address,
   ) {
-    const savedAddress = await this.addressRepository.save(newAddress);
-    const transit = await this.transitRepository.findOne(transitId);
+    const savedAddress = await this.addressRepository.saveAddress(newAddress);
+    const transit = await this.transitRepository.findOne({ id: transitId });
 
     if (!transit) {
       throw new NotFoundException('Transit does not exist, id = ' + transitId);
@@ -218,7 +227,7 @@ export class TransitService {
     );
 
     const driver = transit.getDriver();
-    await this.transitRepository.save(transit);
+    await this.transitRepository.getEntityManager().flush();
     if (driver) {
       this.notificationService.notifyAboutChangedTransitAddress(
         driver.getId(),
@@ -234,8 +243,9 @@ export class TransitService {
     );
   }
 
+  @Transactional()
   public async cancelTransit(transitId: string) {
-    const transit = await this.transitRepository.findOne(transitId);
+    const transit = await this.transitRepository.findOne({ id: transitId });
 
     if (!transit) {
       throw new NotFoundException('Transit does not exist, id = ' + transitId);
@@ -265,11 +275,12 @@ export class TransitService {
     transit.setDriver(null);
     transit.setKm(0);
     transit.setAwaitingDriversResponses(0);
-    await this.transitRepository.save(transit);
+    await this.transitRepository.getEntityManager().flush();
   }
 
+  @Transactional()
   public async publishTransit(transitId: string) {
-    const transit = await this.transitRepository.findOne(transitId);
+    const transit = await this.transitRepository.findOne({ id: transitId });
 
     if (!transit) {
       throw new NotFoundException('Transit does not exist, id = ' + transitId);
@@ -277,14 +288,14 @@ export class TransitService {
 
     transit.setStatus(Status.WAITING_FOR_DRIVER_ASSIGNMENT);
     transit.setPublished(Date.now());
-    await this.transitRepository.save(transit);
+    await this.transitRepository.getEntityManager().flush();
 
     return this.findDriversForTransit(transitId);
   }
 
   // Abandon hope all ye who enter here...
   public async findDriversForTransit(transitId: string) {
-    const transit = await this.transitRepository.findOne(transitId);
+    const transit = await this.transitRepository.findOne({ id: transitId });
 
     if (transit) {
       if (transit.getStatus() === Status.WAITING_FOR_DRIVER_ASSIGNMENT) {
@@ -312,7 +323,7 @@ export class TransitService {
             transit.setDriver(null);
             transit.setKm(0);
             transit.setAwaitingDriversResponses(0);
-            await this.transitRepository.save(transit);
+            await this.transitRepository.getEntityManager().flush();
             return transit;
           }
           let geocoded: number[] = [0, 0];
@@ -327,7 +338,7 @@ export class TransitService {
           const latitude = geocoded[0];
 
           //https://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
-          //Earth’s radius, sphere
+          //Earth's radius, sphere
           //double R = 6378;
           const R = 6371; // Changed to 6371 due to Copy&Paste pattern from different source
 
@@ -433,7 +444,7 @@ export class TransitService {
               }
             }
 
-            await this.transitRepository.save(transit);
+            await this.transitRepository.getEntityManager().flush();
           } else {
             // Next iteration, no drivers at specified area
             continue;
@@ -449,13 +460,14 @@ export class TransitService {
     }
   }
 
+  @Transactional()
   public async acceptTransit(driverId: string, transitId: string) {
-    const driver = await this.driverRepository.findOne(driverId);
+    const driver = await this.driverRepository.findOne({ id: driverId });
 
     if (!driver) {
       throw new NotFoundException('Driver does not exist, id = ' + driverId);
     } else {
-      const transit = await this.transitRepository.findOne(transitId);
+      const transit = await this.transitRepository.findOne({ id: transitId });
 
       if (!transit) {
         throw new NotFoundException(
@@ -481,9 +493,8 @@ export class TransitService {
               transit.setAwaitingDriversResponses(0);
               transit.setAcceptedAt(Date.now());
               transit.setStatus(Status.TRANSIT_TO_PASSENGER);
-              await this.transitRepository.save(transit);
               driver.setOccupied(true);
-              await this.driverRepository.save(driver);
+              await this.transitRepository.getEntityManager().flush();
             }
           }
         }
@@ -491,14 +502,15 @@ export class TransitService {
     }
   }
 
+  @Transactional()
   public async startTransit(driverId: string, transitId: string) {
-    const driver = await this.driverRepository.findOne(driverId);
+    const driver = await this.driverRepository.findOne({ id: driverId });
 
     if (!driver) {
       throw new NotFoundException('Driver does not exist, id = ' + driverId);
     }
 
-    const transit = await this.transitRepository.findOne(transitId);
+    const transit = await this.transitRepository.findOne({ id: transitId });
 
     if (!transit) {
       throw new NotFoundException('Transit does not exist, id = ' + transitId);
@@ -512,17 +524,18 @@ export class TransitService {
 
     transit.setStatus(Status.IN_TRANSIT);
     transit.setStarted(Date.now());
-    await this.transitRepository.save(transit);
+    await this.transitRepository.getEntityManager().flush();
   }
 
+  @Transactional()
   public async rejectTransit(driverId: string, transitId: string) {
-    const driver = await this.driverRepository.findOne(driverId);
+    const driver = await this.driverRepository.findOne({ id: driverId });
 
     if (!driver) {
       throw new NotFoundException('Driver does not exist, id = ' + driverId);
     }
 
-    const transit = await this.transitRepository.findOne(transitId);
+    const transit = await this.transitRepository.findOne({ id: transitId });
 
     if (!transit) {
       throw new NotFoundException('Transit does not exist, id = ' + transitId);
@@ -532,7 +545,7 @@ export class TransitService {
     transit.setAwaitingDriversResponses(
       transit.getAwaitingDriversResponses() - 1,
     );
-    await this.transitRepository.save(transit);
+    await this.transitRepository.getEntityManager().flush();
   }
 
   public completeTransitFromDto(
@@ -547,19 +560,20 @@ export class TransitService {
     );
   }
 
+  @Transactional()
   public async completeTransit(
     driverId: string,
     transitId: string,
     destinationAddress: Address,
   ) {
-    await this.addressRepository.save(destinationAddress);
-    const driver = await this.driverRepository.findOne(driverId);
+    await this.addressRepository.saveAddress(destinationAddress);
+    const driver = await this.driverRepository.findOne({ id: driverId });
 
     if (!driver) {
       throw new NotFoundException('Driver does not exist, id = ' + driverId);
     }
 
-    const transit = await this.transitRepository.findOne(transitId);
+    const transit = await this.transitRepository.findOne({ id: transitId });
 
     if (!transit) {
       throw new NotFoundException('Transit does not exist, id = ' + transitId);
@@ -586,13 +600,12 @@ export class TransitService {
       const driverFee = await this.driverFeeService.calculateDriverFee(
         transitId,
       );
-      transit.setDriversFee(driverFee);
-      await this.driverRepository.save(driver);
+      transit.setDriversFee(driverFee ?? 0);
       await this.awardsService.registerMiles(
         transit.getClient().getId(),
         transitId,
       );
-      await this.transitRepository.save(transit);
+      await this.transitRepository.getEntityManager().flush();
       await this.invoiceGenerator.generate(
         transit.getPrice() ?? 0,
         transit.getClient().getName() + ' ' + transit.getClient().getLastName(),
@@ -605,7 +618,7 @@ export class TransitService {
   }
 
   public async loadTransit(transitId: string) {
-    const transit = await this.transitRepository.findOne(transitId);
+    const transit = await this.transitRepository.findOne({ id: transitId });
 
     if (!transit) {
       throw new NotFoundException('Transit does not exist, id = ' + transitId);
@@ -616,6 +629,6 @@ export class TransitService {
 
   private async addressFromDto(addressDTO: AddressDto) {
     const address = addressDTO.toAddressEntity();
-    return this.addressRepository.save(address);
+    return this.addressRepository.saveAddress(address);
   }
 }

@@ -1,11 +1,10 @@
-import { EntityRepository, MoreThan, Repository, IsNull } from 'typeorm';
+import { EntityRepository } from '@mikro-orm/postgresql';
 import { DriverSession } from '../entity/driver-session.entity';
 import { CarClass } from '../entity/car-type.entity';
 import { Driver } from '../entity/driver.entity';
 import { NotFoundException } from '@nestjs/common';
 
-@EntityRepository(DriverSession)
-export class DriverSessionRepository extends Repository<DriverSession> {
+export class DriverSessionRepository extends EntityRepository<DriverSession> {
   public async findAllByLoggedOutAtNullAndDriverInAndCarClassIn(
     drivers: Driver[],
     carClasses: CarClass[],
@@ -17,12 +16,10 @@ export class DriverSessionRepository extends Repository<DriverSession> {
   public async findTopByDriverAndLoggedOutAtIsNullOrderByLoggedAtDesc(
     driver: Driver,
   ): Promise<DriverSession> {
-    const session = await this.findOne({
-      where: { driver, loggedOutAt: IsNull() },
-      order: {
-        loggedAt: 'DESC',
-      },
-    });
+    const session = await this.findOne(
+      { driver, loggedOutAt: null },
+      { orderBy: { loggedAt: 'DESC' } },
+    );
 
     if (!session) {
       throw new NotFoundException(`Session for ${driver.getId()} not exists`);
@@ -35,14 +32,12 @@ export class DriverSessionRepository extends Repository<DriverSession> {
     since: number,
   ): Promise<DriverSession[]> {
     return this.find({
-      where: {
-        driver,
-        loggedAt: MoreThan(since),
-      },
+      driver,
+      loggedAt: { $gt: since },
     });
   }
 
   public async findByDriver(driver: Driver): Promise<DriverSession[]> {
-    return this.find({ where: { driver } });
+    return this.find({ driver });
   }
 }

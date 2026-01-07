@@ -1,6 +1,6 @@
 import { DriverService } from '../service/driver.service';
 import { DriverRepository } from '../repository/driver.repository';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@mikro-orm/nestjs';
 import { ClaimRepository } from '../repository/claim.repository';
 import { DriverSessionRepository } from '../repository/driver-session.repository';
 import {
@@ -11,6 +11,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { DriverReport } from '../dto/driver-report.dto';
+import { Driver } from '../entity/driver.entity';
 import { DriverAttributeName } from '../entity/driver-attribute.entity';
 import { DriverAttributeDto } from '../dto/driver-attribute.dto';
 import * as dayjs from 'dayjs';
@@ -18,16 +19,18 @@ import { DriverSessionDto } from '../dto/driver-session.dto';
 import { TransitDto } from '../dto/transit.dto';
 import { Status, Transit } from '../entity/transit.entity';
 import { ClaimDto } from '../dto/claim.dto';
+import { Claim } from '../entity/claim.entity';
+import { DriverSession } from '../entity/driver-session.entity';
 
 @Controller('driverreport')
 export class DriverReportController {
   constructor(
     private driverService: DriverService,
-    @InjectRepository(DriverRepository)
+    @InjectRepository(Driver)
     private driverRepository: DriverRepository,
-    @InjectRepository(ClaimRepository)
+    @InjectRepository(Claim)
     private claimRepository: ClaimRepository,
-    @InjectRepository(DriverSessionRepository)
+    @InjectRepository(DriverSession)
     private driverSessionRepository: DriverSessionRepository,
   ) {}
 
@@ -40,7 +43,7 @@ export class DriverReportController {
     const driverDto = await this.driverService.loadDriver(driverId);
 
     driverReport.setDriverDTO(driverDto);
-    const driver = await this.driverRepository.findOne(driverId);
+    const driver = await this.driverRepository.findOne({ id: driverId });
 
     if (!driver) {
       throw new NotFoundException(`Driver with id ${driverId} not exists`);

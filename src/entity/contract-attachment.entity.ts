@@ -1,6 +1,7 @@
 import { BaseEntity } from '../common/base.entity';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, Property, ManyToOne, Enum } from '@mikro-orm/core';
 import { Contract } from './contract.entity';
+import { ContractAttachmentRepository } from '../repository/contract-attachment.repository';
 
 export enum ContractAttachmentStatus {
   PROPOSED = 'proposed',
@@ -9,29 +10,28 @@ export enum ContractAttachmentStatus {
   REJECTED = 'rejected',
 }
 
-@Entity()
+@Entity({ repository: () => ContractAttachmentRepository })
 export class ContractAttachment extends BaseEntity {
-  @ManyToOne(() => Contract, (contract) => contract.attachments)
-  @JoinColumn()
-  public contract: Contract;
+  @ManyToOne(() => Contract, { inversedBy: 'attachments' })
+  public contract!: Contract;
 
-  @Column({ type: 'bytea' })
-  private data: Buffer;
+  @Property({ type: 'blob' })
+  private data!: Buffer;
 
-  @Column({ default: Date.now(), type: 'bigint' })
-  private creationDate: number;
+  @Property({ type: 'bigint' })
+  private creationDate: number = Date.now();
 
-  @Column({ nullable: true, type: 'bigint' })
-  private acceptedAt: number | null;
+  @Property({ nullable: true, type: 'bigint' })
+  private acceptedAt: number | null = null;
 
-  @Column({ nullable: true, type: 'bigint' })
-  private rejectedAt: number | null;
+  @Property({ nullable: true, type: 'bigint' })
+  private rejectedAt: number | null = null;
 
-  @Column({ nullable: true, type: 'bigint' })
-  private changeDate: number;
+  @Property({ nullable: true, type: 'bigint' })
+  private changeDate?: number;
 
-  @Column({ default: ContractAttachmentStatus.PROPOSED })
-  private status: ContractAttachmentStatus;
+  @Enum({ items: () => ContractAttachmentStatus, default: ContractAttachmentStatus.PROPOSED })
+  private status: ContractAttachmentStatus = ContractAttachmentStatus.PROPOSED;
 
   public getData() {
     return this.data;

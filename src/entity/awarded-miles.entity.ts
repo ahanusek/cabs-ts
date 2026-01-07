@@ -1,33 +1,28 @@
 import { BaseEntity } from '../common/base.entity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Entity, Property, ManyToOne } from '@mikro-orm/core';
 import { Client } from './client.entity';
 import { Transit } from './transit.entity';
+import { AwardedMilesRepository } from '../repository/awarded-miles.repository';
 
-@Entity()
+@Entity({ repository: () => AwardedMilesRepository })
 export class AwardedMiles extends BaseEntity {
-  // Aggregate
-  // 1. mile celowo są osobno, aby się mogło rozjechać na ich wydawaniu -> docelowo: kolekcja VOs w agregacie
-  // VO
-  // 1. miles + expirationDate -> VO przykrywające logikę walidacji, czy nie przekroczono daty ważności punktów
-  // 2. wydzielenie interfejsu Miles -> różne VO z różną logiką, np. ExpirableMiles, NonExpirableMiles, LinearExpirableMiles
-
   @ManyToOne(() => Client)
-  public client: Client;
+  public client!: Client;
 
-  @Column()
-  private miles: number;
+  @Property()
+  private miles!: number;
 
-  @Column({ default: Date.now(), type: 'bigint' })
-  private date: number;
+  @Property({ type: 'bigint' })
+  private date: number = Date.now();
 
-  @Column({ nullable: true, type: 'bigint' })
-  private expirationDate: number | null;
+  @Property({ nullable: true, type: 'bigint' })
+  private expirationDate: number | null = null;
 
-  @Column({ nullable: true, type: 'boolean' })
-  private isSpecial: boolean | null;
+  @Property({ nullable: true, type: 'boolean' })
+  private isSpecial: boolean | null = null;
 
-  @ManyToOne(() => Transit)
-  public transit: Transit | null;
+  @ManyToOne(() => Transit, { nullable: true })
+  public transit: Transit | null = null;
 
   public getClient() {
     return this.client;

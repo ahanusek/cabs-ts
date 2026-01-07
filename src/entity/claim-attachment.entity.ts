@@ -1,20 +1,21 @@
 import { BaseEntity } from '../common/base.entity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Entity, Property, ManyToOne } from '@mikro-orm/core';
 import { Claim } from './claim.entity';
+import { ClaimAttachmentRepository } from '../repository/claim-attachment.repository';
 
-@Entity()
+@Entity({ repository: () => ClaimAttachmentRepository })
 export class ClaimAttachment extends BaseEntity {
   @ManyToOne(() => Claim)
-  private claim: Claim;
+  private claim!: Claim;
 
-  @Column({ type: 'bigint' })
-  private creationDate: number;
+  @Property({ type: 'bigint' })
+  private creationDate!: number;
 
-  @Column({ nullable: true, type: 'varchar' })
-  private description: string | null;
+  @Property({ nullable: true, type: 'varchar' })
+  private description: string | null = null;
 
-  @Column({ type: 'bytea' })
-  private data: Buffer;
+  @Property({ type: 'blob' })
+  private data!: Buffer;
 
   public getClient() {
     return this.claim.getOwner();

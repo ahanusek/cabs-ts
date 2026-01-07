@@ -1,16 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@mikro-orm/nestjs';
 import { InvoiceRepository } from '../repository/invoice.repository';
 import { Invoice } from '../entity/invoice.entity';
 
 @Injectable()
 export class InvoiceGenerator {
   constructor(
-    @InjectRepository(InvoiceRepository)
+    @InjectRepository(Invoice)
     private invoiceRepository: InvoiceRepository,
   ) {}
 
   public async generate(amount: number, subjectName: string) {
-    return this.invoiceRepository.save(new Invoice(amount, subjectName));
+    const invoice = new Invoice(amount, subjectName);
+    await this.invoiceRepository.getEntityManager().persistAndFlush(invoice);
+    return invoice;
   }
 }

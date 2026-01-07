@@ -1,5 +1,4 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository } from '@mikro-orm/postgresql';
 import { DriverAttribute } from '../entity/driver-attribute.entity';
 
-@EntityRepository(DriverAttribute)
-export class DriverAttributeRepository extends Repository<DriverAttribute> {}
+export class DriverAttributeRepository extends EntityRepository<DriverAttribute> {}

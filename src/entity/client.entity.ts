@@ -1,6 +1,7 @@
 import { BaseEntity } from '../common/base.entity';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Entity, Property, OneToMany, Collection, Enum } from '@mikro-orm/core';
 import { Claim } from './claim.entity';
+import { ClientRepository } from '../repository/client.repository';
 
 export enum ClientType {
   INDIVIDUAL = 'individual',
@@ -18,32 +19,32 @@ export enum Type {
   VIP = 'vip',
 }
 
-@Entity()
+@Entity({ repository: () => ClientRepository })
 export class Client extends BaseEntity {
-  @Column()
-  private type: Type;
+  @Enum(() => Type)
+  private type!: Type;
 
-  @Column()
-  private name: string;
+  @Property()
+  private name!: string;
 
-  @Column()
-  private lastName: string;
+  @Property()
+  private lastName!: string;
 
-  @Column()
-  private defaultPaymentType: PaymentType;
+  @Enum(() => PaymentType)
+  private defaultPaymentType!: PaymentType;
 
-  @Column({ type: 'enum', enum: ClientType, default: ClientType.INDIVIDUAL })
-  private clientType: ClientType;
+  @Enum({ items: () => ClientType, default: ClientType.INDIVIDUAL })
+  private clientType: ClientType = ClientType.INDIVIDUAL;
 
   @OneToMany(() => Claim, (claim) => claim.owner)
-  public claims: Claim[];
+  public claims = new Collection<Claim>(this);
 
   public getClaims() {
-    return this.claims;
+    return this.claims.getItems();
   }
 
   public setClaims(claims: Claim[]) {
-    this.claims = claims;
+    this.claims.set(claims);
   }
 
   public getName() {

@@ -18,31 +18,126 @@ _____________
 ## Installation
 
 ```bash
-$ yarn install
+$ npm install
 ```
+
+## Database Setup (PostgreSQL)
+
+### Option 1: Using Docker (Recommended)
+
+Start PostgreSQL using Docker Compose:
+
+```bash
+# Start database
+$ docker-compose up -d
+
+# Stop database
+$ docker-compose down
+
+# Stop and remove data
+$ docker-compose down -v
+```
+
+Default connection settings:
+- Host: `localhost`
+- Port: `5432`
+- Database: `cabs`
+- Username: `postgres`
+- Password: `postgres`
+
+### Option 2: Local PostgreSQL Installation
+
+1. Install PostgreSQL 16+ on your system
+2. Create a database:
+
+```bash
+$ psql -U postgres
+postgres=# CREATE DATABASE cabs;
+postgres=# \q
+```
+
+### Environment Variables
+
+You can customize database connection using environment variables:
+
+```bash
+export DATABASE_HOST=localhost
+export DATABASE_PORT=5432
+export DATABASE_NAME=cabs
+export DATABASE_USERNAME=postgres
+export DATABASE_PASSWORD=postgres
+```
+
+Or create a `.env` file in the project root:
+
+```env
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_NAME=cabs
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=postgres
+```
+
+### Database Schema
+
+MikroORM will automatically create/update the schema on application startup.
+
+To manually sync:
+
+```bash
+# Generate migration
+$ npx mikro-orm migration:create
+
+# Run migrations
+$ npx mikro-orm migration:up
+
+# Or use schema sync (development only)
+$ npx mikro-orm schema:update --run
+```
+
+### pgAdmin (Database UI)
+
+pgAdmin is included in Docker Compose for browsing the database.
+
+**URL:** http://localhost:5050
+
+**Login credentials:**
+- Email: `admin@admin.com`
+- Password: `admin`
+
+**Connect to database:**
+1. Right-click "Servers" → "Register" → "Server"
+2. **General tab:** Name = `cabs`
+3. **Connection tab:**
+   - Host: `postgres`
+   - Port: `5432`
+   - Database: `cabs`
+   - Username: `postgres`
+   - Password: `postgres`
+4. Click "Save"
 
 ## Running the app
 
 ```bash
 # development
-$ yarn start
+$ npm run start
 
 # watch mode
-$ yarn start:dev
+$ npm run start:dev
 
 # production mode
-$ yarn start:prod
+$ npm run start:prod
 ```
 
 ## Test
 
 ```bash
 # unit tests
-$ yarn test
+$ npm test
 
 # e2e tests
-$ yarn test:e2e
+$ npm run test:e2e
 
 # test coverage
-$ yarn test:cov
+$ npm run test:cov
 ```

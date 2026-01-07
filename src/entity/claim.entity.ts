@@ -1,7 +1,8 @@
 import { BaseEntity } from '../common/base.entity';
 import { Client } from './client.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { Entity, Property, ManyToOne, OneToOne, Enum } from '@mikro-orm/core';
 import { Transit } from './transit.entity';
+import { ClaimRepository } from '../repository/claim.repository';
 
 export enum ClaimStatus {
   DRAFT = 'draft',
@@ -17,38 +18,37 @@ export enum CompletionMode {
   AUTOMATIC = 'automatic',
 }
 
-@Entity()
+@Entity({ repository: () => ClaimRepository })
 export class Claim extends BaseEntity {
-  @ManyToOne(() => Client, (client) => client.claims)
-  public owner: Client;
+  @ManyToOne(() => Client)
+  public owner!: Client;
 
-  @OneToOne(() => Transit)
-  @JoinColumn()
-  private transit: Transit;
+  @OneToOne(() => Transit, { owner: true })
+  public transit!: Transit;
 
-  @Column({ type: 'bigint' })
-  private creationDate: number;
+  @Property({ type: 'bigint' })
+  public creationDate!: number;
 
-  @Column({ nullable: true, type: 'bigint' })
-  private completionDate: number | null;
+  @Property({ nullable: true, type: 'bigint' })
+  public completionDate: number | null = null;
 
-  @Column({ nullable: true, type: 'bigint' })
-  private changeDate: number | null;
+  @Property({ nullable: true, type: 'bigint' })
+  public changeDate: number | null = null;
 
-  @Column()
-  private reason: string;
+  @Property()
+  public reason!: string;
 
-  @Column({ nullable: true, type: 'varchar' })
-  private incidentDescription: string | null;
+  @Property({ nullable: true, type: 'varchar' })
+  public incidentDescription: string | null = null;
 
-  @Column({ nullable: true, enum: CompletionMode, type: 'enum', default: null })
-  private completionMode: CompletionMode | null;
+  @Enum({ items: () => CompletionMode, nullable: true })
+  public completionMode: CompletionMode | null = null;
 
-  @Column()
-  private status: ClaimStatus;
+  @Enum(() => ClaimStatus)
+  public status!: ClaimStatus;
 
-  @Column()
-  private claimNo: string;
+  @Property()
+  public claimNo!: string;
 
   public getClaimNo() {
     return this.claimNo;

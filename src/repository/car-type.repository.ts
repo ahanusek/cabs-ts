@@ -1,11 +1,10 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository } from '@mikro-orm/postgresql';
 import { CarClass, CarStatus, CarType } from '../entity/car-type.entity';
 import { NotFoundException } from '@nestjs/common';
 
-@EntityRepository(CarType)
-export class CarTypeRepository extends Repository<CarType> {
+export class CarTypeRepository extends EntityRepository<CarType> {
   public async findByCarClass(carClass: CarClass): Promise<CarType> {
-    const carType = await this.findOne({ where: { carClass } });
+    const carType = await this.findOne({ carClass });
 
     if (!carType) {
       throw new NotFoundException('Cannot find car type');
@@ -14,6 +13,6 @@ export class CarTypeRepository extends Repository<CarType> {
   }
 
   public async findByStatus(status: CarStatus): Promise<CarType[]> {
-    return this.find({ where: { status } });
+    return this.find({ status });
   }
 }

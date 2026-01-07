@@ -1,40 +1,24 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ConfigModule } from '@nestjs/config';
 import { DriverController } from './controllers/driver.controller';
 import { DriverService } from './service/driver.service';
-import { DriverRepository } from './repository/driver.repository';
 import { AppProperties } from './config/app-properties.config';
-import { CarTypeRepository } from './repository/car-type.repository';
 import { CarTypeController } from './controllers/car-type.controller';
 import { CarTypeService } from './service/car-type.service';
 import { DistanceCalculator } from './service/distance-calculator.service';
-import { InvoiceRepository } from './repository/invoice.repository';
 import { InvoiceGenerator } from './service/invoice-generator.service';
 import { DriverNotificationService } from './service/driver-notification.service';
 import { GeocodingService } from './service/geocoding.service';
 import { ClaimNumberGenerator } from './service/claim-number-generator.service';
-import { ClaimRepository } from './repository/claim.repository';
 import { ClientNotificationService } from './service/client-notification.service';
 import { ClientService } from './service/client.service';
-import { ClientRepository } from './repository/client.repository';
 import { ClientController } from './controllers/client.controller';
 import { DriverSessionService } from './service/driver-session.service';
-import { DriverSessionRepository } from './repository/driver-session.repository';
 import { DriverSessionController } from './controllers/driver-session.controller';
-import { DriverFeeRepository } from './repository/driver-fee.repository';
-import { TransitRepository } from './repository/transit.repository';
 import { DriverFeeService } from './service/driver-fee.service';
-import { DriverPositionRepository } from './repository/driver-position.repository';
 import { DriverTrackingService } from './service/driver-tracking.service';
 import { DriverTrackingController } from './controllers/driver-tracking.controller';
-import { ClaimAttachmentRepository } from './repository/claim-attachment.repository';
-import { AddressRepository } from './repository/address.repository';
-import { DriverAttributeRepository } from './repository/driver-attribute.repository';
-import { AwardedMilesRepository } from './repository/awarded-miles.repository';
-import { AwardsAccountRepository } from './repository/awards-account.repository';
-import { ContractAttachmentRepository } from './repository/contract-attachment.repository';
-import { ContractRepository } from './repository/contract.repository';
 import { TransitAnalyzerService } from './service/transit-analyzer.service';
 import { AwardsService } from './service/awards.service';
 import { ClaimService } from './service/claim.service';
@@ -46,40 +30,66 @@ import { AwardsAccountController } from './controllers/awards-account.controller
 import { ClaimController } from './controllers/claim.controller';
 import { ContractController } from './controllers/contract.controller';
 import { DriverReportController } from './controllers/driver-report.controller';
+import { PostgreSqlDriver } from '@mikro-orm/postgresql';
+
+// Import entities
+import { Driver } from './entity/driver.entity';
+import { CarType } from './entity/car-type.entity';
+import { Client } from './entity/client.entity';
+import { Transit } from './entity/transit.entity';
+import { Address } from './entity/address.entity';
+import { Claim } from './entity/claim.entity';
+import { Contract } from './entity/contract.entity';
+import { DriverFee } from './entity/driver-fee.entity';
+import { DriverAttribute } from './entity/driver-attribute.entity';
+import { DriverSession } from './entity/driver-session.entity';
+import { DriverPosition } from './entity/driver-position.entity';
+import { AwardsAccount } from './entity/awards-account.entity';
+import { AwardedMiles } from './entity/awarded-miles.entity';
+import { Invoice } from './entity/invoice.entity';
+import { ClaimAttachment } from './entity/claim-attachment.entity';
+import { ContractAttachment } from './entity/contract-attachment.entity';
+
+const entities = [
+  Driver,
+  CarType,
+  Client,
+  Transit,
+  Address,
+  Claim,
+  Contract,
+  DriverFee,
+  DriverAttribute,
+  DriverSession,
+  DriverPosition,
+  AwardsAccount,
+  AwardedMiles,
+  Invoice,
+  ClaimAttachment,
+  ContractAttachment,
+];
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
+    MikroOrmModule.forRoot({
+      driver: PostgreSqlDriver,
+      host: process.env.DATABASE_HOST || 'localhost',
       port: process.env.DATABASE_PORT
         ? parseInt(process.env.DATABASE_PORT, 10)
-        : 3456,
-      username: process.env.DATABASE_USERNAME,
-      password: process.env.DATABASE_PASSWORD,
-      database: process.env.DATABASE_NAME,
-      autoLoadEntities: true,
-      synchronize: true,
+        : 5432,
+      user: process.env.DATABASE_USERNAME || 'postgres',
+      password: process.env.DATABASE_PASSWORD || 'postgres',
+      dbName: process.env.DATABASE_NAME || 'cabs',
+      entities: entities,
+      debug: process.env.NODE_ENV !== 'production',
+      allowGlobalContext: true,
+      schemaGenerator: {
+        disableForeignKeys: true,
+        createForeignKeyConstraints: true,
+      },
     }),
-    TypeOrmModule.forFeature([
-      DriverRepository,
-      CarTypeRepository,
-      InvoiceRepository,
-      ClaimRepository,
-      ClientRepository,
-      DriverSessionRepository,
-      DriverFeeRepository,
-      TransitRepository,
-      DriverPositionRepository,
-      ClaimAttachmentRepository,
-      AddressRepository,
-      DriverAttributeRepository,
-      AwardedMilesRepository,
-      AwardsAccountRepository,
-      ContractAttachmentRepository,
-      ContractRepository,
-    ]),
+    MikroOrmModule.forFeature(entities),
   ],
   controllers: [
     DriverController,

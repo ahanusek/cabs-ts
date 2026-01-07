@@ -1,10 +1,9 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository } from '@mikro-orm/postgresql';
 import { DriverFee } from '../entity/driver-fee.entity';
 import { Driver } from '../entity/driver.entity';
 
-@EntityRepository(DriverFee)
-export class DriverFeeRepository extends Repository<DriverFee> {
-  public async findByDriver(driver: Driver) {
+export class DriverFeeRepository extends EntityRepository<DriverFee> {
+  public async findByDriver(driver: Driver): Promise<DriverFee | null> {
     return this.findOne({ driver });
   }
 }

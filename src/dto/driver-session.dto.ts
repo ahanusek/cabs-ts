@@ -15,7 +15,7 @@ export class DriverSessionDto {
   constructor(session: DriverSession) {
     this.carBrand = session.getCarBrand();
     this.platesNumber = session.getPlatesNumber();
-    this.loggedAt = session.getLoggedAt();
+    this.loggedAt = session.getLoggedAt() ?? null;
     this.loggedOutAt = session.getLoggedOutAt();
     this.carClass = session.getCarClass();
   }

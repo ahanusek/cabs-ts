@@ -1,10 +1,9 @@
-import { Between, EntityRepository, Repository } from 'typeorm';
+import { EntityRepository } from '@mikro-orm/postgresql';
 import { DriverPosition } from '../entity/driver-position.entity';
 import { Driver } from '../entity/driver.entity';
 import { DriverPositionV2Dto } from '../dto/driver-position-v2.dto';
 
-@EntityRepository(DriverPosition)
-export class DriverPositionRepository extends Repository<DriverPosition> {
+export class DriverPositionRepository extends EntityRepository<DriverPosition> {
   public async findAverageDriverPositionSince(
     latitudeMin: number,
     latitudeMax: number,
@@ -12,27 +11,26 @@ export class DriverPositionRepository extends Repository<DriverPosition> {
     longitudeMax: number,
     date: number,
   ): Promise<DriverPositionV2Dto[]> {
-    const driverPosition = await this.createQueryBuilder('driverPosition')
-      .leftJoinAndSelect('driverPosition.driver', 'p')
-      .select(`AVG(p.latitude), AVG(p.longitude), MAX(p.seenAt)`)
-      .where('p.longitude between :longitudeMin and :longitudeMax')
-      .andWhere('p.longitude between :longitudeMin and :longitudeMax')
-      .andWhere('p.seenAt >= :seenAt')
-      .groupBy('p.driver.id')
-      .setParameters({
-        longitudeMin,
-        longitudeMax,
-        seenAt: date,
-      })
-      .getMany();
+    const qb = this.getEntityManager().createQueryBuilder(DriverPosition, 'dp');
 
-    return driverPosition.map(
-      (dp) =>
+    const results = await qb
+      .select(['dp.driver', 'avg(dp.latitude) as avgLatitude', 'avg(dp.longitude) as avgLongitude', 'max(dp.seenAt) as maxSeenAt'])
+      .leftJoinAndSelect('dp.driver', 'd')
+      .where({
+        longitude: { $gte: longitudeMin, $lte: longitudeMax },
+        latitude: { $gte: latitudeMin, $lte: latitudeMax },
+        seenAt: { $gte: date },
+      })
+      .groupBy('dp.driver')
+      .execute();
+
+    return results.map(
+      (dp: any) =>
         new DriverPositionV2Dto(
           dp.driver,
-          dp.latitude,
-          dp.longitude,
-          dp.seenAt,
+          dp.avgLatitude,
+          dp.avgLongitude,
+          dp.maxSeenAt,
         ),
     );
   }
@@ -42,14 +40,12 @@ export class DriverPositionRepository extends Repository<DriverPosition> {
     from: number,
     to: number,
   ): Promise<DriverPosition[]> {
-    return this.find({
-      where: {
+    return this.find(
+      {
         driver,
-        seenAt: Between(from, to),
+        seenAt: { $gte: from, $lte: to },
       },
-      order: {
-        seenAt: 'ASC',
-      },
-    });
+      { orderBy: { seenAt: 'ASC' } },
+    );
   }
 }

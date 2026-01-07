@@ -1,32 +1,33 @@
 import { BaseEntity } from '../common/base.entity';
 import { Driver } from './driver.entity';
-import { Column, Entity, OneToOne } from 'typeorm';
+import { Entity, Property, OneToOne, Enum } from '@mikro-orm/core';
+import { DriverFeeRepository } from '../repository/driver-fee.repository';
 
 export enum FeeType {
   FLAT = 'flat',
   PERCENTAGE = 'percentage',
 }
 
-@Entity()
+@Entity({ repository: () => DriverFeeRepository })
 export class DriverFee extends BaseEntity {
-  @Column()
-  private feeType: FeeType;
+  @Enum(() => FeeType)
+  private feeType!: FeeType;
 
-  @Column()
-  private amount: number;
+  @Property()
+  private amount!: number;
 
-  @Column({ default: 0 })
-  private min: number;
+  @Property({ default: 0 })
+  private min: number = 0;
 
   @OneToOne(() => Driver, (driver) => driver.fee)
-  public driver: Driver;
+  public driver!: Driver;
 
-  constructor(feeType: FeeType, driver: Driver, amount: number, min: number) {
+  constructor(feeType?: FeeType, driver?: Driver, amount?: number, min?: number) {
     super();
-    this.feeType = feeType;
-    this.driver = driver;
-    this.amount = amount;
-    this.min = min;
+    if (feeType) this.feeType = feeType;
+    if (driver) this.driver = driver;
+    if (amount) this.amount = amount;
+    if (min) this.min = min;
   }
 
   public getFeeType() {
