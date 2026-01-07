@@ -1,21 +1,21 @@
 import { BaseEntity } from '../common/base.entity';
-import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import { Entity, Property, OneToOne } from '@mikro-orm/core';
 import { Client } from './client.entity';
+import { AwardsAccountRepository } from '../repository/awards-account.repository';
 
-@Entity()
+@Entity({ repository: () => AwardsAccountRepository })
 export class AwardsAccount extends BaseEntity {
-  @Column({ default: Date.now(), type: 'bigint' })
-  private date: number;
+  @Property({ type: 'bigint' })
+  public date: number = Date.now();
 
-  @Column({ default: false, type: 'boolean' })
-  private isActive: boolean;
+  @Property({ default: false, type: 'boolean' })
+  public isActive: boolean = false;
 
-  @Column({ default: 0, type: 'integer' })
-  private transactions: number;
+  @Property({ default: 0, type: 'integer' })
+  public transactions: number = 0;
 
-  @OneToOne(() => Client, { eager: true })
-  @JoinColumn()
-  private client: Client;
+  @OneToOne(() => Client, { owner: true, eager: true })
+  public client!: Client;
 
   public setClient(client: Client) {
     this.client = client;

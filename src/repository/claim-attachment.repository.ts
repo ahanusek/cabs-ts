@@ -1,5 +1,4 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository } from '@mikro-orm/postgresql';
 import { ClaimAttachment } from '../entity/claim-attachment.entity';
 
-@EntityRepository(ClaimAttachment)
-export class ClaimAttachmentRepository extends Repository<ClaimAttachment> {}
+export class ClaimAttachmentRepository extends EntityRepository<ClaimAttachment> {}

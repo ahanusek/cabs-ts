@@ -1,20 +1,21 @@
 import { BaseEntity } from '../common/base.entity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Entity, Property, ManyToOne } from '@mikro-orm/core';
 import { Driver } from './driver.entity';
+import { DriverPositionRepository } from '../repository/driver-position.repository';
 
-@Entity()
+@Entity({ repository: () => DriverPositionRepository })
 export class DriverPosition extends BaseEntity {
   @ManyToOne(() => Driver)
-  public driver: Driver;
+  public driver!: Driver;
 
-  @Column({ type: 'float' })
+  @Property({ type: 'float' })
   public latitude!: number;
 
-  @Column({ type: 'float' })
-  public longitude: number;
+  @Property({ type: 'float' })
+  public longitude!: number;
 
-  @Column({ type: 'bigint' })
-  public seenAt: number;
+  @Property({ type: 'bigint' })
+  public seenAt!: number;
 
   public getDriver() {
     return this.driver;

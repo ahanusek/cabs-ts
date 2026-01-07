@@ -67,7 +67,7 @@ export class TransitDto {
     if (price) {
       this.price = price;
     }
-    this.date = transit.getDateTime();
+    this.date = transit.getDateTime() ?? 0;
     this.status = transit.getStatus();
     this.setTariff();
     for (const d of transit.getProposedDrivers()) {
@@ -78,17 +78,17 @@ export class TransitDto {
     this.carClass = transit.getCarType();
     this.clientDto = new ClientDto(transit.getClient());
     if (transit.getDriversFee() != null) {
-      this.driverFee = transit.getDriversFee();
+      this.driverFee = transit.getDriversFee()!;
     }
     const estimatedPrice = transit.getEstimatedPrice();
     if (estimatedPrice) {
       this.estimatedPrice = estimatedPrice;
     }
-    this.dateTime = transit.getDateTime();
-    this.published = transit.getPublished();
+    this.dateTime = transit.getDateTime() ?? 0;
+    this.published = transit.getPublished() ?? 0;
     this.acceptedAt = transit.getAcceptedAt();
     this.started = transit.getStarted();
-    this.completeAt = transit.getCompleteAt();
+    this.completeAt = transit.getCompleteAt() ?? null;
   }
 
   public getKmRate() {

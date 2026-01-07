@@ -1,27 +1,28 @@
 import { BaseEntity } from '../common/base.entity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Entity, Property, ManyToOne, Enum } from '@mikro-orm/core';
 import { Driver } from './driver.entity';
 import { CarClass } from './car-type.entity';
+import { DriverSessionRepository } from '../repository/driver-session.repository';
 
-@Entity()
+@Entity({ repository: () => DriverSessionRepository })
 export class DriverSession extends BaseEntity {
-  @Column({ nullable: true, type: 'bigint' })
-  public loggedAt: number;
+  @Property({ nullable: true, type: 'bigint' })
+  public loggedAt?: number;
 
-  @Column({ nullable: true, type: 'bigint' })
-  private loggedOutAt: number | null;
+  @Property({ nullable: true, type: 'bigint' })
+  public loggedOutAt: number | null = null;
 
   @ManyToOne(() => Driver)
-  private driver: Driver;
+  public driver!: Driver;
 
-  @Column()
-  private platesNumber: string;
+  @Property()
+  public platesNumber!: string;
 
-  @Column()
-  private carClass: CarClass;
+  @Enum(() => CarClass)
+  public carClass!: CarClass;
 
-  @Column()
-  private carBrand: string;
+  @Property()
+  public carBrand!: string;
 
   public getLoggedAt() {
     return this.loggedAt;

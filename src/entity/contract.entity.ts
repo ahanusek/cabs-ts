@@ -1,6 +1,7 @@
 import { BaseEntity } from '../common/base.entity';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Entity, Property, OneToMany, Collection, Enum } from '@mikro-orm/core';
 import { ContractAttachment } from './contract-attachment.entity';
+import { ContractRepository } from '../repository/contract.repository';
 
 export enum ContractStatus {
   NEGOTIATIONS_IN_PROGRESS = 'negotiations_in_progress',
@@ -8,38 +9,41 @@ export enum ContractStatus {
   ACCEPTED = 'accepted',
 }
 
-@Entity()
+@Entity({ repository: () => ContractRepository })
 export class Contract extends BaseEntity {
   @OneToMany(
     () => ContractAttachment,
     (contractAttachment) => contractAttachment.contract,
     { eager: true },
   )
-  public attachments: ContractAttachment[];
+  public attachments = new Collection<ContractAttachment>(this);
 
-  @Column()
-  private partnerName: string;
+  @Property()
+  public partnerName!: string;
 
-  @Column()
-  private subject: string;
+  @Property()
+  public subject!: string;
 
-  @Column({ default: Date.now(), type: 'bigint' })
-  private creationDate: number;
+  @Property({ type: 'bigint' })
+  public creationDate: number = Date.now();
 
-  @Column({ nullable: true, type: 'bigint' })
-  private acceptedAt: number | null;
+  @Property({ nullable: true, type: 'bigint' })
+  public acceptedAt: number | null = null;
 
-  @Column({ nullable: true, type: 'bigint' })
-  private rejectedAt: number | null;
+  @Property({ nullable: true, type: 'bigint' })
+  public rejectedAt: number | null = null;
 
-  @Column({ nullable: true, type: 'bigint' })
-  private changeDate: number | null;
+  @Property({ nullable: true, type: 'bigint' })
+  public changeDate: number | null = null;
 
-  @Column({ default: ContractStatus.NEGOTIATIONS_IN_PROGRESS })
-  private status: ContractStatus;
+  @Enum({
+    items: () => ContractStatus,
+    default: ContractStatus.NEGOTIATIONS_IN_PROGRESS,
+  })
+  public status: ContractStatus = ContractStatus.NEGOTIATIONS_IN_PROGRESS;
 
-  @Column()
-  private contractNo: string;
+  @Property()
+  public contractNo!: string;
 
   public getCreationDate() {
     return this.creationDate;
@@ -90,11 +94,11 @@ export class Contract extends BaseEntity {
   }
 
   public getAttachments() {
-    return this.attachments || [];
+    return this.attachments.getItems();
   }
 
   public setAttachments(attachments: ContractAttachment[]) {
-    this.attachments = attachments;
+    this.attachments.set(attachments);
   }
 
   public getPartnerName() {

@@ -1,10 +1,18 @@
 import { ForbiddenException } from '@nestjs/common';
 import { BaseEntity } from '../common/base.entity';
-import { Column, Entity, JoinColumn, ManyToMany, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  Property,
+  ManyToOne,
+  ManyToMany,
+  Collection,
+  Enum,
+} from '@mikro-orm/core';
 import { Driver } from './driver.entity';
 import { Client, PaymentType } from './client.entity';
 import { Address } from './address.entity';
 import { CarClass } from './car-type.entity';
+import { TransitRepository } from '../repository/transit.repository';
 
 export enum Status {
   DRAFT = 'draft',
@@ -54,85 +62,81 @@ export enum DayOfWeek {
   SATURDAY,
 }
 
-@Entity()
+@Entity({ repository: () => TransitRepository })
 export class Transit extends BaseEntity {
   public static readonly BASE_FEE = 8;
 
-  @ManyToOne(() => Driver, (driver) => driver.transits, { eager: true })
-  public driver: Driver | null;
+  @ManyToOne(() => Driver, { nullable: true, eager: true })
+  public driver: Driver | null = null;
 
-  @Column({ nullable: true })
-  private driverPaymentStatus: DriverPaymentStatus;
+  @Enum({ items: () => DriverPaymentStatus, nullable: true })
+  public driverPaymentStatus?: DriverPaymentStatus;
 
-  @Column({ nullable: true })
-  private clientPaymentStatus: ClientPaymentStatus;
+  @Enum({ items: () => ClientPaymentStatus, nullable: true })
+  public clientPaymentStatus?: ClientPaymentStatus;
 
-  @Column({ nullable: true })
-  private paymentType: PaymentType;
+  @Enum({ items: () => PaymentType, nullable: true })
+  public paymentType?: PaymentType;
 
-  @Column()
-  private status: Status;
+  @Enum(() => Status)
+  public status!: Status;
 
-  @Column({ type: 'bigint', nullable: true })
-  private date: number;
-
-  @ManyToOne(() => Address, { eager: true })
-  @JoinColumn()
-  private from: Address;
+  @Property({ type: 'bigint', nullable: true })
+  public date?: number;
 
   @ManyToOne(() => Address, { eager: true })
-  @JoinColumn()
-  private to: Address;
+  public from!: Address;
 
-  @Column({ nullable: true, type: 'bigint' })
-  public acceptedAt: number | null;
+  @ManyToOne(() => Address, { eager: true })
+  public to!: Address;
 
-  @Column({ nullable: true, type: 'bigint' })
-  public started: number | null;
+  @Property({ nullable: true, type: 'bigint' })
+  public acceptedAt: number | null = null;
 
-  @Column({ default: 0 })
-  public pickupAddressChangeCounter: number;
+  @Property({ nullable: true, type: 'bigint' })
+  public started: number | null = null;
+
+  @Property({ default: 0 })
+  public pickupAddressChangeCounter: number = 0;
 
   @ManyToMany(() => Driver)
-  public driversRejections: Driver[];
+  public driversRejections = new Collection<Driver>(this);
 
   @ManyToMany(() => Driver)
-  public proposedDrivers: Driver[];
+  public proposedDrivers = new Collection<Driver>(this);
 
-  @Column({ default: 0, type: 'integer' })
-  public awaitingDriversResponses: number;
+  @Property({ default: 0, type: 'integer' })
+  public awaitingDriversResponses: number = 0;
 
-  @Column({ nullable: true, type: 'varchar' })
-  public factor: number | null;
+  @Property({ nullable: true, type: 'varchar' })
+  public factor: number | null = null;
 
-  @Column({ nullable: false, default: 0 })
-  private km: number;
+  @Property({ default: 0 })
+  public km: number = 0;
 
-  // https://stackoverflow.com/questions/37107123/sould-i-store-price-as-decimal-or-integer-in-mysql
-  @Column({ nullable: true, type: 'integer' })
-  private price: number | null;
+  @Property({ nullable: true, type: 'integer' })
+  public price: number | null = null;
 
-  @Column({ nullable: true, type: 'integer' })
-  private estimatedPrice: number | null;
+  @Property({ nullable: true, type: 'integer' })
+  public estimatedPrice: number | null = null;
 
-  @Column({ nullable: true })
-  private driversFee: number;
+  @Property({ nullable: true })
+  public driversFee?: number;
 
-  @Column({ type: 'bigint', nullable: true })
-  public dateTime: number;
+  @Property({ type: 'bigint', nullable: true })
+  public dateTime?: number;
 
-  @Column({ type: 'bigint', nullable: true })
-  private published: number;
+  @Property({ type: 'bigint', nullable: true })
+  public published?: number;
 
   @ManyToOne(() => Client, { eager: true })
-  @JoinColumn()
-  private client: Client;
+  public client!: Client;
 
-  @Column()
-  private carType: CarClass;
+  @Enum(() => CarClass)
+  public carType!: CarClass;
 
-  @Column({ type: 'bigint', nullable: true })
-  private completeAt: number;
+  @Property({ type: 'bigint', nullable: true })
+  public completeAt?: number;
 
   public getCarType() {
     return this.carType as CarClass;
@@ -150,7 +154,6 @@ export class Transit extends BaseEntity {
     return this.price;
   }
 
-  //just for testing
   public setPrice(price: number) {
     this.price = price;
   }
@@ -213,19 +216,19 @@ export class Transit extends BaseEntity {
   }
 
   public getDriversRejections() {
-    return this.driversRejections || [];
+    return this.driversRejections.getItems();
   }
 
   public setDriversRejections(driversRejections: Driver[]) {
-    this.driversRejections = driversRejections;
+    this.driversRejections.set(driversRejections);
   }
 
   public getProposedDrivers() {
-    return this.proposedDrivers || [];
+    return this.proposedDrivers.getItems();
   }
 
   public setProposedDrivers(proposedDrivers: Driver[]) {
-    this.proposedDrivers = proposedDrivers;
+    this.proposedDrivers.set(proposedDrivers);
   }
 
   public getAcceptedAt() {
@@ -321,7 +324,6 @@ export class Transit extends BaseEntity {
     }
     let kmRate: number;
     const day = new Date();
-    // wprowadzenie nowych cennikow od 1.01.2019
     if (day.getFullYear() <= 2018) {
       kmRate = 1.0;
       baseFee++;
@@ -335,7 +337,6 @@ export class Transit extends BaseEntity {
         kmRate = 3.5;
         baseFee += 3;
       } else {
-        // piątek i sobota po 17 do 6 następnego dnia
         if (
           (day.getDay() == DayOfWeek.FRIDAY && day.getHours() >= 17) ||
           (day.getDay() == DayOfWeek.SATURDAY && day.getHours() <= 6) ||
@@ -345,7 +346,6 @@ export class Transit extends BaseEntity {
           kmRate = 2.5;
           baseFee += 2;
         } else {
-          // pozostałe godziny weekendu
           if (
             (day.getDay() == DayOfWeek.SATURDAY &&
               day.getHours() > 6 &&
@@ -354,7 +354,6 @@ export class Transit extends BaseEntity {
           ) {
             kmRate = 1.5;
           } else {
-            // tydzień roboczy
             kmRate = 1.0;
             baseFee++;
           }

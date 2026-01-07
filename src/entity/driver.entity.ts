@@ -1,8 +1,16 @@
-import { Entity, Column, OneToMany, OneToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Property,
+  OneToMany,
+  OneToOne,
+  Collection,
+  Enum,
+} from '@mikro-orm/core';
 import { BaseEntity } from '../common/base.entity';
 import { Transit } from './transit.entity';
 import { DriverAttribute } from './driver-attribute.entity';
 import { DriverFee } from './driver-fee.entity';
+import { DriverRepository } from '../repository/driver.repository';
 
 export enum DriverStatus {
   INACTIVE = 'inactive',
@@ -14,51 +22,52 @@ export enum DriverType {
   REGULAR = 'regular',
 }
 
-@Entity()
+@Entity({ repository: () => DriverRepository })
 export class Driver extends BaseEntity {
-  @Column()
-  private status: DriverStatus;
+  @Enum(() => DriverStatus)
+  private status!: DriverStatus;
 
-  @Column()
-  private firstName: string;
+  @Property()
+  private firstName!: string;
 
-  @Column()
-  private lastName: string;
+  @Property()
+  private lastName!: string;
 
-  @Column()
-  private driverLicense: string;
+  @Property()
+  private driverLicense!: string;
 
-  @Column({ nullable: true, type: 'varchar' })
-  private photo: string | null;
+  @Property({ nullable: true, type: 'varchar' })
+  private photo: string | null = null;
 
-  @Column()
-  private type: DriverType;
+  @Enum(() => DriverType)
+  private type!: DriverType;
 
-  @Column({ default: false })
-  private isOccupied: boolean;
+  @Property({ default: false })
+  private isOccupied: boolean = false;
 
-  @OneToOne(() => DriverFee, (fee) => fee.driver)
-  @JoinColumn()
-  public fee: DriverFee;
+  @OneToOne(() => DriverFee, (fee) => fee.driver, {
+    owner: true,
+    nullable: true,
+  })
+  public fee?: DriverFee;
+
+  @OneToMany(() => DriverAttribute, (driverAttribute) => driverAttribute.driver)
+  public attributes = new Collection<DriverAttribute>(this);
+
+  @OneToMany(() => Transit, (transit) => transit.driver)
+  public transits = new Collection<Transit>(this);
 
   public getAttributes() {
-    return this.attributes || [];
+    return this.attributes.getItems();
   }
 
   public setAttributes(attributes: DriverAttribute[]) {
-    this.attributes = attributes;
+    this.attributes.set(attributes);
   }
-
-  @OneToMany(() => DriverAttribute, (driverAttribute) => driverAttribute.driver)
-  public attributes: DriverAttribute[];
-
-  @OneToMany(() => Transit, (transit) => transit.driver)
-  public transits: Transit[];
 
   public calculateEarningsForTransit(transit: Transit) {
     console.log(transit);
     return null;
-    // zdublować kod wyliczenia kosztu przejazdu
   }
 
   public setLastName(lastName: string) {
@@ -126,6 +135,6 @@ export class Driver extends BaseEntity {
   }
 
   public getTransits() {
-    return this.transits || [];
+    return this.transits.getItems();
   }
 }

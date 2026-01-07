@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@mikro-orm/nestjs';
 import { CarTypeRepository } from '../repository/car-type.repository';
 import { AppProperties } from '../config/app-properties.config';
 import { CarClass, CarStatus, CarType } from '../entity/car-type.entity';
@@ -9,13 +9,13 @@ import { CarTypeDto } from '../dto/car-type.dto';
 @Injectable()
 export class CarTypeService {
   constructor(
-    @InjectRepository(CarTypeRepository)
+    @InjectRepository(CarType)
     private carTypeRepository: CarTypeRepository,
     private readonly appProperties: AppProperties,
   ) {}
 
   public async load(id: string) {
-    const carType = await this.carTypeRepository.findOne(id);
+    const carType = await this.carTypeRepository.findOne({ id });
     if (!carType) {
       throw new NotFoundException('Cannot find car type');
     }
@@ -33,7 +33,8 @@ export class CarTypeService {
         carTypeDTO.carClass,
       );
       byCarClass.setDescription(carTypeDTO.description);
-      return this.carTypeRepository.save(byCarClass);
+      await this.carTypeRepository.getEntityManager().flush();
+      return byCarClass;
     } catch {
       const carType = new CarType(
         carTypeDTO.carClass,
@@ -41,7 +42,8 @@ export class CarTypeService {
         this.getMinNumberOfCars(carTypeDTO.carClass),
       );
 
-      return this.carTypeRepository.save(carType);
+      await this.carTypeRepository.getEntityManager().persistAndFlush(carType);
+      return carType;
     }
   }
 
@@ -50,7 +52,7 @@ export class CarTypeService {
 
     carType.activate();
 
-    await this.carTypeRepository.save(carType);
+    await this.carTypeRepository.getEntityManager().flush();
   }
 
   public async deactivate(id: string) {
@@ -58,7 +60,7 @@ export class CarTypeService {
 
     carType.deactivate();
 
-    await this.carTypeRepository.save(carType);
+    await this.carTypeRepository.getEntityManager().flush();
   }
 
   public async registerCar(carClass: CarClass) {
@@ -66,7 +68,7 @@ export class CarTypeService {
 
     carType.registerCar();
 
-    await this.carTypeRepository.save(carType);
+    await this.carTypeRepository.getEntityManager().flush();
   }
 
   public async unregisterCar(carClass: CarClass) {
@@ -74,7 +76,7 @@ export class CarTypeService {
 
     carType.unregisterCar();
 
-    await this.carTypeRepository.save(carType);
+    await this.carTypeRepository.getEntityManager().flush();
   }
 
   public async registerActiveCar(carClass: CarClass) {
@@ -82,7 +84,7 @@ export class CarTypeService {
 
     carType.registerActiveCar();
 
-    await this.carTypeRepository.save(carType);
+    await this.carTypeRepository.getEntityManager().flush();
   }
 
   public async unregisterActiveCar(carClass: CarClass) {
@@ -90,7 +92,7 @@ export class CarTypeService {
 
     carType.unregisterActiveCar();
 
-    await this.carTypeRepository.save(carType);
+    await this.carTypeRepository.getEntityManager().flush();
   }
 
   public async findActiveCarClasses() {
@@ -101,7 +103,7 @@ export class CarTypeService {
   public async removeCarType(carClass: CarClass) {
     const carType = await this.carTypeRepository.findByCarClass(carClass);
     if (carType) {
-      await this.carTypeRepository.delete(carType);
+      await this.carTypeRepository.getEntityManager().removeAndFlush(carType);
     }
   }
 

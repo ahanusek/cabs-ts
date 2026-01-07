@@ -5,7 +5,7 @@ import {
   NotFoundException,
   NotAcceptableException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@mikro-orm/nestjs';
 import { ClientRepository } from '../repository/client.repository';
 import { TransitRepository } from '../repository/transit.repository';
 import { AppProperties } from '../config/app-properties.config';
@@ -15,6 +15,7 @@ import { AwardsAccount } from '../entity/awards-account.entity';
 import dayjs from 'dayjs';
 import { Client, Type } from '../entity/client.entity';
 import orderBy from 'lodash.orderby';
+import { Transit } from '../entity/transit.entity';
 
 export interface IAwardsService {
   findBy: (clientId: string) => Promise<AwardsAccountDto>;
@@ -49,13 +50,13 @@ export interface IAwardsService {
 @Injectable()
 export class AwardsService implements IAwardsService {
   constructor(
-    @InjectRepository(ClientRepository)
+    @InjectRepository(Client)
     private clientRepository: ClientRepository,
-    @InjectRepository(TransitRepository)
+    @InjectRepository(Transit)
     private transitRepository: TransitRepository,
-    @InjectRepository(AwardsAccountRepository)
+    @InjectRepository(AwardsAccount)
     private accountRepository: AwardsAccountRepository,
-    @InjectRepository(AwardedMilesRepository)
+    @InjectRepository(AwardedMiles)
     private milesRepository: AwardedMilesRepository,
     private appProperties: AppProperties,
   ) {}
@@ -67,7 +68,7 @@ export class AwardsService implements IAwardsService {
   }
 
   public async registerToProgram(clientId: string) {
-    const client = await this.clientRepository.findOne(clientId);
+    const client = await this.clientRepository.findOne({ id: clientId });
 
     if (!client) {
       throw new NotFoundException('Client does not exists, id = ' + clientId);
@@ -79,7 +80,7 @@ export class AwardsService implements IAwardsService {
     account.setActive(false);
     account.setDate(Date.now());
 
-    await this.accountRepository.save(account);
+    await this.accountRepository.getEntityManager().persistAndFlush(account);
   }
 
   public async activateAccount(clientId: string) {
@@ -87,7 +88,7 @@ export class AwardsService implements IAwardsService {
 
     account.setActive(true);
 
-    await this.accountRepository.save(account);
+    await this.accountRepository.getEntityManager().flush();
   }
 
   public async deactivateAccount(clientId: string) {
@@ -95,12 +96,12 @@ export class AwardsService implements IAwardsService {
 
     account.setActive(false);
 
-    await this.accountRepository.save(account);
+    await this.accountRepository.getEntityManager().flush();
   }
 
   public async registerMiles(clientId: string, transitId: string) {
     const account = await this.getAccountForClient(clientId);
-    const transit = await this.transitRepository.findOne(transitId);
+    const transit = await this.transitRepository.findOne({ id: transitId });
 
     if (!transit) {
       throw new NotFoundException('transit does not exists, id = ' + transitId);
@@ -123,8 +124,8 @@ export class AwardsService implements IAwardsService {
       miles.setSpecial(false);
       account.increaseTransactions();
 
-      await this.milesRepository.save(miles);
-      await this.accountRepository.save(account);
+      await this.milesRepository.getEntityManager().persistAndFlush(miles);
+      await this.accountRepository.getEntityManager().flush();
       return miles;
     }
   }
@@ -139,13 +140,13 @@ export class AwardsService implements IAwardsService {
     _miles.setDate(Date.now());
     _miles.setSpecial(true);
     account.increaseTransactions();
-    await this.milesRepository.save(_miles);
-    await this.accountRepository.save(account);
+    await this.milesRepository.getEntityManager().persistAndFlush(_miles);
+    await this.accountRepository.getEntityManager().flush();
     return _miles;
   }
 
   public async removeMiles(clientId: string, miles: number) {
-    const client = await this.clientRepository.findOne(clientId);
+    const client = await this.clientRepository.findOne({ id: clientId });
     if (!client) {
       throw new NotFoundException(
         `Client with id ${clientId} doest not exists`,
@@ -208,9 +209,9 @@ export class AwardsService implements IAwardsService {
               iter.setMiles(iter.getMiles() - miles);
               miles = 0;
             }
-            await this.milesRepository.save(iter);
           }
         }
+        await this.milesRepository.getEntityManager().flush();
       } else {
         throw new NotAcceptableException(
           'Insufficient miles, id = ' +
@@ -223,7 +224,7 @@ export class AwardsService implements IAwardsService {
   }
 
   public async calculateBalance(clientId: string) {
-    const client = await this.clientRepository.findOne(clientId);
+    const client = await this.clientRepository.findOne({ id: clientId });
     if (!client) {
       throw new NotFoundException(
         `Client with id ${clientId} doest not exists`,
@@ -250,7 +251,9 @@ export class AwardsService implements IAwardsService {
     toClientId: string,
     miles: number,
   ) {
-    const fromClient = await this.clientRepository.findOne(fromClientId);
+    const fromClient = await this.clientRepository.findOne({
+      id: fromClientId,
+    });
     if (!fromClient) {
       throw new NotFoundException(
         `Client with id ${fromClientId} doest not exists`,
@@ -282,17 +285,15 @@ export class AwardsService implements IAwardsService {
 
             miles -= iter.getMiles();
 
-            await this.milesRepository.save(_miles);
+            await this.milesRepository.getEntityManager().persist(_miles);
           }
-          await this.milesRepository.save(iter);
         }
       }
 
       accountFrom.increaseTransactions();
       accountTo.increaseTransactions();
 
-      await this.accountRepository.save(accountFrom);
-      await this.accountRepository.save(accountTo);
+      await this.accountRepository.getEntityManager().flush();
     }
   }
 
@@ -303,7 +304,7 @@ export class AwardsService implements IAwardsService {
   private async getAccountForClient(clientId: string | Client) {
     const client =
       typeof clientId === 'string'
-        ? await this.clientRepository.findOne(clientId)
+        ? await this.clientRepository.findOne({ id: clientId })
         : clientId;
     if (!client) {
       throw new NotFoundException(

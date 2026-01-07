@@ -1,27 +1,20 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository } from '@mikro-orm/postgresql';
 import { Address } from '../entity/address.entity';
 
-@EntityRepository(Address)
-export class AddressRepository extends Repository<Address> {
-  // FIX ME: To replace with getOrCreate method instead of that?
-  // Actual workaround for address uniqueness problem: assign result from repo.save to variable for later usage
-  //@ts-expect-error to avoid params error
-  public async save(address: Address) {
+export class AddressRepository extends EntityRepository<Address> {
+  public async saveAddress(address: Address): Promise<Address> {
     if (!address.getId()) {
-      const existingAddress = await this.findOne({
-        where: { hash: address.getHash() },
-      });
+      const existingAddress = await this.findOne({ hash: address.getHash() });
       if (existingAddress) {
         return existingAddress;
       }
     }
 
-    return super.save(address);
+    await this.getEntityManager().persistAndFlush(address);
+    return address;
   }
 
-  public async findByHash(hash: string) {
-    return this.findOne({
-      where: { hash },
-    });
+  public async findByHash(hash: string): Promise<Address | null> {
+    return this.findOne({ hash });
   }
 }

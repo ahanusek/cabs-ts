@@ -1,21 +1,18 @@
-import { Between, EntityRepository, Repository } from 'typeorm';
+import { EntityRepository } from '@mikro-orm/postgresql';
 import { Status, Transit } from '../entity/transit.entity';
 import { Driver } from '../entity/driver.entity';
 import { Client } from '../entity/client.entity';
 import { Address } from '../entity/address.entity';
 
-@EntityRepository(Transit)
-export class TransitRepository extends Repository<Transit> {
+export class TransitRepository extends EntityRepository<Transit> {
   public async findAllByDriverAndDateTimeBetween(
     driver: Driver,
     from: number,
     to: number,
   ): Promise<Transit[]> {
-    return await this.find({
-      where: {
-        driver,
-        dateTime: Between(from, to),
-      },
+    return this.find({
+      driver,
+      dateTime: { $gte: from, $lte: to },
     });
   }
 
@@ -24,16 +21,10 @@ export class TransitRepository extends Repository<Transit> {
     from: Address,
     status: Status,
   ): Promise<Transit[]> {
-    return await this.find({
-      where: {
-        client,
-        from,
-        status,
-      },
-      order: {
-        dateTime: 'DESC',
-      },
-    });
+    return this.find(
+      { client, from, status },
+      { orderBy: { dateTime: 'DESC' } },
+    );
   }
 
   public async findAllByClientAndFromAndPublishedAfterAndStatusOrderByDateTimeDesc(
@@ -42,24 +33,13 @@ export class TransitRepository extends Repository<Transit> {
     when: number,
     status: Status,
   ): Promise<Transit[]> {
-    return this.find({
-      where: {
-        client,
-        from,
-        status,
-        published: when,
-      },
-      order: {
-        dateTime: 'DESC',
-      },
-    });
+    return this.find(
+      { client, from, status, published: { $gte: when } },
+      { orderBy: { dateTime: 'DESC' } },
+    );
   }
 
   public async findByClient(client: Client): Promise<Transit[]> {
-    return this.find({
-      where: {
-        client,
-      },
-    });
+    return this.find({ client });
   }
 }

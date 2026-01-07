@@ -1,20 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@mikro-orm/nestjs';
 import { DriverFeeRepository } from '../repository/driver-fee.repository';
 import { TransitRepository } from '../repository/transit.repository';
-import { FeeType } from '../entity/driver-fee.entity';
+import { FeeType, DriverFee } from '../entity/driver-fee.entity';
+import { Transit } from '../entity/transit.entity';
 
 @Injectable()
 export class DriverFeeService {
   constructor(
-    @InjectRepository(DriverFeeRepository)
+    @InjectRepository(DriverFee)
     private driverFeeRepository: DriverFeeRepository,
-    @InjectRepository(TransitRepository)
+    @InjectRepository(Transit)
     private transitRepository: TransitRepository,
   ) {}
 
   public async calculateDriverFee(transitId: string) {
-    const transit = await this.transitRepository.findOne(transitId);
+    const transit = await this.transitRepository.findOne({ id: transitId });
     if (!transit) {
       throw new NotFoundException('transit does not exist, id = ' + transitId);
     }

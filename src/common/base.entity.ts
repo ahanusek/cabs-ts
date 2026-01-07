@@ -1,8 +1,9 @@
-import { PrimaryGeneratedColumn } from 'typeorm';
+import { PrimaryKey } from '@mikro-orm/core';
+import { v4 as uuidv4 } from 'uuid';
 
-export class BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  protected id: string;
+export abstract class BaseEntity {
+  @PrimaryKey({ type: 'uuid' })
+  public id: string = uuidv4();
 
   public getId(): string {
     return this.id;

@@ -3,19 +3,19 @@ import {
   NotFoundException,
   NotAcceptableException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@mikro-orm/nestjs';
 import { DriverRepository } from '../repository/driver.repository';
 import { DriverPositionRepository } from '../repository/driver-position.repository';
 import { DistanceCalculator } from './distance-calculator.service';
 import { DriverPosition } from '../entity/driver-position.entity';
-import { DriverStatus } from '../entity/driver.entity';
+import { Driver, DriverStatus } from '../entity/driver.entity';
 
 @Injectable()
 export class DriverTrackingService {
   constructor(
-    @InjectRepository(DriverRepository)
+    @InjectRepository(Driver)
     private driverRepository: DriverRepository,
-    @InjectRepository(DriverPositionRepository)
+    @InjectRepository(DriverPosition)
     private positionRepository: DriverPositionRepository,
     private distanceCalculator: DistanceCalculator,
   ) {}
@@ -25,7 +25,7 @@ export class DriverTrackingService {
     latitude: number,
     longitude: number,
   ): Promise<DriverPosition> {
-    const driver = await this.driverRepository.findOne(driverId);
+    const driver = await this.driverRepository.findOne({ id: driverId });
     if (!driver) {
       throw new NotFoundException('Driver does not exists, id = ' + driverId);
     }
@@ -39,7 +39,8 @@ export class DriverTrackingService {
     position.setSeenAt(Date.now());
     position.setLatitude(latitude);
     position.setLongitude(longitude);
-    return await this.positionRepository.save(position);
+    await this.positionRepository.getEntityManager().persistAndFlush(position);
+    return position;
   }
 
   public async calculateTravelledDistance(
@@ -47,7 +48,7 @@ export class DriverTrackingService {
     from: number,
     to: number,
   ) {
-    const driver = await this.driverRepository.findOne(driverId);
+    const driver = await this.driverRepository.findOne({ id: driverId });
     if (!driver) {
       throw new NotFoundException('Driver does not exists, id = ' + driverId);
     }

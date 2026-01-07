@@ -1,4 +1,4 @@
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@mikro-orm/nestjs';
 import { ClientRepository } from '../repository/client.repository';
 import { TransitRepository } from '../repository/transit.repository';
 import { AddressRepository } from '../repository/address.repository';
@@ -11,11 +11,11 @@ import dayjs from 'dayjs';
 @Injectable()
 export class TransitAnalyzerService {
   constructor(
-    @InjectRepository(ClientRepository)
+    @InjectRepository(Client)
     private clientRepository: ClientRepository,
-    @InjectRepository(TransitRepository)
+    @InjectRepository(Transit)
     private transitRepository: TransitRepository,
-    @InjectRepository(AddressRepository)
+    @InjectRepository(Address)
     private addressRepository: AddressRepository,
   ) {}
 
@@ -23,11 +23,11 @@ export class TransitAnalyzerService {
     clientId: string,
     addressId: string,
   ): Promise<Address[]> {
-    const client = await this.clientRepository.findOne(clientId);
+    const client = await this.clientRepository.findOne({ id: clientId });
     if (!client) {
       throw new NotFoundException('Client does not exists, id = ' + clientId);
     }
-    const address = await this.addressRepository.findOne(addressId);
+    const address = await this.addressRepository.findOne({ id: addressId });
     if (!address) {
       throw new NotFoundException('Address does not exists, id = ' + addressId);
     }
@@ -55,7 +55,7 @@ export class TransitAnalyzerService {
         await this.transitRepository.findAllByClientAndFromAndPublishedAfterAndStatusOrderByDateTimeDesc(
           client,
           from,
-          t.getPublished(),
+          t.getPublished() ?? 0,
           Status.COMPLETED,
         );
     }

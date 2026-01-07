@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@mikro-orm/nestjs';
 import { ClientRepository } from '../repository/client.repository';
 import { TransitRepository } from '../repository/transit.repository';
 import { AppProperties } from '../config/app-properties.config';
@@ -10,16 +10,17 @@ import { ClientNotificationService } from './client-notification.service';
 import { DriverNotificationService } from './driver-notification.service';
 import { ClaimDto } from '../dto/claim.dto';
 import { Claim, ClaimStatus, CompletionMode } from '../entity/claim.entity';
-import { Type } from '../entity/client.entity';
+import { Type, Client } from '../entity/client.entity';
+import { Transit } from '../entity/transit.entity';
 
 @Injectable()
 export class ClaimService {
   constructor(
-    @InjectRepository(ClientRepository)
+    @InjectRepository(Client)
     private clientRepository: ClientRepository,
-    @InjectRepository(TransitRepository)
+    @InjectRepository(Transit)
     private transitRepository: TransitRepository,
-    @InjectRepository(ClaimRepository)
+    @InjectRepository(Claim)
     private claimRepository: ClaimRepository,
     private claimNumberGenerator: ClaimNumberGenerator,
     private awardsService: AwardsService,
@@ -37,7 +38,7 @@ export class ClaimService {
   }
 
   public async find(id: string): Promise<Claim> {
-    const claim = await this.claimRepository.findOne(id);
+    const claim = await this.claimRepository.findOne({ id });
     if (!claim) {
       throw new NotFoundException('Claim does not exists');
     }
@@ -45,10 +46,12 @@ export class ClaimService {
   }
 
   public async update(claimDTO: ClaimDto, claim: Claim) {
-    const client = await this.clientRepository.findOne(claimDTO.getClientId());
-    const transit = await this.transitRepository.findOne(
-      claimDTO.getTransitId(),
-    );
+    const client = await this.clientRepository.findOne({
+      id: claimDTO.getClientId(),
+    });
+    const transit = await this.transitRepository.findOne({
+      id: claimDTO.getTransitId(),
+    });
     if (client == null) {
       throw new NotFoundException('Client does not exists');
     }
@@ -65,13 +68,14 @@ export class ClaimService {
     claim.setCreationDate(Date.now());
     claim.setReason(claimDTO.getReason());
     claim.setIncidentDescription(claimDTO.getIncidentDescription());
-    return this.claimRepository.save(claim);
+    await this.claimRepository.getEntityManager().persistAndFlush(claim);
+    return claim;
   }
 
   public async setStatus(newStatus: ClaimStatus, id: string) {
     const claim = await this.find(id);
     claim.setStatus(newStatus);
-    await this.claimRepository.save(claim);
+    await this.claimRepository.getEntityManager().flush();
     return claim;
   }
 

@@ -8,22 +8,24 @@ import { Driver, DriverStatus, DriverType } from '../entity/driver.entity';
 import { DriverDto } from '../dto/driver.dto';
 import { CreateDriverDto } from '../dto/create-driver.dto';
 import { DriverRepository } from '../repository/driver.repository';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@mikro-orm/nestjs';
 import { DriverAttributeRepository } from '../repository/driver-attribute.repository';
 import { TransitRepository } from '../repository/transit.repository';
 import { DriverFeeService } from './driver-fee.service';
 import dayjs from 'dayjs';
+import { DriverAttribute } from '../entity/driver-attribute.entity';
+import { Transit } from '../entity/transit.entity';
 
 @Injectable()
 export class DriverService {
   public static DRIVER_LICENSE_REGEX = '^[A-Z9]{5}\\d{6}[A-Z9]{2}\\d[A-Z]{2}$';
 
   constructor(
-    @InjectRepository(DriverRepository)
+    @InjectRepository(Driver)
     private driverRepository: DriverRepository,
-    @InjectRepository(DriverAttributeRepository)
+    @InjectRepository(DriverAttribute)
     private driverAttributeRepository: DriverAttributeRepository,
-    @InjectRepository(DriverRepository)
+    @InjectRepository(Transit)
     private transitRepository: TransitRepository,
     private driverFeeService: DriverFeeService,
   ) {}
@@ -58,11 +60,12 @@ export class DriverService {
       }
     }
 
-    return this.driverRepository.save(driver);
+    await this.driverRepository.getEntityManager().persistAndFlush(driver);
+    return driver;
   }
 
   public async loadDriver(driverId: string): Promise<DriverDto> {
-    const driver = await this.driverRepository.findOne(driverId);
+    const driver = await this.driverRepository.findOne({ id: driverId });
 
     if (!driver) {
       throw new NotFoundException(
@@ -74,7 +77,7 @@ export class DriverService {
   }
 
   public async changeDriverStatus(driverId: string, status: DriverStatus) {
-    const driver = await this.driverRepository.findOne(driverId);
+    const driver = await this.driverRepository.findOne({ id: driverId });
 
     if (!driver) {
       throw new NotFoundException(
@@ -92,11 +95,11 @@ export class DriverService {
     }
 
     driver.setStatus(status);
-    await this.driverRepository.update(driver.getId(), driver);
+    await this.driverRepository.getEntityManager().flush();
   }
 
   public async changeLicenseNumber(newLicense: string, driverId: string) {
-    const driver = await this.driverRepository.findOne(driverId);
+    const driver = await this.driverRepository.findOne({ id: driverId });
 
     if (!driver) {
       throw new NotFoundException(
@@ -116,11 +119,11 @@ export class DriverService {
     }
 
     driver.setDriverLicense(newLicense);
-    await this.driverRepository.save(driver);
+    await this.driverRepository.getEntityManager().flush();
   }
 
   public async changePhoto(driverId: string, photo: string) {
-    const driver = await this.driverRepository.findOne(driverId);
+    const driver = await this.driverRepository.findOne({ id: driverId });
 
     if (!driver) {
       throw new NotFoundException(
@@ -132,7 +135,7 @@ export class DriverService {
       throw new NotAcceptableException('Illegal photo in base64');
     }
     driver.setPhoto(photo);
-    await this.driverRepository.save(driver);
+    await this.driverRepository.getEntityManager().flush();
   }
 
   public async calculateDriverMonthlyPayment(
@@ -140,7 +143,7 @@ export class DriverService {
     year: number,
     month: number,
   ) {
-    const driver = await this.driverRepository.findOne(driverId);
+    const driver = await this.driverRepository.findOne({ id: driverId });
 
     if (!driver) {
       throw new NotFoundException(
@@ -159,13 +162,12 @@ export class DriverService {
         to.valueOf(),
       );
 
-    const sum = (
-      await Promise.all(
-        transitsList.map((t) =>
-          this.driverFeeService.calculateDriverFee(t.getId()),
-        ),
-      )
-    ).reduce((prev, curr) => prev + curr, 0);
+    const fees = await Promise.all(
+      transitsList.map((t) =>
+        this.driverFeeService.calculateDriverFee(t.getId()),
+      ),
+    );
+    const sum = fees.reduce((prev, curr) => (prev ?? 0) + (curr ?? 0), 0);
 
     return sum;
   }

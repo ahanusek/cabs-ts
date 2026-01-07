@@ -1,5 +1,4 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository } from '@mikro-orm/postgresql';
 import { Invoice } from '../entity/invoice.entity';
 
-@EntityRepository(Invoice)
-export class InvoiceRepository extends Repository<Invoice> {}
+export class InvoiceRepository extends EntityRepository<Invoice> {}

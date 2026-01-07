@@ -1,6 +1,7 @@
 import { BaseEntity } from '../common/base.entity';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, Property, ManyToOne, Enum } from '@mikro-orm/core';
 import { Driver } from './driver.entity';
+import { DriverAttributeRepository } from '../repository/driver-attribute.repository';
 
 export enum DriverAttributeName {
   PENALTY_POINTS = 'penalty_points',
@@ -13,23 +14,22 @@ export enum DriverAttributeName {
   COMPANY_NAME = 'companyName',
 }
 
-@Entity()
+@Entity({ repository: () => DriverAttributeRepository })
 export class DriverAttribute extends BaseEntity {
-  @Column()
-  private name: DriverAttributeName;
+  @Enum(() => DriverAttributeName)
+  private name!: DriverAttributeName;
 
-  @Column()
-  private value: string;
+  @Property()
+  private value!: string;
 
-  @ManyToOne(() => Driver, (driver) => driver)
-  @JoinColumn({ name: 'DRIVER_ID' })
-  public driver: Driver;
+  @ManyToOne(() => Driver)
+  public driver!: Driver;
 
-  constructor(driver: Driver, attr: DriverAttributeName, value: string) {
+  constructor(driver?: Driver, attr?: DriverAttributeName, value?: string) {
     super();
-    this.driver = driver;
-    this.name = attr;
-    this.value = value;
+    if (driver) this.driver = driver;
+    if (attr) this.name = attr;
+    if (value) this.value = value;
   }
 
   public getName() {
