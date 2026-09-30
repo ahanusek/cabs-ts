@@ -1,3 +1,7 @@
+import {
+  DriverReportReconciliation,
+  type ReportComparator,
+} from './driver-report.reconciliation';
 import { Inject, Injectable } from '@nestjs/common';
 import { DriverReportView } from './driver-report.view';
 import { DriverReportFeatures } from './driver-report.features';
@@ -14,9 +18,20 @@ export class DriverReportCreator implements ReportSource {
     @Inject(SqlDriverReportCreator) private readonly sql: ReportSource,
     @Inject(LegacyDriverReportCreator) private readonly legacy: ReportSource,
     private readonly features: DriverReportFeatures,
+    @Inject(DriverReportReconciliation)
+    private readonly reconciliation: ReportComparator,
   ) {}
 
-  public create(driverId: string, lastDays: number): Promise<DriverReportView> {
+  public async create(
+    driverId: string,
+    lastDays: number,
+  ): Promise<DriverReportView> {
+    if (this.features.reconcile) {
+      const previous = await this.legacy.create(driverId, lastDays);
+      const current = await this.sql.create(driverId, lastDays);
+      this.reconciliation.compare(previous, current);
+      return this.features.useSql ? current : previous;
+    }
     const source = this.features.useSql ? this.sql : this.legacy;
     return source.create(driverId, lastDays);
   }

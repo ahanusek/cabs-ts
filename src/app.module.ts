@@ -1,3 +1,4 @@
+import { DriverReportReconciliation } from './driverreport/driver-report.reconciliation';
 import { DriverReportCreator } from './driverreport/driver-report.creator';
 import { LegacyDriverReportCreator } from './driverreport/legacy-driver-report.creator';
 import { DriverReportFeatures } from './driverreport/driver-report.features';
@@ -99,6 +100,7 @@ const entities = [
     DriverReportController,
   ],
   providers: [
+    DriverReportReconciliation,
     DriverReportCreator,
     LegacyDriverReportCreator,
     DriverReportFeatures,
