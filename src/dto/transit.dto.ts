@@ -1,15 +1,12 @@
+import { Tariff } from '../pricing/tariff';
 import { Distance } from '../distance/distance';
-import { DayOfWeek, Status, Transit } from '../entity/transit.entity';
+import { Status, Transit } from '../entity/transit.entity';
 import { DriverDto } from './driver.dto';
 import { ClaimDto } from './claim.dto';
 import { AddressDto } from './address.dto';
 import { CarClass } from '../entity/car-type.entity';
 import { ClientDto } from './client.dto';
-import dayjs from 'dayjs';
-import dayOfYear from 'dayjs/plugin/dayOfYear';
 import { NotAcceptableException } from '@nestjs/common';
-
-dayjs.extend(dayOfYear);
 
 export class TransitDto {
   public id: string;
@@ -70,7 +67,7 @@ export class TransitDto {
     }
     this.date = transit.getDateTime() ?? 0;
     this.status = transit.getStatus();
-    this.setTariff();
+    this.setTariff(transit.getTariff());
     for (const d of transit.getProposedDrivers()) {
       this.proposedDrivers.push(new DriverDto(d));
     }
@@ -96,64 +93,10 @@ export class TransitDto {
     return this.kmRate;
   }
 
-  public setTariff() {
-    const day = dayjs();
-
-    // wprowadzenie nowych cennikow od 1.01.2019
-    if (day.get('year') <= 2018) {
-      this.kmRate = 1.0;
-      this.tariff = 'Standard';
-      return;
-    }
-
-    const year = day.get('year');
-    const leap = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
-
-    if (
-      (leap && day.dayOfYear() == 366) ||
-      (!leap && day.dayOfYear() == 365) ||
-      (day.dayOfYear() == 1 && day.get('hour') <= 6)
-    ) {
-      this.tariff = 'Sylwester';
-      this.kmRate = 3.5;
-    } else {
-      switch (day.get('day')) {
-        case DayOfWeek.MONDAY:
-        case DayOfWeek.TUESDAY:
-        case DayOfWeek.WEDNESDAY:
-        case DayOfWeek.THURSDAY:
-          this.kmRate = 1.0;
-          this.tariff = 'Standard';
-          break;
-        case DayOfWeek.FRIDAY:
-          if (day.get('hour') < 17) {
-            this.tariff = 'Standard';
-            this.kmRate = 1.0;
-          } else {
-            this.tariff = 'Weekend+';
-            this.kmRate = 2.5;
-          }
-          break;
-        case DayOfWeek.SATURDAY:
-          if (day.get('hour') < 6 || day.get('hour') >= 17) {
-            this.kmRate = 2.5;
-            this.tariff = 'Weekend+';
-          } else if (day.get('hour') < 17) {
-            this.kmRate = 1.5;
-            this.tariff = 'Weekend';
-          }
-          break;
-        case DayOfWeek.SUNDAY:
-          if (day.get('hour') < 6) {
-            this.kmRate = 2.5;
-            this.tariff = 'Weekend+';
-          } else {
-            this.kmRate = 1.5;
-            this.tariff = 'Weekend';
-          }
-          break;
-      }
-    }
+  public setTariff(tariff: Tariff = Tariff.ofTime(new Date())) {
+    this.tariff = tariff.getName();
+    this.kmRate = tariff.getKmRate();
+    this.baseFee = tariff.getBaseFee();
   }
 
   public getTariff() {

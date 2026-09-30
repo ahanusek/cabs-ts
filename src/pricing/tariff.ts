@@ -1,12 +1,23 @@
+import { Embeddable, Property } from '@mikro-orm/decorators/legacy';
 import { Distance } from '../distance/distance';
 import { Money } from '../money/money';
 
+@Embeddable()
 export class Tariff {
-  private constructor(
-    private readonly kmRate: number,
-    private readonly name: string,
-    private readonly baseFee: number,
-  ) {}
+  @Property({ type: 'double' })
+  private readonly kmRate: number;
+
+  @Property()
+  private readonly name: string;
+
+  @Property({ type: 'integer' })
+  private readonly baseFee: number;
+
+  private constructor(kmRate: number, name: string, baseFee: number) {
+    this.kmRate = kmRate;
+    this.name = name;
+    this.baseFee = baseFee;
+  }
 
   public static ofTime(time: Date): Tariff {
     const month = time.getMonth();

@@ -21,6 +21,16 @@ describe('Money persistence and driver fees', () => {
     expect(loaded.getPrice()!.toInt()).toBe(1012);
   });
 
+  it('persists the tariff selected when the transit was created', async () => {
+    const em = fixture.orm.em.fork();
+    const transit = aCompletedTransit(new Money(4400));
+    transit.setDateTime(new Date('2021-12-31T12:00:00').getTime());
+    await em.persist(transit).flush();
+    em.clear();
+    const loaded = await em.findOneOrFail(Transit, transit.id);
+    expect(loaded.getTariff().getName()).toBe('Sylwester');
+  });
+
   it.each([
     [FeeType.FLAT, 10, 0, 3400],
     [FeeType.PERCENTAGE, 30, 0, 1320],

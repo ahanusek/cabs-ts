@@ -1,3 +1,6 @@
+import { Tariff } from '../pricing/tariff';
+import { Distance } from '../distance/distance';
+import { Embedded } from '@mikro-orm/decorators/legacy';
 import { Money } from '../money/money';
 import { MoneyType } from '../money/money.type';
 import { ForbiddenException } from '@nestjs/common';
@@ -39,34 +42,14 @@ export enum ClientPaymentStatus {
   RETURNED = 'returned',
 }
 
-export enum Month {
-  JANUARY,
-  FEBRUARY,
-  MARCH,
-  APRIL,
-  MAY,
-  JUNE,
-  JULY,
-  AUGUST,
-  SEPTEMBER,
-  OCTOBER,
-  NOVEMBER,
-  DECEMBER,
-}
-
-export enum DayOfWeek {
-  SUNDAY,
-  MONDAY,
-  TUESDAY,
-  WEDNESDAY,
-  THURSDAY,
-  FRIDAY,
-  SATURDAY,
-}
-
 @Entity({ repository: () => TransitRepository })
 export class Transit extends BaseEntity {
-  public static readonly BASE_FEE = 8;
+  @Embedded(() => Tariff)
+  private tariff: Tariff = Tariff.ofTime(new Date());
+
+  public getTariff(): Tariff {
+    return this.tariff;
+  }
 
   @ManyToOne(() => Driver, { nullable: true, eager: true })
   public driver: Driver | null = null;
@@ -182,6 +165,7 @@ export class Transit extends BaseEntity {
 
   public setDateTime(dateTime: number) {
     this.dateTime = dateTime;
+    this.tariff = Tariff.ofTime(new Date(dateTime));
   }
 
   public getDateTime() {
@@ -319,53 +303,7 @@ export class Transit extends BaseEntity {
   }
 
   private calculateCost(): Money {
-    let baseFee = Transit.BASE_FEE;
-    let factorToCalculate = this.factor;
-    if (factorToCalculate == null) {
-      factorToCalculate = 1;
-    }
-    let kmRate: number;
-    const day = new Date();
-    if (day.getFullYear() <= 2018) {
-      kmRate = 1.0;
-      baseFee++;
-    } else {
-      if (
-        (day.getMonth() == Month.DECEMBER && day.getDate() == 31) ||
-        (day.getMonth() == Month.JANUARY &&
-          day.getDate() == 1 &&
-          day.getHours() <= 6)
-      ) {
-        kmRate = 3.5;
-        baseFee += 3;
-      } else {
-        if (
-          (day.getDay() == DayOfWeek.FRIDAY && day.getHours() >= 17) ||
-          (day.getDay() == DayOfWeek.SATURDAY && day.getHours() <= 6) ||
-          (day.getDay() == DayOfWeek.SATURDAY && day.getHours() >= 17) ||
-          (day.getDay() == DayOfWeek.SUNDAY && day.getHours() <= 6)
-        ) {
-          kmRate = 2.5;
-          baseFee += 2;
-        } else {
-          if (
-            (day.getDay() == DayOfWeek.SATURDAY &&
-              day.getHours() > 6 &&
-              day.getHours() < 17) ||
-            (day.getDay() == DayOfWeek.SUNDAY && day.getHours() > 6)
-          ) {
-            kmRate = 1.5;
-          } else {
-            kmRate = 1.0;
-            baseFee++;
-          }
-        }
-      }
-    }
-    const priceBigDecimal = Number(
-      (this.km * kmRate * factorToCalculate + baseFee).toFixed(2),
-    );
-    this.price = Money.fromMajor(priceBigDecimal);
+    this.price = this.tariff.calculateCost(Distance.ofKm(this.km));
     return this.price;
   }
 }
