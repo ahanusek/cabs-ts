@@ -1,12 +1,12 @@
 import { BaseEntity } from '../common/base.entity';
-import { Entity, Property, ManyToOne } from '@mikro-orm/decorators/legacy';
-import { Driver } from '../driverfleet/driver.entity';
-import { DriverPositionRepository } from '../repository/driver-position.repository';
+import { Entity, Property } from '@mikro-orm/decorators/legacy';
+
+import { DriverPositionRepository } from './driver-position.repository';
 
 @Entity({ repository: () => DriverPositionRepository })
 export class DriverPosition extends BaseEntity {
-  @ManyToOne(() => Driver)
-  public driver!: Driver;
+  @Property({ type: 'uuid' })
+  public driverId!: string;
 
   @Property({ type: 'double' })
   public latitude!: number;
@@ -17,12 +17,12 @@ export class DriverPosition extends BaseEntity {
   @Property({ type: 'bigint', runtimeType: 'number' })
   public seenAt!: number;
 
-  public getDriver() {
-    return this.driver;
+  public getDriverId() {
+    return this.driverId;
   }
 
-  public setDriver(driver: Driver) {
-    this.driver = driver;
+  public setDriverId(driverId: string) {
+    this.driverId = driverId;
   }
 
   public getLatitude() {

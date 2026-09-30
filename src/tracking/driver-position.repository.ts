@@ -1,7 +1,7 @@
 import { EntityRepository, raw } from '@mikro-orm/postgresql';
-import { DriverPosition } from '../entity/driver-position.entity';
-import { Driver } from '../driverfleet/driver.entity';
-import { DriverPositionV2Dto } from '../dto/driver-position-v2.dto';
+import { DriverPosition } from './driver-position.entity';
+
+import { DriverPositionV2Dto } from './driver-position-v2.dto';
 
 export class DriverPositionRepository extends EntityRepository<DriverPosition> {
   public async findAverageDriverPositionSince(
@@ -15,7 +15,7 @@ export class DriverPositionRepository extends EntityRepository<DriverPosition> {
 
     const results = await qb
       .select([
-        'dp.driver',
+        'dp.driverId',
         raw('avg(??)', ['dp.latitude']).as('avgLatitude'),
         raw('avg(??)', ['dp.longitude']).as('avgLongitude'),
         raw('max(??)', ['dp.seen_at']).as('maxSeenAt'),
@@ -25,25 +25,20 @@ export class DriverPositionRepository extends EntityRepository<DriverPosition> {
         latitude: { $gte: latitudeMin, $lte: latitudeMax },
         seenAt: { $gte: date },
       })
-      .groupBy('dp.driver')
+      .groupBy('dp.driverId')
       .execute<
         {
-          driver: string;
+          driverId: string;
           avgLatitude: number;
           avgLongitude: number;
           maxSeenAt: number;
         }[]
       >();
 
-    const drivers = await this.getEntityManager().find(Driver, {
-      id: { $in: results.map((position) => position.driver) },
-    });
-    const driversById = new Map(drivers.map((driver) => [driver.id, driver]));
-
     return results.map(
       (dp) =>
         new DriverPositionV2Dto(
-          driversById.get(dp.driver)!,
+          dp.driverId,
           Number(dp.avgLatitude),
           Number(dp.avgLongitude),
           Number(dp.maxSeenAt),
@@ -52,13 +47,13 @@ export class DriverPositionRepository extends EntityRepository<DriverPosition> {
   }
 
   public async findByDriverAndSeenAtBetweenOrderBySeenAtAsc(
-    driver: Driver,
+    driverId: string,
     from: number,
     to: number,
   ): Promise<DriverPosition[]> {
     return this.find(
       {
-        driver,
+        driverId,
         seenAt: { $gte: from, $lte: to },
       },
       { orderBy: { seenAt: 'ASC' } },

@@ -1,22 +1,17 @@
-import { TravelledDistanceService } from '../driverreport/travelled-distance/travelled-distance.service';
+import { DriverService } from '../driverfleet/driver.service';
+import { TravelledDistanceService } from '../driverfleet/driverreport/travelled-distance/travelled-distance.service';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Transactional } from '@mikro-orm/decorators/legacy';
-import {
-  Injectable,
-  NotFoundException,
-  NotAcceptableException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { DriverRepository } from '../driverfleet/driver.repository';
-import { DriverPositionRepository } from '../repository/driver-position.repository';
-import { DriverPosition } from '../entity/driver-position.entity';
-import { Driver, DriverStatus } from '../driverfleet/driver.entity';
+
+import { DriverPositionRepository } from './driver-position.repository';
+import { DriverPosition } from './driver-position.entity';
 
 @Injectable()
 export class DriverTrackingService {
   constructor(
-    @InjectRepository(Driver)
-    private driverRepository: DriverRepository,
+    private readonly drivers: DriverService,
     @InjectRepository(DriverPosition)
     private positionRepository: DriverPositionRepository,
     private readonly distances: TravelledDistanceService,
@@ -30,17 +25,9 @@ export class DriverTrackingService {
     longitude: number,
     seenAt: number,
   ): Promise<DriverPosition> {
-    const driver = await this.driverRepository.findOne({ id: driverId });
-    if (!driver) {
-      throw new NotFoundException('Driver does not exists, id = ' + driverId);
-    }
-    if (driver.getStatus() !== DriverStatus.ACTIVE) {
-      throw new NotAcceptableException(
-        'Driver is not active, cannot register position, id = ' + driverId,
-      );
-    }
+    await this.drivers.ensureActive(driverId);
     const position = new DriverPosition();
-    position.setDriver(driver);
+    position.setDriverId(driverId);
     position.setSeenAt(seenAt);
     position.setLatitude(latitude);
     position.setLongitude(longitude);
@@ -59,10 +46,7 @@ export class DriverTrackingService {
     from: number,
     to: number,
   ) {
-    const driver = await this.driverRepository.findOne({ id: driverId });
-    if (!driver) {
-      throw new NotFoundException('Driver does not exists, id = ' + driverId);
-    }
+    await this.drivers.ensureExists(driverId);
     return this.distances.calculateDistance(driverId, from, to);
   }
 }

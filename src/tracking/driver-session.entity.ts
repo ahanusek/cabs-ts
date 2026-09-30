@@ -1,13 +1,8 @@
 import { BaseEntity } from '../common/base.entity';
-import {
-  Entity,
-  Property,
-  ManyToOne,
-  Enum,
-} from '@mikro-orm/decorators/legacy';
-import { Driver } from '../driverfleet/driver.entity';
+import { Entity, Property, Enum } from '@mikro-orm/decorators/legacy';
+
 import { CarClass } from '../carfleet/car-type.entity';
-import { DriverSessionRepository } from '../repository/driver-session.repository';
+import { DriverSessionRepository } from './driver-session.repository';
 
 @Entity({ repository: () => DriverSessionRepository })
 export class DriverSession extends BaseEntity {
@@ -17,8 +12,8 @@ export class DriverSession extends BaseEntity {
   @Property({ nullable: true, type: 'bigint', runtimeType: 'number' })
   public loggedOutAt: number | null = null;
 
-  @ManyToOne(() => Driver)
-  public driver!: Driver;
+  @Property({ type: 'uuid' })
+  public driverId!: string;
 
   @Property()
   public platesNumber!: string;
@@ -53,12 +48,12 @@ export class DriverSession extends BaseEntity {
     this.loggedOutAt = loggedOutAt;
   }
 
-  public getDriver() {
-    return this.driver;
+  public getDriverId() {
+    return this.driverId;
   }
 
-  public setDriver(driver: Driver) {
-    this.driver = driver;
+  public setDriverId(driverId: string) {
+    this.driverId = driverId;
   }
 
   public getPlatesNumber() {

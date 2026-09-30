@@ -1,49 +1,46 @@
 import { EntityRepository } from '@mikro-orm/postgresql';
-import { DriverSession } from '../entity/driver-session.entity';
+import { DriverSession } from './driver-session.entity';
 import { CarClass } from '../carfleet/car-type.entity';
-import { Driver } from '../driverfleet/driver.entity';
+
 import { NotFoundException } from '@nestjs/common';
 
 export class DriverSessionRepository extends EntityRepository<DriverSession> {
   public async findAllByLoggedOutAtNullAndDriverInAndCarClassIn(
-    drivers: Driver[],
+    driverIds: string[],
     carClasses: CarClass[],
   ): Promise<DriverSession[]> {
-    return this.find(
-      {
-        driver: { $in: drivers },
-        carClass: { $in: carClasses },
-        loggedOutAt: null,
-      },
-      { populate: ['driver'] },
-    );
+    return this.find({
+      driverId: { $in: driverIds },
+      carClass: { $in: carClasses },
+      loggedOutAt: null,
+    });
   }
 
   public async findTopByDriverAndLoggedOutAtIsNullOrderByLoggedAtDesc(
-    driver: Driver,
+    driverId: string,
   ): Promise<DriverSession> {
     const session = await this.findOne(
-      { driver, loggedOutAt: null },
+      { driverId, loggedOutAt: null },
       { orderBy: { loggedAt: 'DESC' } },
     );
 
     if (!session) {
-      throw new NotFoundException(`Session for ${driver.getId()} not exists`);
+      throw new NotFoundException(`Session for ${driverId} not exists`);
     }
     return session;
   }
 
   public async findAllByDriverAndLoggedAtAfter(
-    driver: Driver,
+    driverId: string,
     since: number,
   ): Promise<DriverSession[]> {
     return this.find({
-      driver,
+      driverId,
       loggedAt: { $gt: since },
     });
   }
 
-  public async findByDriver(driver: Driver): Promise<DriverSession[]> {
-    return this.find({ driver });
+  public async findByDriver(driverId: string): Promise<DriverSession[]> {
+    return this.find({ driverId });
   }
 }

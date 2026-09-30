@@ -26,6 +26,18 @@ export class DriverService {
     private readonly details: TransitDetailsFacade,
   ) {}
 
+  public async ensureExists(driverId: string): Promise<void> {
+    await this.loadDriver(driverId);
+  }
+
+  public async ensureActive(driverId: string): Promise<void> {
+    const driver = await this.driverRepository.findOne({ id: driverId });
+    if (!driver)
+      throw new NotFoundException(`Driver ${driverId} does not exist`);
+    if (driver.getStatus() !== DriverStatus.ACTIVE)
+      throw new NotAcceptableException('Driver is not active');
+  }
+
   public async createDriver({
     photo,
     driverLicense,

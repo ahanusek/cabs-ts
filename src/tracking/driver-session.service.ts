@@ -1,22 +1,25 @@
+import { DriverService } from '../driverfleet/driver.service';
+import { EntityManager } from '@mikro-orm/postgresql';
+import { Transactional } from '@mikro-orm/decorators/legacy';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { DriverRepository } from '../driverfleet/driver.repository';
-import { DriverSessionRepository } from '../repository/driver-session.repository';
+
+import { DriverSessionRepository } from './driver-session.repository';
 import { CarTypeService } from '../carfleet/car-type.service';
 import { CarClass } from '../carfleet/car-type.entity';
-import { DriverSession } from '../entity/driver-session.entity';
-import { Driver } from '../driverfleet/driver.entity';
+import { DriverSession } from './driver-session.entity';
 
 @Injectable()
 export class DriverSessionService {
   constructor(
     @InjectRepository(DriverSession)
     private driverSessionRepository: DriverSessionRepository,
-    @InjectRepository(Driver)
-    private driverRepository: DriverRepository,
+    private readonly drivers: DriverService,
+    private readonly em: EntityManager,
     private carTypeService: CarTypeService,
   ) {}
 
+  @Transactional()
   public async logIn(
     driverId: string,
     plateNumber: string,
@@ -24,12 +27,8 @@ export class DriverSessionService {
     carBrand: string,
   ) {
     const session = new DriverSession();
-    const driver = await this.driverRepository.findOne({ id: driverId });
-
-    if (!driver) {
-      throw new NotFoundException(`Driver with id ${driverId} not exists`);
-    }
-    session.setDriver(driver);
+    await this.drivers.ensureExists(driverId);
+    session.setDriverId(driverId);
     session.setLoggedAt(Date.now());
     session.setCarClass(carClass);
     session.setPlatesNumber(plateNumber);
@@ -42,6 +41,7 @@ export class DriverSessionService {
     return session;
   }
 
+  @Transactional()
   public async logOut(sessionId: string) {
     const session = await this.driverSessionRepository.findOne({
       id: sessionId,
@@ -49,37 +49,31 @@ export class DriverSessionService {
     if (!session) {
       throw new NotFoundException('Session does not exist');
     }
-    await this.carTypeService.unregisterCar(session.getCarClass());
+    if (session.getLoggedOutAt() !== null) return;
+    await this.carTypeService.unregisterActiveCar(session.getCarClass());
     session.setLoggedOutAt(Date.now());
 
     await this.driverSessionRepository.getEntityManager().flush();
   }
 
+  @Transactional()
   public async logOutCurrentSession(driverId: string) {
-    const driver = await this.driverRepository.findOne({ id: driverId });
-
-    if (!driver) {
-      throw new NotFoundException(`Driver with id ${driverId} not exists`);
-    }
+    await this.drivers.ensureExists(driverId);
 
     const session =
       await this.driverSessionRepository.findTopByDriverAndLoggedOutAtIsNullOrderByLoggedAtDesc(
-        driver,
+        driverId,
       );
     if (session) {
       session.setLoggedOutAt(Date.now());
-      await this.carTypeService.unregisterCar(session.getCarClass());
+      await this.carTypeService.unregisterActiveCar(session.getCarClass());
       await this.driverSessionRepository.getEntityManager().flush();
     }
   }
 
   public async findByDriver(driverId: string): Promise<DriverSession[]> {
-    const driver = await this.driverRepository.findOne({ id: driverId });
+    await this.drivers.ensureExists(driverId);
 
-    if (!driver) {
-      throw new NotFoundException(`Driver with id ${driverId} not exists`);
-    }
-
-    return this.driverSessionRepository.findByDriver(driver);
+    return this.driverSessionRepository.findByDriver(driverId);
   }
 }

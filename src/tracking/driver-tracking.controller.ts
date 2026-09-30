@@ -7,10 +7,10 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { DriverTrackingService } from '../service/driver-tracking.service';
-import { DriverPositionDto } from '../dto/driver-position.dto';
-import { CreateDriverPositionDto } from '../dto/create-driver-position.dto';
-import { DriverPosition } from '../entity/driver-position.entity';
+import { DriverTrackingService } from './driver-tracking.service';
+import { DriverPositionDto } from './driver-position.dto';
+import { CreateDriverPositionDto } from './create-driver-position.dto';
+import { DriverPosition } from './driver-position.entity';
 
 @Controller('driverPositions')
 export class DriverTrackingController {
@@ -47,7 +47,7 @@ export class DriverTrackingController {
 
   private toDto(driverPosition: DriverPosition) {
     return new DriverPositionDto(
-      driverPosition.getDriver().getId(),
+      driverPosition.getDriverId(),
       driverPosition.getLatitude(),
       driverPosition.getLongitude(),
       driverPosition.getSeenAt(),

@@ -1,3 +1,5 @@
+import { TrackingModule } from './tracking/tracking-module';
+import { DriverReportModule } from './driverfleet/driverreport/driver-report-module';
 import { TransitAnalysisModule } from './crm/transitanalyzer/transit-analysis-module';
 import { ClaimsModule } from './crm/claims/claims-module';
 import { GeolocationModule } from './geolocation/geolocation-module';
@@ -23,9 +25,8 @@ import { DocumentContent } from './contracts/model/document-content.entity';
 import { RepairModule } from './repair/repair.module';
 import { Party } from './party/party.entity';
 import { PartyRelationship } from './party/party-relationship.entity';
-import { TravelledDistance } from './driverreport/travelled-distance/travelled-distance.entity';
-import { TravelledDistanceService } from './driverreport/travelled-distance/travelled-distance.service';
-import { SqlDriverReportCreator } from './driverreport/sql-driver-report.creator';
+import { TravelledDistance } from './driverfleet/driverreport/travelled-distance/travelled-distance.entity';
+
 import { ContractAttachmentData } from './agreements/contract-attachment-data.entity';
 import { ClaimsResolver } from './crm/claims/claims-resolver.entity';
 import { CarTypeActiveCounter } from './carfleet/car-type-active-counter.entity';
@@ -34,17 +35,10 @@ import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ConfigModule } from '@nestjs/config';
 
-import { DriverSessionService } from './service/driver-session.service';
-import { DriverSessionController } from './controllers/driver-session.controller';
-
-import { DriverTrackingService } from './service/driver-tracking.service';
-import { DriverTrackingController } from './controllers/driver-tracking.controller';
-
 import { TransitService } from './service/transit.service';
 
 import { TransitController } from './controllers/transit.controller';
 
-import { DriverReportController } from './controllers/driver-report.controller';
 import ormConfig from './mikro-orm.config';
 
 import { Driver } from './driverfleet/driver.entity';
@@ -56,8 +50,8 @@ import { Claim } from './crm/claims/claim.entity';
 import { Contract } from './agreements/contract.entity';
 import { DriverFee } from './driverfleet/driver-fee.entity';
 import { DriverAttribute } from './driverfleet/driver-attribute.entity';
-import { DriverSession } from './entity/driver-session.entity';
-import { DriverPosition } from './entity/driver-position.entity';
+import { DriverSession } from './tracking/driver-session.entity';
+import { DriverPosition } from './tracking/driver-position.entity';
 import { AwardsAccount } from './loyalty/awards-account.entity';
 import { AwardedMiles } from './loyalty/awarded-miles.entity';
 import { Invoice } from './invoicing/invoice.entity';
@@ -95,6 +89,8 @@ const entities = [
 
 @Module({
   imports: [
+    TrackingModule,
+    DriverReportModule,
     TransitAnalysisModule,
     ClaimsModule,
     GeolocationModule,
@@ -115,19 +111,7 @@ const entities = [
     MikroOrmModule.forRoot({ ...ormConfig, entities }),
     MikroOrmModule.forFeature(entities),
   ],
-  controllers: [
-    DriverSessionController,
-    DriverTrackingController,
-    TransitController,
-    DriverReportController,
-  ],
-  providers: [
-    TravelledDistanceService,
-    SqlDriverReportCreator,
-    DriverFinder,
-    DriverSessionService,
-    DriverTrackingService,
-    TransitService,
-  ],
+  controllers: [TransitController],
+  providers: [DriverFinder, TransitService],
 })
 export class AppModule {}

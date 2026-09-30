@@ -1,5 +1,5 @@
 import { CarClass } from '../carfleet/car-type.entity';
-import { DriverSession } from '../entity/driver-session.entity';
+import { DriverSession } from './driver-session.entity';
 
 export class DriverSessionDto {
   private loggedAt: number | null;

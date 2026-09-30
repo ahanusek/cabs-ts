@@ -1,9 +1,11 @@
+import { Driver } from '../driverfleet/driver.entity';
+import { DriverRepository } from '../driverfleet/driver.repository';
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { DriverPosition } from '../entity/driver-position.entity';
-import { DriverPositionRepository } from '../repository/driver-position.repository';
-import { DriverSession } from '../entity/driver-session.entity';
-import { DriverSessionRepository } from '../repository/driver-session.repository';
+import { DriverPosition } from '../tracking/driver-position.entity';
+import { DriverPositionRepository } from '../tracking/driver-position.repository';
+import { DriverSession } from '../tracking/driver-session.entity';
+import { DriverSessionRepository } from '../tracking/driver-session.repository';
 import { DriverStatus } from '../driverfleet/driver.entity';
 import { Status, Transit } from '../entity/transit.entity';
 import { CarTypeService } from '../carfleet/car-type.service';
@@ -17,6 +19,7 @@ const ASSIGNMENT_TIMEOUT_MS = 5 * 60 * 1000;
 @Injectable()
 export class DriverFinder {
   constructor(
+    @InjectRepository(Driver) private readonly drivers: DriverRepository,
     @InjectRepository(DriverPosition)
     private readonly positions: DriverPositionRepository,
     @InjectRepository(DriverSession)
@@ -63,12 +66,15 @@ export class DriverFinder {
       );
       const sessions =
         await this.sessions.findAllByLoggedOutAtNullAndDriverInAndCarClassIn(
-          candidates.slice(0, 20).map((position) => position.getDriver()),
+          candidates.slice(0, 20).map((position) => position.getDriverId()),
           [transit.getCarType()],
         );
       for (const session of sessions) {
-        const driver = session.getDriver();
+        const driver = await this.drivers.findOne({
+          id: session.getDriverId(),
+        });
         if (
+          driver &&
           driver.getStatus() === DriverStatus.ACTIVE &&
           !driver.getOccupied() &&
           transit.canProposeTo(driver)

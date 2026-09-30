@@ -2,8 +2,8 @@ import { TransitDetails } from '../src/transitdetails/transit-details.entity';
 import { transitSnapshot } from '../src/transitdetails/transit-snapshot';
 import request from 'supertest';
 import dayjs from 'dayjs';
-import { DriverReportController } from '../src/controllers/driver-report.controller';
-import { DriverSession } from '../src/entity/driver-session.entity';
+import { DriverReportController } from '../src/driverfleet/driverreport/driver-report.controller';
+import { DriverSession } from '../src/tracking/driver-session.entity';
 import {
   DriverAttribute,
   DriverAttributeName,
@@ -39,7 +39,7 @@ describe('Driver report', () => {
           .add(10, 'hours')
           .valueOf();
         const session = new DriverSession();
-        session.setDriver(driver);
+        session.setDriverId(driver.id);
         session.setLoggedAt(start);
         session.setLoggedOutAt(start + 7200000);
         session.setCarBrand(`Car ${daysAgo}`);

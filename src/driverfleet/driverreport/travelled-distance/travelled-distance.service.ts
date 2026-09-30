@@ -2,8 +2,8 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Transactional } from '@mikro-orm/decorators/legacy';
 import type { PositionSample } from './position-sample';
-import { DistanceCalculator } from '../../geolocation/distance-calculator.service';
-import { Distance } from '../../geolocation/distance';
+import { DistanceCalculator } from '../../../geolocation/distance-calculator.service';
+import { Distance } from '../../../geolocation/distance';
 import { TimeSlot, FIVE_MINUTES } from './time-slot';
 import { TravelledDistance } from './travelled-distance.entity';
 

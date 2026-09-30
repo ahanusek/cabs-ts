@@ -1,7 +1,5 @@
-import { Driver } from '../driverfleet/driver.entity';
-
 export class DriverPositionV2Dto {
-  private driver: Driver;
+  private driverId: string;
 
   private latitude: number;
 
@@ -10,23 +8,23 @@ export class DriverPositionV2Dto {
   private seenAt: number;
 
   constructor(
-    driver: Driver,
+    driverId: string,
     latitude: number,
     longitude: number,
     seenAt: number,
   ) {
-    this.driver = driver;
+    this.driverId = driverId;
     this.latitude = latitude;
     this.longitude = longitude;
     this.seenAt = seenAt;
   }
 
-  public getDriver() {
-    return this.driver;
+  public getDriverId() {
+    return this.driverId;
   }
 
-  public setDriver(driver: Driver) {
-    this.driver = driver;
+  public setDriverId(driverId: string) {
+    this.driverId = driverId;
   }
 
   public getLatitude() {

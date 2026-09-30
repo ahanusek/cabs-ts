@@ -8,8 +8,8 @@ import {
   DriverStatus,
   DriverType,
 } from '../src/driverfleet/driver.entity';
-import { DriverPosition } from '../src/entity/driver-position.entity';
-import { DriverPositionRepository } from '../src/repository/driver-position.repository';
+import { DriverPosition } from '../src/tracking/driver-position.entity';
+import { DriverPositionRepository } from '../src/tracking/driver-position.repository';
 import { AppModule } from '../src/app.module';
 
 // The dedicated database is configured before importing AppModule.
@@ -69,7 +69,7 @@ describe('Client API with PostgreSQL', () => {
     expect(position.getSeenAt()).toBe(1700000000000);
   });
 
-  it('aggregates recent positions and loads the driver for assignment', async () => {
+  it('aggregates recent positions using only the driver identifier', async () => {
     const { em, driver } = await recordPositions();
     const repository = em.getRepository(
       DriverPosition,
@@ -82,18 +82,18 @@ describe('Client API with PostgreSQL', () => {
       1700000000000,
     );
     const position = positions.find(
-      (item) => item.getDriver().id === driver.id,
+      (item) => item.getDriverId() === driver.id,
     )!;
     expect({
       latitude: position.getLatitude(),
       longitude: position.getLongitude(),
       seenAt: position.getSeenAt(),
-      status: position.getDriver().getStatus(),
+      driverId: position.getDriverId(),
     }).toEqual({
       latitude: 52,
       longitude: 21,
       seenAt: 1700000001000,
-      status: DriverStatus.ACTIVE,
+      driverId: driver.id,
     });
   });
 
@@ -107,13 +107,13 @@ describe('Client API with PostgreSQL', () => {
     driver.setType(DriverType.REGULAR);
     const positions = [0, 1].map((index) => {
       const position = new DriverPosition();
-      position.setDriver(driver);
+      position.setDriverId(driver.id);
       position.setLatitude(51 + index * 2);
       position.setLongitude(20 + index * 2);
       position.setSeenAt(1700000000000 + index * 1000);
       return position;
     });
-    await em.persist(positions).flush();
+    await em.persist([driver, ...positions]).flush();
     em.clear();
     return { em, driver, positions };
   }
