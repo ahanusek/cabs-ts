@@ -84,10 +84,10 @@ export class Transit extends BaseEntity {
   @Property({ default: 0 })
   public pickupAddressChangeCounter: number = 0;
 
-  @ManyToMany(() => Driver)
+  @ManyToMany({ entity: () => Driver, eager: true })
   public driversRejections = new Collection<Driver>(this);
 
-  @ManyToMany(() => Driver)
+  @ManyToMany({ entity: () => Driver, eager: true })
   public proposedDrivers = new Collection<Driver>(this);
 
   @Property({ default: 0, type: 'integer' })
@@ -122,6 +122,115 @@ export class Transit extends BaseEntity {
 
   @Property({ type: 'bigint', nullable: true })
   public completeAt?: number;
+
+  public changePickupTo(
+    address: Address,
+    distance: Distance,
+    previousPickupDistance: number,
+  ) {
+    const changeable = [Status.DRAFT, Status.WAITING_FOR_DRIVER_ASSIGNMENT];
+    if (
+      !changeable.includes(this.status) ||
+      this.pickupAddressChangeCounter >= 3 ||
+      previousPickupDistance > 0.25
+    ) {
+      throw new ForbiddenException('Pickup address cannot be changed');
+    }
+    this.from = address;
+    this.pickupAddressChangeCounter++;
+    this.setKm(distance.toKm());
+  }
+
+  public changeDestinationTo(address: Address, distance: Distance) {
+    if (this.status === Status.COMPLETED)
+      throw new ForbiddenException('Transit is completed');
+    this.to = address;
+    this.setKm(distance.toKm());
+  }
+
+  public cancel() {
+    if (
+      ![
+        Status.DRAFT,
+        Status.WAITING_FOR_DRIVER_ASSIGNMENT,
+        Status.TRANSIT_TO_PASSENGER,
+      ].includes(this.status)
+    ) {
+      throw new ForbiddenException('Transit cannot be cancelled');
+    }
+    this.status = Status.CANCELLED;
+    this.driver = null;
+    this.km = 0;
+    this.awaitingDriversResponses = 0;
+  }
+
+  public publishAt(when: number) {
+    this.status = Status.WAITING_FOR_DRIVER_ASSIGNMENT;
+    this.published = when;
+  }
+
+  public canProposeTo(driver: Driver): boolean {
+    return !this.driversRejections.contains(driver);
+  }
+
+  public proposeTo(driver: Driver) {
+    if (this.canProposeTo(driver) && !this.proposedDrivers.contains(driver)) {
+      this.proposedDrivers.add(driver);
+      this.awaitingDriversResponses++;
+    }
+  }
+
+  public failDriverAssignment() {
+    this.status = Status.DRIVER_ASSIGNMENT_FAILED;
+    this.driver = null;
+    this.km = 0;
+    this.awaitingDriversResponses = 0;
+  }
+
+  public acceptBy(driver: Driver, when: number) {
+    if (
+      this.driver ||
+      !this.proposedDrivers.contains(driver) ||
+      this.driversRejections.contains(driver)
+    ) {
+      throw new ForbiddenException('Driver cannot accept this transit');
+    }
+    this.driver = driver;
+    driver.setOccupied(true);
+    this.awaitingDriversResponses = 0;
+    this.acceptedAt = when;
+    this.status = Status.TRANSIT_TO_PASSENGER;
+  }
+
+  public start(when: number) {
+    if (this.status !== Status.TRANSIT_TO_PASSENGER)
+      throw new ForbiddenException('Transit cannot be started');
+    this.started = when;
+    this.status = Status.IN_TRANSIT;
+  }
+
+  public rejectBy(driver: Driver) {
+    if (
+      this.proposedDrivers.contains(driver) &&
+      !this.driversRejections.contains(driver)
+    ) {
+      this.driversRejections.add(driver);
+      this.awaitingDriversResponses = Math.max(
+        0,
+        this.awaitingDriversResponses - 1,
+      );
+    }
+  }
+
+  public complete(when: number, destination: Address, distance: Distance) {
+    if (this.status !== Status.IN_TRANSIT)
+      throw new ForbiddenException('Transit cannot be completed');
+    this.setKm(distance.toKm());
+    this.completeAt = when;
+    this.to = destination;
+    this.status = Status.COMPLETED;
+    this.calculateFinalCosts();
+  }
 
   public getCarType() {
     return this.carType as CarClass;
@@ -197,40 +306,20 @@ export class Transit extends BaseEntity {
     return this.awaitingDriversResponses;
   }
 
-  public setAwaitingDriversResponses(proposedDriversCounter: number) {
-    this.awaitingDriversResponses = proposedDriversCounter;
-  }
-
   public getDriversRejections() {
     return this.driversRejections.getItems();
-  }
-
-  public setDriversRejections(driversRejections: Driver[]) {
-    this.driversRejections.set(driversRejections);
   }
 
   public getProposedDrivers() {
     return this.proposedDrivers.getItems();
   }
 
-  public setProposedDrivers(proposedDrivers: Driver[]) {
-    this.proposedDrivers.set(proposedDrivers);
-  }
-
   public getAcceptedAt() {
     return this.acceptedAt;
   }
 
-  public setAcceptedAt(acceptedAt: number) {
-    this.acceptedAt = acceptedAt;
-  }
-
   public getStarted() {
     return this.started;
-  }
-
-  public setStarted(started: number) {
-    this.started = started;
   }
 
   public getFrom() {
@@ -251,10 +340,6 @@ export class Transit extends BaseEntity {
 
   public getPickupAddressChangeCounter() {
     return this.pickupAddressChangeCounter;
-  }
-
-  public setPickupAddressChangeCounter(pickupChanges: number) {
-    this.pickupAddressChangeCounter = pickupChanges;
   }
 
   public setCompleteAt(when: number) {

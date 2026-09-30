@@ -9,8 +9,14 @@ export class DriverSessionRepository extends EntityRepository<DriverSession> {
     drivers: Driver[],
     carClasses: CarClass[],
   ): Promise<DriverSession[]> {
-    console.log('To implement...', drivers, carClasses);
-    return [];
+    return this.find(
+      {
+        driver: { $in: drivers },
+        carClass: { $in: carClasses },
+        loggedOutAt: null,
+      },
+      { populate: ['driver'] },
+    );
   }
 
   public async findTopByDriverAndLoggedOutAtIsNullOrderByLoggedAtDesc(

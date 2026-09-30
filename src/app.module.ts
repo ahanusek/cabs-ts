@@ -1,3 +1,4 @@
+import { DriverFinder } from './service/driver-finder.service';
 import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ConfigModule } from '@nestjs/config';
@@ -88,6 +89,7 @@ const entities = [
     DriverReportController,
   ],
   providers: [
+    DriverFinder,
     AppProperties,
     DriverService,
     CarTypeService,
