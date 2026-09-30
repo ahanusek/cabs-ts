@@ -1,4 +1,5 @@
-import { Miles } from '../loyalty/miles/miles';
+import { AwardsAccount } from './awards-account.entity';
+import type { Miles } from '../loyalty/miles/miles';
 import { type MilesSnapshot, restoreMiles } from '../loyalty/miles/miles-json';
 import { BaseEntity } from '../common/base.entity';
 import { Entity, Property, ManyToOne } from '@mikro-orm/decorators/legacy';
@@ -8,6 +9,23 @@ import { AwardedMilesRepository } from '../repository/awarded-miles.repository';
 
 @Entity({ repository: () => AwardedMilesRepository })
 export class AwardedMiles extends BaseEntity {
+  @ManyToOne(() => AwardsAccount)
+  public account: AwardsAccount;
+
+  constructor(
+    account: AwardsAccount,
+    miles: Miles,
+    date: number,
+    transit: Transit | null,
+  ) {
+    super();
+    this.account = account;
+    this.client = account.getClient();
+    this.miles = miles.snapshot();
+    this.date = date;
+    this.transit = transit;
+  }
+
   @ManyToOne(() => Client)
   public client!: Client;
 
