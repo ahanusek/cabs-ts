@@ -1,3 +1,4 @@
+import { Distance } from '../distance/distance';
 import { DayOfWeek, Status, Transit } from '../entity/transit.entity';
 import { DriverDto } from './driver.dto';
 import { ClaimDto } from './claim.dto';
@@ -161,15 +162,11 @@ export class TransitDto {
 
   public getDistance(unit: string) {
     this.distanceUnit = unit;
-    if (unit === 'm') return `${Math.round(this.distance * 1000)}m`;
-    if (unit === 'km') {
-      return `${Number.isInteger(this.distance) ? this.distance : this.distance.toFixed(3)}km`;
+    try {
+      return Distance.ofKm(this.distance).printIn(unit);
+    } catch {
+      throw new NotAcceptableException('Invalid distance or unit ' + unit);
     }
-    if (unit === 'miles') {
-      const miles = this.distance / 1.609344;
-      return `${Number.isInteger(miles) ? miles : miles.toFixed(3)}miles`;
-    }
-    throw new NotAcceptableException('Invalid unit ' + unit);
   }
 
   public getProposedDrivers() {
