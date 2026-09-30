@@ -153,28 +153,17 @@ export class TransitService {
     // calculate the result
     const distanceInKMeters = c * r;
 
-    if (
-      transit.getStatus() !== Status.DRAFT ||
-      transit.getStatus() === Status.WAITING_FOR_DRIVER_ASSIGNMENT ||
-      transit.getPickupAddressChangeCounter() > 2 ||
-      distanceInKMeters > 0.25
-    ) {
-      throw new NotAcceptableException(
-        "Address 'from' cannot be changed, id = " + transitId,
-      );
-    }
-
-    transit.setFrom(newAddress);
-    transit.setKm(
-      this.distanceCalculator.calculateByMap(
-        geoFromNew[0],
-        geoFromNew[1],
-        geoFromOld[0],
-        geoFromOld[1],
+    transit.changePickupTo(
+      newAddress,
+      Distance.ofKm(
+        this.distanceCalculator.calculateByMap(
+          geoFromNew[0],
+          geoFromNew[1],
+          geoFromOld[0],
+          geoFromOld[1],
+        ),
       ),
-    );
-    transit.setPickupAddressChangeCounter(
-      transit.getPickupAddressChangeCounter() + 1,
+      distanceInKMeters,
     );
     await this.transitRepository.getEntityManager().flush();
 

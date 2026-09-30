@@ -144,6 +144,25 @@ export class Transit extends BaseEntity {
   @Property({ type: 'bigint', nullable: true })
   public completeAt?: number;
 
+  public changePickupTo(
+    address: Address,
+    distance: Distance,
+    previousPickupDistance: number,
+  ) {
+    if (
+      ![Status.DRAFT, Status.WAITING_FOR_DRIVER_ASSIGNMENT].includes(
+        this.status,
+      ) ||
+      this.pickupAddressChangeCounter >= 3 ||
+      previousPickupDistance > 0.25
+    ) {
+      throw new ForbiddenException('Pickup address cannot be changed');
+    }
+    this.from = address;
+    this.pickupAddressChangeCounter++;
+    this.setKm(distance.toKm());
+  }
+
   public getCarType() {
     return this.carType as CarClass;
   }
