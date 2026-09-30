@@ -76,7 +76,12 @@ describe('Driver travelled distance', () => {
     await position(start, noon);
     const sample = await position(destination, noon + 1);
     await application.run(() =>
-      application.app.get(TravelledDistanceService).addPosition(sample),
+      application.app.get(TravelledDistanceService).addPosition(driverId, {
+        id: sample.id,
+        latitude: sample.getLatitude(),
+        longitude: sample.getLongitude(),
+        seenAt: sample.getSeenAt(),
+      }),
     );
     expect(await distance(noon, noon + fiveMinutes)).toBe('2.004km');
   });

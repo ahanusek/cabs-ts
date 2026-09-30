@@ -45,7 +45,12 @@ export class DriverTrackingService {
     position.setLatitude(latitude);
     position.setLongitude(longitude);
     await this.positionRepository.getEntityManager().persist(position).flush();
-    await this.distances.addPosition(position);
+    await this.distances.addPosition(driverId, {
+      id: position.id,
+      latitude,
+      longitude,
+      seenAt,
+    });
     return position;
   }
 

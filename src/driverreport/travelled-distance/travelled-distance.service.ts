@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Transactional } from '@mikro-orm/decorators/legacy';
-import { DriverPosition } from '../../entity/driver-position.entity';
+import type { PositionSample } from './position-sample';
 import { DistanceCalculator } from '../../service/distance-calculator.service';
 import { Distance } from '../../distance/distance';
 import { TimeSlot, FIVE_MINUTES } from './time-slot';
@@ -34,13 +34,15 @@ export class TravelledDistanceService {
   }
 
   @Transactional()
-  public async addPosition(position: DriverPosition): Promise<void> {
-    const driverId = position.getDriver().id;
+  public async addPosition(
+    driverId: string,
+    position: PositionSample,
+  ): Promise<void> {
     // Serialize updates per driver, including concurrent creation of the first slot.
     await this.em.execute('select pg_advisory_xact_lock(hashtext(?))', [
       `distance:${driverId}`,
     ]);
-    const slot = TimeSlot.containing(position.getSeenAt());
+    const slot = TimeSlot.containing(position.seenAt);
     let current = await this.em.findOne(
       TravelledDistance,
       { driverId, beginning: slot.beginning },

@@ -1,14 +1,7 @@
 import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
-import { DriverPosition } from '../../entity/driver-position.entity';
+import type { PositionSample } from './position-sample';
 import { DistanceCalculator } from '../../service/distance-calculator.service';
 import { TimeSlot, FIVE_MINUTES } from './time-slot';
-
-interface PositionSample {
-  id: string;
-  latitude: number;
-  longitude: number;
-  seenAt: number;
-}
 
 @Entity()
 export class TravelledDistance {
@@ -24,25 +17,25 @@ export class TravelledDistance {
   @Property({ type: 'json' })
   private samples: PositionSample[] = [];
 
-  constructor(driverId: string, slot: TimeSlot, position: DriverPosition) {
+  constructor(driverId: string, slot: TimeSlot, position: PositionSample) {
     this.driverId = driverId;
     this.beginning = slot.beginning;
     this.addPosition(position);
   }
 
-  public addPosition(position: DriverPosition): void {
+  public addPosition(position: PositionSample): void {
     if (
       !new TimeSlot(this.beginning, this.beginning + FIVE_MINUTES).contains(
-        position.getSeenAt(),
+        position.seenAt,
       )
     ) {
       throw new RangeError('Position is outside this time slot');
     }
     const sample = {
       id: position.id,
-      latitude: position.getLatitude(),
-      longitude: position.getLongitude(),
-      seenAt: position.getSeenAt(),
+      latitude: position.latitude,
+      longitude: position.longitude,
+      seenAt: position.seenAt,
     };
     if (this.samples.some((existing) => existing.id === sample.id)) return;
     this.samples = [...this.samples, sample].sort(

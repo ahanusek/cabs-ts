@@ -1,6 +1,7 @@
 import { TravelledDistance } from './travelled-distance.entity';
 import { TimeSlot, FIVE_MINUTES } from './time-slot';
-import { DriverPosition } from '../../entity/driver-position.entity';
+import { randomUUID } from 'node:crypto';
+import type { PositionSample } from './position-sample';
 import { DistanceCalculator } from '../../service/distance-calculator.service';
 import { Distance } from '../../distance/distance';
 
@@ -79,11 +80,12 @@ describe('Travelled distance projection without an application or database', () 
   function point(
     coordinates: readonly [number, number],
     seenAt: number,
-  ): DriverPosition {
-    const point = new DriverPosition();
-    point.setLatitude(coordinates[0]);
-    point.setLongitude(coordinates[1]);
-    point.setSeenAt(seenAt);
-    return point;
+  ): PositionSample {
+    return {
+      id: randomUUID(),
+      latitude: coordinates[0],
+      longitude: coordinates[1],
+      seenAt,
+    };
   }
 });
