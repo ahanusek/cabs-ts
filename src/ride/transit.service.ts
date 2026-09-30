@@ -1,3 +1,5 @@
+import { ChangeDestinationService } from './change-destination.service';
+import { ChangePickupService } from './change-pickup.service';
 import { RequestTransitService } from './request-transit.service';
 import { Injectable, ForbiddenException } from '@nestjs/common';
 import { Transactional } from '@mikro-orm/decorators/legacy';
@@ -40,6 +42,8 @@ export class TransitService {
     private readonly details: TransitDetailsFacade,
     private readonly store: RideStore,
     private readonly requests: RequestTransitService,
+    private readonly pickups: ChangePickupService,
+    private readonly destinations: ChangeDestinationService,
   ) {}
   public createTransit(dto: CreateTransitDto) {
     return this.requests.createTransit(dto);
@@ -53,56 +57,15 @@ export class TransitService {
   ) {
     return this.requests._createTransit(clientId, from, to, carClass);
   }
-
-  @Transactional()
-  public async _changeTransitAddressFrom(id: string, address: Address) {
-    const request = await this.store.request(id);
-    const demand = await this.store.demand(id);
-    const details = await this.details.find(id);
-    const pickup = await this.routes.save(address);
-    const previous = await this.routes.find(details.fromAddressId);
-    demand.changePickup(
-      this.routes.distanceFromPreviousPickup(previous, pickup),
-    );
-    const distance = this.routes.distance(
-      pickup,
-      await this.routes.find(details.toAddressId),
-    );
-    await this.details.pickupChanged(
-      id,
-      pickup,
-      distance,
-      request.getTariff().calculateCost(distance),
-    );
-    await this.assignments.notifyPickupChanged(id);
-    await this.em.flush();
+  public _changeTransitAddressFrom(id: string, address: Address) {
+    return this.pickups._changeTransitAddressFrom(id, address);
   }
 
   public changeTransitAddressFrom(id: string, address: AddressDto) {
-    return this._changeTransitAddressFrom(id, address.toAddressEntity());
+    return this.pickups.changeTransitAddressFrom(id, address);
   }
-
-  @Transactional()
-  public async changeTransitAddressTo(id: string, address: AddressDto) {
-    const request = await this.store.request(id);
-    const details = await this.details.find(id);
-    if ([Status.CANCELLED, Status.COMPLETED].includes(details.status as Status))
-      throw new ForbiddenException('Transit is closed');
-    const destination = await this.routes.save(address.toAddressEntity());
-    const distance = this.routes.distance(
-      await this.routes.find(details.fromAddressId),
-      destination,
-    );
-    const transit = await this.em.findOne(Transit, { requestId: id });
-    transit?.changeDestination(distance);
-    await this.details.destinationChanged(
-      id,
-      destination,
-      distance,
-      request.getTariff().calculateCost(distance),
-    );
-    await this.assignments.notifyDestinationChanged(id);
-    await this.em.flush();
+  public changeTransitAddressTo(id: string, address: AddressDto) {
+    return this.destinations.changeTransitAddressTo(id, address);
   }
 
   @Transactional()
