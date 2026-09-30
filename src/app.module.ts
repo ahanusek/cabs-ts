@@ -1,3 +1,4 @@
+import { ClaimRefundedSubscriber } from './loyalty/claim-refunded.subscriber';
 import { TransitDetails } from './transitdetails/transit-details.entity';
 import { TransitDetailsFacade } from './transitdetails/transit-details.facade';
 import { PopulateGraphService } from './transitanalyzer/populate-graph.service';
@@ -15,7 +16,7 @@ import { TravelledDistance } from './driverreport/travelled-distance/travelled-d
 import { TravelledDistanceService } from './driverreport/travelled-distance/travelled-distance.service';
 import { SqlDriverReportCreator } from './driverreport/sql-driver-report.creator';
 import { ContractAttachmentData } from './entity/contract-attachment-data.entity';
-import { ClaimsResolver } from './claims/claims-resolver.entity';
+import { ClaimsResolver } from './crm/claims/claims-resolver.entity';
 import { CarTypeActiveCounter } from './entity/car-type-active-counter.entity';
 import { DriverFinder } from './service/driver-finder.service';
 import { Module } from '@nestjs/common';
@@ -30,7 +31,7 @@ import { DistanceCalculator } from './service/distance-calculator.service';
 import { InvoiceGenerator } from './service/invoice-generator.service';
 import { DriverNotificationService } from './service/driver-notification.service';
 import { GeocodingService } from './service/geocoding.service';
-import { ClaimNumberGenerator } from './service/claim-number-generator.service';
+import { ClaimNumberGenerator } from './crm/claims/claim-number-generator.service';
 import { ClientNotificationService } from './service/client-notification.service';
 import { ClientService } from './service/client.service';
 import { ClientController } from './controllers/client.controller';
@@ -40,13 +41,13 @@ import { DriverFeeService } from './service/driver-fee.service';
 import { DriverTrackingService } from './service/driver-tracking.service';
 import { DriverTrackingController } from './controllers/driver-tracking.controller';
 import { AwardsService } from './service/awards.service';
-import { ClaimService } from './service/claim.service';
+import { ClaimService } from './crm/claims/claim.service';
 import { ContractService } from './service/contract.service';
 import { TransitService } from './service/transit.service';
 import { TransitAnalyzerController } from './controllers/transit-analyzer.controller';
 import { TransitController } from './controllers/transit.controller';
 import { AwardsAccountController } from './controllers/awards-account.controller';
-import { ClaimController } from './controllers/claim.controller';
+import { ClaimController } from './crm/claims/claim.controller';
 import { ContractController } from './controllers/contract.controller';
 import { DriverReportController } from './controllers/driver-report.controller';
 import ormConfig from './mikro-orm.config';
@@ -56,7 +57,7 @@ import { CarType } from './entity/car-type.entity';
 import { Client } from './entity/client.entity';
 import { Transit } from './entity/transit.entity';
 import { Address } from './entity/address.entity';
-import { Claim } from './entity/claim.entity';
+import { Claim } from './crm/claims/claim.entity';
 import { Contract } from './entity/contract.entity';
 import { DriverFee } from './entity/driver-fee.entity';
 import { DriverAttribute } from './entity/driver-attribute.entity';
@@ -65,7 +66,7 @@ import { DriverPosition } from './entity/driver-position.entity';
 import { AwardsAccount } from './entity/awards-account.entity';
 import { AwardedMiles } from './entity/awarded-miles.entity';
 import { Invoice } from './entity/invoice.entity';
-import { ClaimAttachment } from './entity/claim-attachment.entity';
+import { ClaimAttachment } from './crm/claims/claim-attachment.entity';
 import { ContractAttachment } from './entity/contract-attachment.entity';
 
 const entities = [
@@ -119,6 +120,7 @@ const entities = [
     DriverReportController,
   ],
   providers: [
+    ClaimRefundedSubscriber,
     TransitDetailsFacade,
     PopulateGraphService,
     DomainEvents,

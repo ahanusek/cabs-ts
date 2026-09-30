@@ -1,33 +1,33 @@
-import { ClaimsResolver, WhoToAsk } from '../claims/claims-resolver.entity';
-import { Money } from '../money/money';
+import { DomainEvents } from '../../common/domain-events';
+import { TransitDetailsFacade } from '../../transitdetails/transit-details.facade';
+import { ClaimsResolver, WhoToAsk } from './claims-resolver.entity';
+import { Money } from '../../money/money';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Transactional } from '@mikro-orm/decorators/legacy';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { ClientRepository } from '../repository/client.repository';
-import { TransitRepository } from '../repository/transit.repository';
-import { AppProperties } from '../config/app-properties.config';
-import { ClaimRepository } from '../repository/claim.repository';
+import { ClientRepository } from '../../repository/client.repository';
+
+import { AppProperties } from '../../config/app-properties.config';
+import { ClaimRepository } from './claim.repository';
 import { ClaimNumberGenerator } from './claim-number-generator.service';
-import { AwardsService } from './awards.service';
-import { ClientNotificationService } from './client-notification.service';
-import { DriverNotificationService } from './driver-notification.service';
-import { ClaimDto } from '../dto/claim.dto';
-import { Claim, ClaimStatus, CompletionMode } from '../entity/claim.entity';
-import { Type, Client } from '../entity/client.entity';
-import { Transit } from '../entity/transit.entity';
+
+import { ClientNotificationService } from '../../service/client-notification.service';
+import { DriverNotificationService } from '../../service/driver-notification.service';
+import { ClaimDto } from './claim.dto';
+import { Claim, ClaimStatus, CompletionMode } from './claim.entity';
+import { Client } from '../../entity/client.entity';
 
 @Injectable()
 export class ClaimService {
   constructor(
     @InjectRepository(Client)
     private clientRepository: ClientRepository,
-    @InjectRepository(Transit)
-    private transitRepository: TransitRepository,
+    private readonly details: TransitDetailsFacade,
     @InjectRepository(Claim)
     private claimRepository: ClaimRepository,
     private claimNumberGenerator: ClaimNumberGenerator,
-    private awardsService: AwardsService,
+    private readonly events: DomainEvents,
     private clientNotificationService: ClientNotificationService,
     private driverNotificationService: DriverNotificationService,
     private appProperties: AppProperties,
@@ -54,22 +54,17 @@ export class ClaimService {
     const client = await this.clientRepository.findOne({
       id: claimDTO.getClientId(),
     });
-    const transit = await this.transitRepository.findOne({
-      id: claimDTO.getTransitId(),
-    });
+    await this.details.find(claimDTO.getTransitId());
     if (client == null) {
       throw new NotFoundException('Client does not exists');
-    }
-    if (transit == null) {
-      throw new NotFoundException('Transit does not exists');
     }
     if (claimDTO.isDraft()) {
       claim.setStatus(ClaimStatus.DRAFT);
     } else {
       claim.setStatus(ClaimStatus.NEW);
     }
-    claim.setOwner(client);
-    claim.setTransit(transit);
+    claim.setOwner(client.id, client.getType());
+    claim.setTransitId(claimDTO.getTransitId());
     claim.setCreationDate(Date.now());
     claim.setReason(claimDTO.getReason());
     claim.setIncidentDescription(claimDTO.getIncidentDescription());
@@ -88,28 +83,34 @@ export class ClaimService {
   public async tryToResolveAutomatically(id: string): Promise<Claim> {
     const claim = await this.find(id);
     let resolver = await this.em.findOne(ClaimsResolver, {
-      clientId: claim.getOwner().id,
+      clientId: claim.clientId,
     });
     if (!resolver) {
-      const previousClaims = await this.claimRepository.find(
-        { owner: claim.getOwner(), id: { $ne: id } },
-        { populate: ['transit'] },
-      );
-      resolver = new ClaimsResolver(claim.getOwner().id, [
-        ...new Set(previousClaims.map((previous) => previous.getTransit().id)),
+      const previousClaims = await this.claimRepository.find({
+        clientId: claim.clientId,
+        id: { $ne: id },
+      });
+      resolver = new ClaimsResolver(claim.clientId, [
+        ...new Set(previousClaims.map((previous) => previous.transitId)),
       ]);
       this.em.persist(resolver);
     }
-    const count = await this.transitRepository.count({
-      client: claim.getOwner(),
-    });
-    const result = resolver.resolve(claim, count, {
-      vipThreshold: Money.fromMajor(
-        this.appProperties.getAutomaticRefundForVipThreshold(),
-      ),
-      minimumTransits:
-        this.appProperties.getNoOfTransitsForClaimAutomaticRefund(),
-    });
+    const count = await this.details.countByClient(claim.clientId);
+    const transit = await this.details.find(claim.transitId);
+    const result = resolver.resolve(
+      claim,
+      {
+        numberOfTransits: count,
+        price: Money.fromMajor(transit.view.price ?? 0),
+      },
+      {
+        vipThreshold: Money.fromMajor(
+          this.appProperties.getAutomaticRefundForVipThreshold(),
+        ),
+        minimumTransits:
+          this.appProperties.getNoOfTransitsForClaimAutomaticRefund(),
+      },
+    );
     claim.setStatus(result.status);
     claim.setChangeDate(Date.now());
     claim.setCompletionDate(Date.now());
@@ -121,24 +122,24 @@ export class ClaimService {
     if (result.status === ClaimStatus.REFUNDED) {
       this.clientNotificationService.notifyClientAboutRefund(
         claim.getClaimNo(),
-        claim.getOwner().id,
+        claim.clientId,
       );
-      if (claim.getOwner().getType() === Type.VIP)
-        await this.awardsService.registerNonExpiringMiles(
-          claim.getOwner().id,
-          10,
-        );
+      await this.events.publish({
+        type: 'claim-refunded',
+        clientId: claim.clientId,
+        clientType: claim.clientType,
+      });
     }
-    if (result.whoToAsk === WhoToAsk.DRIVER && claim.getTransit().getDriver()) {
+    if (result.whoToAsk === WhoToAsk.DRIVER && transit.driverId) {
       this.driverNotificationService.askDriverForDetailsAboutClaim(
         claim.getClaimNo(),
-        claim.getTransit().getDriver()!.id,
+        transit.driverId,
       );
     }
     if (result.whoToAsk === WhoToAsk.CLIENT) {
       this.clientNotificationService.askForMoreInformation(
         claim.getClaimNo(),
-        claim.getOwner().id,
+        claim.clientId,
       );
     }
     await this.em.flush();

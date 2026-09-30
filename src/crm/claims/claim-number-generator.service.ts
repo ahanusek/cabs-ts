@@ -1,8 +1,8 @@
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
-import { ClaimRepository } from '../repository/claim.repository';
-import { Claim } from '../entity/claim.entity';
+import { ClaimRepository } from './claim.repository';
+import { Claim } from './claim.entity';
 
 @Injectable()
 export class ClaimNumberGenerator {

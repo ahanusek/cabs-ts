@@ -1,7 +1,7 @@
-import { BaseEntity } from '../common/base.entity';
+import { BaseEntity } from '../../common/base.entity';
 import { Entity, Property, ManyToOne } from '@mikro-orm/decorators/legacy';
 import { Claim } from './claim.entity';
-import { ClaimAttachmentRepository } from '../repository/claim-attachment.repository';
+import { ClaimAttachmentRepository } from './claim-attachment.repository';
 
 @Entity({ repository: () => ClaimAttachmentRepository })
 export class ClaimAttachment extends BaseEntity {
@@ -18,7 +18,7 @@ export class ClaimAttachment extends BaseEntity {
   private data!: Buffer;
 
   public getClient() {
-    return this.claim.getOwner();
+    return this.claim.clientId;
   }
 
   public getClaim() {

@@ -1,7 +1,7 @@
 import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
-import { Claim, ClaimStatus } from '../entity/claim.entity';
-import { Type } from '../entity/client.entity';
-import { Money } from '../money/money';
+import { Claim, ClaimStatus } from './claim.entity';
+
+import { Money } from '../../money/money';
 
 export enum WhoToAsk {
   DRIVER = 'driver',
@@ -34,21 +34,19 @@ export class ClaimsResolver {
 
   public resolve(
     claim: Claim,
-    numberOfTransits: number,
+    facts: { numberOfTransits: number; price: Money },
     rules: RefundRules,
   ): ClaimDecision {
-    const transitId = claim.getTransit().id;
+    const transitId = claim.transitId;
     if (this.claimedTransitIds.includes(transitId))
       return this.escalate(WhoToAsk.NO_ONE);
     this.claimedTransitIds = [...this.claimedTransitIds, transitId];
     if (this.claimedTransitIds.length <= 3) return this.refund();
-    const inexpensive =
-      (claim.getTransit().getPrice() ?? Money.ZERO).toInt() <
-      rules.vipThreshold.toInt();
-    if (claim.getOwner().getType() === Type.VIP) {
+    const inexpensive = facts.price.toInt() < rules.vipThreshold.toInt();
+    if (claim.clientType === 'vip') {
       return inexpensive ? this.refund() : this.escalate(WhoToAsk.DRIVER);
     }
-    if (numberOfTransits >= rules.minimumTransits) {
+    if (facts.numberOfTransits >= rules.minimumTransits) {
       return inexpensive ? this.refund() : this.escalate(WhoToAsk.CLIENT);
     }
     return this.escalate(WhoToAsk.DRIVER);

@@ -1,4 +1,4 @@
-import { Claim, ClaimStatus, CompletionMode } from '../entity/claim.entity';
+import { Claim, ClaimStatus, CompletionMode } from './claim.entity';
 import { CreateClaimDto } from './create-claim.dto';
 
 export class ClaimDto {
@@ -42,8 +42,8 @@ export class ClaimDto {
       this.setClaimID(claim.getId());
       this.setReason(claim.getReason());
       this.setIncidentDescription(claim.getIncidentDescription());
-      this.setTransitId(claim.getTransit().getId());
-      this.setClientId(claim.getOwner().getId());
+      this.setTransitId(claim.transitId);
+      this.setClientId(claim.clientId);
       this.setCompletionDate(claim.getCompletionDate());
       this.setChangeDate(claim.getChangeDate());
       this.setClaimNo(claim.getClaimNo());

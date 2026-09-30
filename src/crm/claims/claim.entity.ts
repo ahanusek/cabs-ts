@@ -1,13 +1,8 @@
-import { BaseEntity } from '../common/base.entity';
-import { Client } from './client.entity';
-import {
-  Entity,
-  Property,
-  ManyToOne,
-  Enum,
-} from '@mikro-orm/decorators/legacy';
-import { Transit } from './transit.entity';
-import { ClaimRepository } from '../repository/claim.repository';
+import { BaseEntity } from '../../common/base.entity';
+
+import { Entity, Property, Enum } from '@mikro-orm/decorators/legacy';
+
+import { ClaimRepository } from './claim.repository';
 
 export enum ClaimStatus {
   DRAFT = 'draft',
@@ -25,11 +20,14 @@ export enum CompletionMode {
 
 @Entity({ repository: () => ClaimRepository })
 export class Claim extends BaseEntity {
-  @ManyToOne(() => Client, { eager: true })
-  public owner!: Client;
+  @Property({ type: 'uuid', fieldName: 'owner_id' })
+  public clientId!: string;
 
-  @ManyToOne(() => Transit, { eager: true })
-  public transit!: Transit;
+  @Property({ type: 'varchar' })
+  public clientType: 'normal' | 'vip' = 'normal';
+
+  @Property({ type: 'uuid' })
+  public transitId!: string;
 
   @Property({ type: 'bigint', runtimeType: 'number' })
   public creationDate!: number;
@@ -63,20 +61,13 @@ export class Claim extends BaseEntity {
     this.claimNo = claimNo;
   }
 
-  public getOwner() {
-    return this.owner;
+  public setOwner(clientId: string, clientType: 'normal' | 'vip') {
+    this.clientId = clientId;
+    this.clientType = clientType;
   }
 
-  public setOwner(owner: Client) {
-    this.owner = owner;
-  }
-
-  public getTransit() {
-    return this.transit;
-  }
-
-  public setTransit(transit: Transit) {
-    this.transit = transit;
+  public setTransitId(transitId: string) {
+    this.transitId = transitId;
   }
 
   public getCreationDate() {

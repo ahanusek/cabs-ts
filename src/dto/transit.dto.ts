@@ -2,7 +2,7 @@ import { Tariff } from '../pricing/tariff';
 import { Distance } from '../distance/distance';
 import { Status, Transit } from '../entity/transit.entity';
 import { DriverDto } from './driver.dto';
-import { ClaimDto } from './claim.dto';
+import { ClaimDto } from '../crm/claims/claim.dto';
 import { AddressDto } from './address.dto';
 import { CarClass } from '../entity/car-type.entity';
 import { ClientDto } from './client.dto';

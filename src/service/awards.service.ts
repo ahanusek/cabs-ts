@@ -1,3 +1,4 @@
+import { Claim } from '../crm/claims/claim.entity';
 import { chooseMilesSpendingPolicy } from '../loyalty/miles-spending-policy';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
@@ -90,14 +91,13 @@ export class AwardsService {
   public async removeMiles(clientId: string, amount: number): Promise<void> {
     const account = await this.getAccountForClient(clientId);
     const client = account.getClient();
-    await this.em.populate(client, ['claims']);
     const now = Date.now();
     account.remove(
       amount,
       now,
       chooseMilesSpendingPolicy({
         transitCount: await this.transits.count({ client }),
-        claimCount: client.getClaims().length,
+        claimCount: await this.em.count(Claim, { clientId }),
         clientType: client.getType(),
         moment: now,
       }),

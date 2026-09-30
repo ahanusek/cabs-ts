@@ -1,30 +1,44 @@
 import { ClaimsResolver, WhoToAsk } from './claims-resolver.entity';
-import { Claim, ClaimStatus } from '../entity/claim.entity';
-import { Type } from '../entity/client.entity';
-import { Money } from '../money/money';
-import { aCompletedTransit } from '../../test/support/transit.fixtures';
+import { Claim, ClaimStatus } from './claim.entity';
+import { Type } from '../../entity/client.entity';
+import { Money } from '../../money/money';
+import { aCompletedTransit } from '../../../test/support/transit.fixtures';
 
 const rules = { vipThreshold: new Money(5000), minimumTransits: 10 };
-function aClaim(price = 4400, type = Type.NORMAL) {
-  const transit = aCompletedTransit(new Money(price));
+function aClaim(type = Type.NORMAL) {
+  const transit = aCompletedTransit(new Money(4400));
   transit.getClient().setType(type);
   const claim = new Claim();
-  claim.setOwner(transit.getClient());
-  claim.setTransit(transit);
+  claim.setOwner(transit.getClient().id, transit.getClient().getType());
+  claim.setTransitId(transit.id);
   return claim;
 }
 
 describe('ClaimsResolver', () => {
   it('refunds the first claim', () => {
     expect(
-      new ClaimsResolver('client').resolve(aClaim(), 0, rules).status,
+      new ClaimsResolver('client').resolve(
+        aClaim(),
+        { numberOfTransits: 0, price: new Money(4400) },
+        rules,
+      ).status,
     ).toBe(ClaimStatus.REFUNDED);
   });
   it('escalates a duplicate without asking anyone', () => {
     const claim = aClaim();
     const resolver = new ClaimsResolver('client');
-    resolver.resolve(claim, 0, rules);
-    expect(resolver.resolve(claim, 0, rules)).toEqual({
+    resolver.resolve(
+      claim,
+      { numberOfTransits: 0, price: new Money(4400) },
+      rules,
+    );
+    expect(
+      resolver.resolve(
+        claim,
+        { numberOfTransits: 0, price: new Money(4400) },
+        rules,
+      ),
+    ).toEqual({
       status: ClaimStatus.ESCALATED,
       whoToAsk: WhoToAsk.NO_ONE,
     });
@@ -39,7 +53,13 @@ describe('ClaimsResolver', () => {
     'resolves an established client claim according to their history',
     (type, price, count, status, whoToAsk) => {
       const resolver = new ClaimsResolver('client', ['one', 'two', 'three']);
-      expect(resolver.resolve(aClaim(price, type), count, rules)).toEqual({
+      expect(
+        resolver.resolve(
+          aClaim(type),
+          { numberOfTransits: count, price: new Money(price) },
+          rules,
+        ),
+      ).toEqual({
         status,
         whoToAsk,
       });

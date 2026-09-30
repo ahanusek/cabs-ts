@@ -8,7 +8,7 @@ import {
   DriverAttribute,
   DriverAttributeName,
 } from '../src/entity/driver-attribute.entity';
-import { Claim, ClaimStatus } from '../src/entity/claim.entity';
+import { Claim, ClaimStatus } from '../src/crm/claims/claim.entity';
 import { CarClass } from '../src/entity/car-type.entity';
 import { Money } from '../src/money/money';
 import { aCompletedTransit } from './support/transit.fixtures';
@@ -64,8 +64,8 @@ describe('Driver report', () => {
         }
         if (daysAgo === 2) {
           const claim = new Claim();
-          claim.setOwner(transit.getClient());
-          claim.setTransit(transit);
+          claim.setOwner(transit.getClient().id, transit.getClient().getType());
+          claim.setTransitId(transit.id);
           claim.setClaimNo(claim.id);
           claim.setCreationDate(start);
           claim.setReason('Too fast');

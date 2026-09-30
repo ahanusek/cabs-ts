@@ -1,12 +1,7 @@
 import { BaseEntity } from '../common/base.entity';
-import { Collection } from '@mikro-orm/core';
-import {
-  Entity,
-  Property,
-  OneToMany,
-  Enum,
-} from '@mikro-orm/decorators/legacy';
-import { Claim } from './claim.entity';
+
+import { Entity, Property, Enum } from '@mikro-orm/decorators/legacy';
+
 import { ClientRepository } from '../repository/client.repository';
 
 export enum ClientType {
@@ -41,17 +36,6 @@ export class Client extends BaseEntity {
 
   @Enum({ items: () => ClientType, default: ClientType.INDIVIDUAL })
   private clientType: ClientType = ClientType.INDIVIDUAL;
-
-  @OneToMany(() => Claim, (claim) => claim.owner)
-  public claims = new Collection<Claim>(this);
-
-  public getClaims() {
-    return this.claims.getItems();
-  }
-
-  public setClaims(claims: Claim[]) {
-    this.claims.set(claims);
-  }
 
   public getName() {
     return this.name;
