@@ -1,3 +1,4 @@
+import { DriverLicense } from '../src/driverfleet/driver-license';
 import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { MikroORM } from '@mikro-orm/postgresql';
@@ -97,7 +98,7 @@ describe('Client API with PostgreSQL', () => {
     const driver = new Driver();
     driver.setFirstName('Jan');
     driver.setLastName('Kowalski');
-    driver.setDriverLicense('FARME100165AB5EW');
+    driver.setDriverLicense(DriverLicense.withLicense('FARME100165AB5EW'));
     driver.setStatus(DriverStatus.ACTIVE);
     driver.setType(DriverType.REGULAR);
     const positions = [0, 1].map((index) => {

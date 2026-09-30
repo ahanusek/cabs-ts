@@ -1,3 +1,5 @@
+import { DriverLicense } from '../driverfleet/driver-license';
+import { DriverLicenseType } from '../driverfleet/driver-license.type';
 import { Collection } from '@mikro-orm/core';
 import {
   Entity,
@@ -33,8 +35,8 @@ export class Driver extends BaseEntity {
   @Property()
   private lastName!: string;
 
-  @Property()
-  private driverLicense!: string;
+  @Property({ type: DriverLicenseType })
+  private driverLicense!: DriverLicense;
 
   @Property({ nullable: true, type: 'varchar' })
   private photo: string | null = null;
@@ -78,7 +80,7 @@ export class Driver extends BaseEntity {
     this.firstName = firstName;
   }
 
-  public setDriverLicense(license: string) {
+  public setDriverLicense(license: DriverLicense) {
     this.driverLicense = license;
   }
 

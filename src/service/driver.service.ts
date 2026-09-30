@@ -1,3 +1,4 @@
+import { DriverLicense } from '../driverfleet/driver-license';
 import {
   Injectable,
   NotAcceptableException,
@@ -18,8 +19,6 @@ import { Transit } from '../entity/transit.entity';
 
 @Injectable()
 export class DriverService {
-  public static DRIVER_LICENSE_REGEX = '^[A-Z9]{5}\\d{6}[A-Z9]{2}\\d[A-Z]{2}$';
-
   constructor(
     @InjectRepository(Driver)
     private driverRepository: DriverRepository,
@@ -37,17 +36,7 @@ export class DriverService {
     firstName,
   }: CreateDriverDto): Promise<Driver> {
     const driver = new Driver();
-    if (driver.getStatus() === DriverStatus.ACTIVE) {
-      if (
-        !driverLicense ||
-        !driverLicense.match(DriverService.DRIVER_LICENSE_REGEX)
-      ) {
-        throw new NotAcceptableException(
-          'Illegal license no = ' + driverLicense,
-        );
-      }
-    }
-    driver.setDriverLicense(driverLicense);
+    driver.setDriverLicense(DriverLicense.withoutValidation(driverLicense));
     driver.setLastName(lastName);
     driver.setFirstName(firstName);
     driver.setStatus(DriverStatus.INACTIVE);
@@ -85,12 +74,12 @@ export class DriverService {
       );
     }
     if (status === DriverStatus.ACTIVE) {
-      const license = driver.getDriverLicense();
-
-      if (!license) {
-        throw new ForbiddenException(
-          `Status cannot be ACTIVE. Illegal license no ${license}`,
+      try {
+        driver.setDriverLicense(
+          DriverLicense.withLicense(driver.getDriverLicense().asString()),
         );
+      } catch {
+        throw new ForbiddenException('An active driver needs a valid license');
       }
     }
 
@@ -106,19 +95,18 @@ export class DriverService {
         `Driver with id ${driverId} does not exists.`,
       );
     }
-    if (!newLicense || !newLicense.match(DriverService.DRIVER_LICENSE_REGEX)) {
-      throw new NotAcceptableException(
-        'Illegal new license no = ' + newLicense,
-      );
-    }
-
-    if (!(driver.getStatus() === DriverStatus.ACTIVE)) {
+    if (driver.getStatus() !== DriverStatus.ACTIVE) {
       throw new NotAcceptableException(
         'Driver is not active, cannot change license',
       );
     }
-
-    driver.setDriverLicense(newLicense);
+    try {
+      driver.setDriverLicense(DriverLicense.withLicense(newLicense));
+    } catch {
+      throw new NotAcceptableException(
+        'Illegal new license no = ' + newLicense,
+      );
+    }
     await this.driverRepository.getEntityManager().flush();
   }
 

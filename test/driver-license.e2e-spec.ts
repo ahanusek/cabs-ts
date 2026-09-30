@@ -68,6 +68,15 @@ describe('Driver license behavior before extracting a value object', () => {
     ).rejects.toThrow();
   });
 
+  it('rejects activating a driver with an invalid license', async () => {
+    const driver = await fixture.run(() => register('invalid'));
+    await expect(
+      fixture.run(() =>
+        drivers.changeDriverStatus(driver.id, DriverStatus.ACTIVE),
+      ),
+    ).rejects.toThrow();
+  });
+
   function register(driverLicense: string) {
     return drivers.createDriver({
       driverLicense,
