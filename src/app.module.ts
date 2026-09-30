@@ -1,3 +1,6 @@
+import { DriverReportCreator } from './driverreport/driver-report.creator';
+import { LegacyDriverReportCreator } from './driverreport/legacy-driver-report.creator';
+import { DriverReportFeatures } from './driverreport/driver-report.features';
 import { SqlDriverReportCreator } from './driverreport/sql-driver-report.creator';
 import { ContractAttachmentData } from './entity/contract-attachment-data.entity';
 import { ClaimsResolver } from './claims/claims-resolver.entity';
@@ -96,6 +99,9 @@ const entities = [
     DriverReportController,
   ],
   providers: [
+    DriverReportCreator,
+    LegacyDriverReportCreator,
+    DriverReportFeatures,
     SqlDriverReportCreator,
     DriverFinder,
     AppProperties,
