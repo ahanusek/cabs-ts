@@ -2,7 +2,7 @@ import { Claim, ClaimStatus } from '../src/entity/claim.entity';
 import { ClaimService } from '../src/service/claim.service';
 import { Money } from '../src/money/money';
 import { createTestApplication } from './support/test-application';
-import { aCompletedTransit } from './support/fixtures';
+import { aCompletedTransit } from './support/transit.fixtures';
 
 describe('Automatic claims resolution', () => {
   let fixture: Awaited<ReturnType<typeof createTestApplication>>;

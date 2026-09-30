@@ -4,7 +4,7 @@ import { DriverFee, FeeType } from '../src/entity/driver-fee.entity';
 import { TransitService } from '../src/service/transit.service';
 import { Status, Transit } from '../src/entity/transit.entity';
 import { Money } from '../src/money/money';
-import { aCompletedTransit } from './support/fixtures';
+import { aCompletedTransit } from './support/transit.fixtures';
 import { createTestApplication } from './support/test-application';
 
 describe('Transit lifecycle through the application service', () => {

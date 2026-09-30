@@ -2,7 +2,8 @@ import { MikroORM } from '@mikro-orm/postgresql';
 import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';
 import { Transit, Status } from './transit.entity';
 import { Distance } from '../distance/distance';
-import { anActiveDriver, anAddress } from '../../test/support/fixtures';
+import { anActiveDriver } from '../../test/support/driver.fixtures';
+import { anAddress } from '../../test/support/address.fixtures';
 
 describe('Transit lifecycle without a database', () => {
   let orm: MikroORM;

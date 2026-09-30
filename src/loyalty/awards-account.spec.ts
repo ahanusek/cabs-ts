@@ -1,7 +1,7 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';
 import { AwardsAccount } from '../entity/awards-account.entity';
-import { aClient } from '../../test/support/fixtures';
+import { aClient } from '../../test/support/client.fixtures';
 
 describe('Awards account aggregate', () => {
   let metadata: MikroORM;

@@ -2,7 +2,7 @@ import { ClaimsResolver, WhoToAsk } from './claims-resolver.entity';
 import { Claim, ClaimStatus } from '../entity/claim.entity';
 import { Type } from '../entity/client.entity';
 import { Money } from '../money/money';
-import { aCompletedTransit } from '../../test/support/fixtures';
+import { aCompletedTransit } from '../../test/support/transit.fixtures';
 
 const rules = { vipThreshold: new Money(5000), minimumTransits: 10 };
 function aClaim(price = 4400, type = Type.NORMAL) {

@@ -3,7 +3,8 @@ import { PopulateGraphService } from '../src/transitanalyzer/populate-graph.serv
 import { GraphTransitAnalyzer } from '../src/transitanalyzer/graph-transit-analyzer';
 import { CompletedTransitEdge } from '../src/transitanalyzer/completed-transit-edge.entity';
 import { Money } from '../src/money/money';
-import { aCompletedTransit, anAddress } from './support/fixtures';
+import { aCompletedTransit } from './support/transit.fixtures';
+import { anAddress } from './support/address.fixtures';
 import { createTestApplication } from './support/test-application';
 
 describe('Backfilling the graph from historical transits', () => {

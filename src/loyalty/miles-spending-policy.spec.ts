@@ -2,7 +2,8 @@ import { MikroORM } from '@mikro-orm/postgresql';
 import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';
 import { AwardsAccount } from '../entity/awards-account.entity';
 import { Type } from '../entity/client.entity';
-import { aClient, aCompletedTransit } from '../../test/support/fixtures';
+import { aClient } from '../../test/support/client.fixtures';
+import { aCompletedTransit } from '../../test/support/transit.fixtures';
 import { Money } from '../money/money';
 import { chooseMilesSpendingPolicy } from './miles-spending-policy';
 

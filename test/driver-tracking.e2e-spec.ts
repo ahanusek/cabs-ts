@@ -2,7 +2,7 @@ import { TravelledDistanceService } from '../src/driverreport/travelled-distance
 import { NotAcceptableException } from '@nestjs/common';
 import { DriverTrackingService } from '../src/service/driver-tracking.service';
 import { DriverStatus } from '../src/entity/driver.entity';
-import { anActiveDriver } from './support/fixtures';
+import { anActiveDriver } from './support/driver.fixtures';
 import { createTestApplication } from './support/test-application';
 
 const noon = Date.UTC(1989, 11, 12, 12, 10);

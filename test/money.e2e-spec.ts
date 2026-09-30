@@ -3,7 +3,7 @@ import { Transit } from '../src/entity/transit.entity';
 import { DriverFee, FeeType } from '../src/entity/driver-fee.entity';
 import { DriverFeeService } from '../src/service/driver-fee.service';
 import { createTestApplication } from './support/test-application';
-import { aCompletedTransit } from './support/fixtures';
+import { aCompletedTransit } from './support/transit.fixtures';
 
 describe('Money persistence and driver fees', () => {
   let fixture: Awaited<ReturnType<typeof createTestApplication>>;

@@ -11,7 +11,8 @@ import {
 import { Claim, ClaimStatus } from '../src/entity/claim.entity';
 import { CarClass } from '../src/entity/car-type.entity';
 import { Money } from '../src/money/money';
-import { aCompletedTransit, anActiveDriver } from './support/fixtures';
+import { aCompletedTransit } from './support/transit.fixtures';
+import { anActiveDriver } from './support/driver.fixtures';
 import { createTestApplication } from './support/test-application';
 
 describe('Driver report', () => {

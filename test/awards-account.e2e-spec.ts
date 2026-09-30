@@ -3,7 +3,8 @@ import { NotAcceptableException } from '@nestjs/common';
 import { AwardsService } from '../src/service/awards.service';
 import { AwardedMiles } from '../src/entity/awarded-miles.entity';
 import { Money } from '../src/money/money';
-import { aClient, aCompletedTransit } from './support/fixtures';
+import { aClient } from './support/client.fixtures';
+import { aCompletedTransit } from './support/transit.fixtures';
 import { createTestApplication } from './support/test-application';
 
 describe('Awards account — legacy behavior', () => {

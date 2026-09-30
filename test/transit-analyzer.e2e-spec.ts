@@ -1,7 +1,9 @@
 import { DomainEvents } from '../src/common/domain-events';
 import { TransitAnalyzerController } from '../src/controllers/transit-analyzer.controller';
 import { Money } from '../src/money/money';
-import { aClient, aCompletedTransit, anAddress } from './support/fixtures';
+import { aClient } from './support/client.fixtures';
+import { aCompletedTransit } from './support/transit.fixtures';
+import { anAddress } from './support/address.fixtures';
 import { createTestApplication } from './support/test-application';
 
 const minute = 60000;
