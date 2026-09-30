@@ -23,7 +23,7 @@ export class ChangePickupService {
   ) {}
 
   @Transactional()
-  public async _changeTransitAddressFrom(id: string, address: Address) {
+  public async changePickup(id: string, address: Address) {
     const request = await this.store.request(id);
     const demand = await this.store.demand(id);
     const details = await this.details.find(id);
@@ -47,6 +47,6 @@ export class ChangePickupService {
   }
 
   public changeTransitAddressFrom(id: string, address: AddressDto) {
-    return this._changeTransitAddressFrom(id, address.toAddressEntity());
+    return this.changePickup(id, address.toAddressEntity());
   }
 }

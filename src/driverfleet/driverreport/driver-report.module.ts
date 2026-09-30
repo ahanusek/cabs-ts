@@ -1,4 +1,4 @@
-import { GeolocationModule } from '../../geolocation/geolocation-module';
+import { GeolocationModule } from '../../geolocation/geolocation.module';
 import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { SqlDriverReportCreator } from './sql-driver-report.creator';

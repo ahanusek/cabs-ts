@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { TransitService } from './transit.service';
+import { RideService } from './ride.service';
 import type { TransitView } from './details/transit-view';
 import { CreateAddressDto } from '../geolocation/address/create-address.dto';
 import { AddressDto } from '../geolocation/address/address.dto';
@@ -7,7 +7,7 @@ import { CreateTransitDto } from './create-transit.dto';
 
 @Controller('transits')
 export class TransitController {
-  constructor(private readonly transitService: TransitService) {}
+  constructor(private readonly transitService: RideService) {}
 
   @Get(':transitId')
   public async getTransit(

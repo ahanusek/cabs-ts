@@ -4,7 +4,7 @@ import { CarTypeService } from './car-type.service';
 import { CarTypeController } from './car-type.controller';
 import { CarType } from './car-type.entity';
 import { CarTypeActiveCounter } from './car-type-active-counter.entity';
-import { ConfigurationModule } from '../config/configuration-module';
+import { ConfigurationModule } from '../config/configuration.module';
 
 @Module({
   imports: [

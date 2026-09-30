@@ -7,7 +7,7 @@ import { TransitAnalyzerController } from './transit-analyzer.controller';
 import { CompletedTransitEdge } from './completed-transit-edge.entity';
 
 import { Address } from '../../geolocation/address/address.entity';
-import { DomainEventsModule } from '../../common/domain-events-module';
+import { DomainEventsModule } from '../../common/domain-events.module';
 
 @Module({
   imports: [

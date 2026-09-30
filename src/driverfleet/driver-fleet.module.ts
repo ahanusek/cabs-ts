@@ -6,7 +6,7 @@ import { DriverController } from './driver.controller';
 import { Driver } from './driver.entity';
 import { DriverFee } from './driver-fee.entity';
 import { DriverAttribute } from './driver-attribute.entity';
-import { TransitDetailsModule } from '../ride/details/transit-details-module';
+import { TransitDetailsModule } from '../ride/details/transit-details.module';
 
 @Module({
   imports: [

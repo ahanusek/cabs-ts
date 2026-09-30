@@ -5,11 +5,11 @@ import { ClaimRefundedSubscriber } from './claim-refunded.subscriber';
 import { AwardsAccountController } from './awards-account.controller';
 import { AwardsAccount } from './awards-account.entity';
 import { AwardedMiles } from './awarded-miles.entity';
-import { ClientAccessModule } from '../crm/client-access-module';
-import { ClaimsQueriesModule } from '../crm/claims/claims-queries-module';
-import { TransitDetailsModule } from '../ride/details/transit-details-module';
-import { ConfigurationModule } from '../config/configuration-module';
-import { DomainEventsModule } from '../common/domain-events-module';
+import { ClientAccessModule } from '../crm/client-access.module';
+import { ClaimsQueriesModule } from '../crm/claims/claims-queries.module';
+import { TransitDetailsModule } from '../ride/details/transit-details.module';
+import { ConfigurationModule } from '../config/configuration.module';
+import { DomainEventsModule } from '../common/domain-events.module';
 
 @Module({
   imports: [

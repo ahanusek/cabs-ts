@@ -1,6 +1,6 @@
 import { CarClass, CarStatus } from '../../src/carfleet/car-type.entity';
 import { CarTypeService } from '../../src/carfleet/car-type.service';
-import { TransitService } from '../../src/ride/transit.service';
+import { RideService } from '../../src/ride/ride.service';
 import { AwardsService } from '../../src/loyalty/awards.service';
 import { DriverSessionService } from '../../src/tracking/driver-session.service';
 import { DriverTrackingService } from '../../src/tracking/driver-tracking.service';
@@ -20,7 +20,7 @@ export class RideFixtures {
     const from = anAddress();
     const to = anAddress();
     await this.application.orm.em.persist(client).flush();
-    const request = await this.service()._createTransit(
+    const request = await this.service().createTransitFromAddresses(
       client.id,
       from,
       to,
@@ -75,6 +75,6 @@ export class RideFixtures {
     return this.service().loadTransit(id);
   }
   private service() {
-    return this.application.app.get(TransitService);
+    return this.application.app.get(RideService);
   }
 }

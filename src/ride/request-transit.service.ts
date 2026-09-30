@@ -27,7 +27,7 @@ export class RequestTransitService {
 
   @Transactional()
   public async createTransit(dto: CreateTransitDto) {
-    return this._createTransit(
+    return this.createTransitFromAddresses(
       dto.clientId,
       new AddressDto(dto.from).toAddressEntity(),
       new AddressDto(dto.to).toAddressEntity(),
@@ -36,7 +36,7 @@ export class RequestTransitService {
   }
 
   @Transactional()
-  public async _createTransit(
+  public async createTransitFromAddresses(
     clientId: string,
     origin: Address,
     destination: Address,

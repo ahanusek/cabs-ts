@@ -1,5 +1,5 @@
 import { GraphTransitAnalyzer } from '../src/crm/transitanalyzer/graph-transit-analyzer';
-import { TransitService } from '../src/ride/transit.service';
+import { RideService } from '../src/ride/ride.service';
 import { Status } from '../src/ride/details/status';
 import { RequestForTransit } from '../src/ride/request-for-transit.entity';
 import { TransitDemand } from '../src/ride/transit-demand.entity';
@@ -12,11 +12,11 @@ import { createTestApplication } from './support/test-application';
 describe('Ride lifecycle across domain boundaries', () => {
   let application: Awaited<ReturnType<typeof createTestApplication>>;
   let rides: RideFixtures;
-  let service: TransitService;
+  let service: RideService;
   beforeAll(async () => {
     application = await createTestApplication();
     rides = new RideFixtures(application);
-    service = application.app.get(TransitService);
+    service = application.app.get(RideService);
   });
   afterAll(async () => application.close());
 

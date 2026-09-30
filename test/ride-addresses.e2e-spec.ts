@@ -1,4 +1,4 @@
-import { TransitService } from '../src/ride/transit.service';
+import { RideService } from '../src/ride/ride.service';
 import { AddressDto } from '../src/geolocation/address/address.dto';
 import { RideFixtures } from './support/ride.fixtures';
 import { anAddress } from './support/address.fixtures';
@@ -7,11 +7,11 @@ import { createTestApplication } from './support/test-application';
 describe('Changing ride addresses', () => {
   let application: Awaited<ReturnType<typeof createTestApplication>>;
   let rides: RideFixtures;
-  let service: TransitService;
+  let service: RideService;
   beforeAll(async () => {
     application = await createTestApplication();
     rides = new RideFixtures(application);
-    service = application.app.get(TransitService);
+    service = application.app.get(RideService);
   });
   afterAll(async () => application.close());
 
@@ -23,7 +23,7 @@ describe('Changing ride addresses', () => {
       const pickup = anAddress();
       pickup.setStreet('Nowa');
       pickup.setHash();
-      await service._changeTransitAddressFrom(ride.id, pickup);
+      await service.changePickup(ride.id, pickup);
       expect((await rides.viewRide(ride.id)).from.street).toBe('Nowa');
     }));
 
@@ -33,7 +33,7 @@ describe('Changing ride addresses', () => {
     pickup.setStreet('Forbidden');
     pickup.setHash();
     const results = await Promise.allSettled([
-      application.run(() => service._changeTransitAddressFrom(ride.id, pickup)),
+      application.run(() => service.changePickup(ride.id, pickup)),
     ]);
     const view = await application.run(() => rides.viewRide(ride.id));
     expect([results[0].status, view.from.street]).toEqual([
