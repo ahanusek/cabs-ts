@@ -42,8 +42,29 @@ export enum ClientPaymentStatus {
   RETURNED = 'returned',
 }
 
+export interface TransitRequest {
+  from: Address;
+  to: Address;
+  client: Client;
+  carClass: CarClass;
+  when: number;
+  distance: Distance;
+}
+
 @Entity({ repository: () => TransitRepository })
 export class Transit extends BaseEntity {
+  constructor(request?: TransitRequest) {
+    super();
+    if (!request) return;
+    this.from = request.from;
+    this.to = request.to;
+    this.client = request.client;
+    this.carType = request.carClass;
+    this.status = Status.DRAFT;
+    this.setDateTime(request.when);
+    this.km = request.distance.toKm();
+  }
+
   @Embedded(() => Tariff)
   private tariff: Tariff = Tariff.ofTime(new Date());
 

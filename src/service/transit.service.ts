@@ -1,3 +1,4 @@
+import { Distance } from '../distance/distance';
 import {
   Injectable,
   NotAcceptableException,
@@ -86,26 +87,26 @@ export class TransitService {
       throw new NotFoundException('Client does not exist, id = ' + clientId);
     }
 
-    const transit = new Transit();
-
     // FIXME later: add some exceptions handling
     const geoFrom = this.geocodingService.geocodeAddress(from);
     const geoTo = this.geocodingService.geocodeAddress(to);
 
-    transit.setClient(client);
-    transit.setFrom(from);
-    transit.setTo(to);
-    transit.setCarType(carClass);
-    transit.setStatus(Status.DRAFT);
-    transit.setDateTime(Date.now());
-    transit.setKm(
-      this.distanceCalculator.calculateByMap(
-        geoFrom[0],
-        geoFrom[1],
-        geoTo[0],
-        geoTo[1],
+    const transit = new Transit({
+      from,
+      to,
+      client,
+      carClass,
+      when: Date.now(),
+      distance: Distance.ofKm(
+        this.distanceCalculator.calculateByMap(
+          geoFrom[0],
+          geoFrom[1],
+          geoTo[0],
+          geoTo[1],
+        ),
       ),
-    );
+    });
+    transit.estimateCost();
 
     await this.transitRepository.getEntityManager().persist(transit).flush();
     return transit;
