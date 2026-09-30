@@ -1,3 +1,4 @@
+import { ActiveCarCounterProxy } from '../carfleet/active-car-counter.proxy';
 import { CarTypeActiveCounter } from '../entity/car-type-active-counter.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
@@ -87,11 +88,17 @@ export class CarTypeService {
   }
 
   public async registerActiveCar(carClass: CarClass) {
-    await this.carTypeRepository.registerActiveCar(carClass);
+    await new ActiveCarCounterProxy(
+      carClass,
+      this.carTypeRepository,
+    ).register();
   }
 
   public async unregisterActiveCar(carClass: CarClass) {
-    await this.carTypeRepository.unregisterActiveCar(carClass);
+    await new ActiveCarCounterProxy(
+      carClass,
+      this.carTypeRepository,
+    ).unregister();
   }
 
   public async findActiveCarClasses() {
