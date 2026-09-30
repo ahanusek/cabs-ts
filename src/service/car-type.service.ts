@@ -1,3 +1,4 @@
+import { CarTypeActiveCounter } from '../entity/car-type-active-counter.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { CarTypeRepository } from '../repository/car-type.repository';
@@ -24,7 +25,10 @@ export class CarTypeService {
 
   public async loadDto(id: string): Promise<CarTypeDto> {
     const carType = await this.load(id);
-    return new CarTypeDto(carType);
+    return new CarTypeDto(
+      carType,
+      await this.carTypeRepository.countActiveCars(carType.getCarClass()),
+    );
   }
 
   public async create(carTypeDTO: CreateCarTypeDto): Promise<CarType> {
@@ -42,7 +46,10 @@ export class CarTypeService {
         this.getMinNumberOfCars(carTypeDTO.carClass),
       );
 
-      await this.carTypeRepository.getEntityManager().persist(carType).flush();
+      await this.carTypeRepository
+        .getEntityManager()
+        .persist([carType, new CarTypeActiveCounter(carTypeDTO.carClass)])
+        .flush();
       return carType;
     }
   }
@@ -80,19 +87,11 @@ export class CarTypeService {
   }
 
   public async registerActiveCar(carClass: CarClass) {
-    const carType = await this.carTypeRepository.findByCarClass(carClass);
-
-    carType.registerActiveCar();
-
-    await this.carTypeRepository.getEntityManager().flush();
+    await this.carTypeRepository.registerActiveCar(carClass);
   }
 
   public async unregisterActiveCar(carClass: CarClass) {
-    const carType = await this.carTypeRepository.findByCarClass(carClass);
-
-    carType.unregisterActiveCar();
-
-    await this.carTypeRepository.getEntityManager().flush();
+    await this.carTypeRepository.unregisterActiveCar(carClass);
   }
 
   public async findActiveCarClasses() {
@@ -103,6 +102,9 @@ export class CarTypeService {
   public async removeCarType(carClass: CarClass) {
     const carType = await this.carTypeRepository.findByCarClass(carClass);
     if (carType) {
+      await this.carTypeRepository
+        .getEntityManager()
+        .nativeDelete(CarTypeActiveCounter, { carClass });
       await this.carTypeRepository.getEntityManager().remove(carType).flush();
     }
   }

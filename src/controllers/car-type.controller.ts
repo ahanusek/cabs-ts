@@ -26,7 +26,7 @@ export class CarTypeController {
   ): Promise<CarTypeDto> {
     const carType = await this.carTypeService.create(createCarTypeDto);
 
-    return new CarTypeDto(carType);
+    return this.carTypeService.loadDto(carType.id);
   }
 
   @Post(':carClass/registerCar')

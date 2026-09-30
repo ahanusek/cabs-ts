@@ -39,4 +39,16 @@ describe('Car fleet behavior', () => {
     const dto = await fixture.run(() => cars.loadDto(car.id));
     expect(dto).toEqual(expect.objectContaining({ activeCarsCounter: 1 }));
   });
+  it('preserves concurrent active-car increments', async () => {
+    const car = await fixture.run(() =>
+      cars.create({ carClass: CarClass.ECO, description: 'Eco' }),
+    );
+    await Promise.all(
+      Array.from({ length: 10 }, () =>
+        fixture.run(() => cars.registerActiveCar(CarClass.ECO)),
+      ),
+    );
+    const dto = await fixture.run(() => cars.loadDto(car.id));
+    expect(dto).toEqual(expect.objectContaining({ activeCarsCounter: 10 }));
+  });
 });

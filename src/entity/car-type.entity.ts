@@ -32,9 +32,6 @@ export class CarType extends BaseEntity {
   @Property({ type: 'int', default: 0 })
   public minNoOfCarsToActivateClass: number = 0;
 
-  @Property({ type: 'int', default: 0 })
-  public activeCarsCounter: number = 0;
-
   constructor(
     carClass?: CarClass,
     description?: string,
@@ -45,14 +42,6 @@ export class CarType extends BaseEntity {
     if (description) this.description = description;
     if (minNoOfCarsToActivateClass)
       this.minNoOfCarsToActivateClass = minNoOfCarsToActivateClass;
-  }
-
-  public registerActiveCar() {
-    this.activeCarsCounter++;
-  }
-
-  public unregisterActiveCar() {
-    this.activeCarsCounter--;
   }
 
   public registerCar() {
@@ -101,10 +90,6 @@ export class CarType extends BaseEntity {
 
   public getCarsCounter() {
     return this.carsCounter;
-  }
-
-  public getActiveCarsCounter() {
-    return this.activeCarsCounter;
   }
 
   public getMinNoOfCarsToActivateClass() {

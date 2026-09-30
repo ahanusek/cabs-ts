@@ -14,13 +14,13 @@ export class CarTypeDto {
 
   private activeCarsCounter: number;
 
-  constructor(carType: CarType) {
+  constructor(carType: CarType, activeCarsCounter: number) {
     this.id = carType.getId();
     this.carClass = carType.getCarClass();
     this.status = carType.getStatus();
     this.description = carType.getDescription();
     this.carsCounter = carType.getCarsCounter();
     this.minNoOfCarsToActivateClass = carType.getMinNoOfCarsToActivateClass();
-    this.activeCarsCounter = carType.getActiveCarsCounter();
+    this.activeCarsCounter = activeCarsCounter;
   }
 }
