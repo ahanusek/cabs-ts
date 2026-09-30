@@ -1,3 +1,5 @@
+import { TransitDetails } from '../src/transitdetails/transit-details.entity';
+import { transitSnapshot } from '../src/transitdetails/transit-snapshot';
 import request from 'supertest';
 import dayjs from 'dayjs';
 import { DriverReportController } from '../src/controllers/driver-report.controller';
@@ -45,12 +47,19 @@ describe('Driver report', () => {
         const transit = aCompletedTransit(Money.fromMajor(80));
         transit.setDriver(driver);
         transit.setCompleteAt(start + 3600000);
-        application.orm.em.persist([session, transit]);
+        application.orm.em.persist([
+          session,
+          transit,
+          new TransitDetails(transitSnapshot(transit)),
+        ]);
         if (daysAgo === 0) {
           const second = aCompletedTransit(Money.fromMajor(90));
           second.setDriver(driver);
           second.setCompleteAt(start + 5400000);
-          application.orm.em.persist(second);
+          application.orm.em.persist([
+            second,
+            new TransitDetails(transitSnapshot(second)),
+          ]);
         }
         if (daysAgo === 2) {
           const claim = new Claim();

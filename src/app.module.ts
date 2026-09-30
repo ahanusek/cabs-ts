@@ -1,3 +1,5 @@
+import { TransitDetails } from './transitdetails/transit-details.entity';
+import { TransitDetailsFacade } from './transitdetails/transit-details.facade';
 import { PopulateGraphService } from './transitanalyzer/populate-graph.service';
 import { DomainEvents } from './common/domain-events';
 import { GraphTransitSubscriber } from './transitanalyzer/graph-transit.subscriber';
@@ -37,7 +39,6 @@ import { DriverSessionController } from './controllers/driver-session.controller
 import { DriverFeeService } from './service/driver-fee.service';
 import { DriverTrackingService } from './service/driver-tracking.service';
 import { DriverTrackingController } from './controllers/driver-tracking.controller';
-import { TransitAnalyzerService } from './service/transit-analyzer.service';
 import { AwardsService } from './service/awards.service';
 import { ClaimService } from './service/claim.service';
 import { ContractService } from './service/contract.service';
@@ -68,6 +69,7 @@ import { ClaimAttachment } from './entity/claim-attachment.entity';
 import { ContractAttachment } from './entity/contract-attachment.entity';
 
 const entities = [
+  TransitDetails,
   CompletedTransitEdge,
   DocumentHeader,
   DocumentContent,
@@ -117,6 +119,7 @@ const entities = [
     DriverReportController,
   ],
   providers: [
+    TransitDetailsFacade,
     PopulateGraphService,
     DomainEvents,
     GraphTransitSubscriber,
@@ -137,7 +140,6 @@ const entities = [
     DriverSessionService,
     DriverFeeService,
     DriverTrackingService,
-    TransitAnalyzerService,
     AwardsService,
     ClaimService,
     ContractService,

@@ -13,7 +13,8 @@ import { GeocodingService } from './geocoding.service';
 import { InvoiceGenerator } from './invoice-generator.service';
 import { DistanceCalculator } from './distance-calculator.service';
 import { DriverFinder } from './driver-finder.service';
-import { TransitDto } from '../dto/transit.dto';
+import { TransitDetailsFacade } from '../transitdetails/transit-details.facade';
+import { transitSnapshot } from '../transitdetails/transit-snapshot';
 import { AddressDto } from '../dto/address.dto';
 import { CarClass } from '../entity/car-type.entity';
 import { Address } from '../entity/address.entity';
@@ -40,6 +41,7 @@ export class TransitService {
     private readonly finder: DriverFinder,
     private readonly em: EntityManager,
     private readonly events: DomainEvents,
+    private readonly details: TransitDetailsFacade,
   ) {}
 
   @Transactional()
@@ -69,7 +71,8 @@ export class TransitService {
     transit.setStatus(Status.DRAFT);
     transit.setDateTime(Date.now());
     transit.setKm(this.distanceBetween(from, to).toKm());
-    await this.em.persist(transit).flush();
+    this.em.persist(transit);
+    await this.save(transit);
     return transit;
   }
 
@@ -96,7 +99,7 @@ export class TransitService {
         transit.id,
       );
     }
-    await this.em.flush();
+    await this.save(transit);
   }
 
   public changeTransitAddressFrom(transitId: string, address: AddressDto) {
@@ -119,7 +122,7 @@ export class TransitService {
         driver.id,
         transit.id,
       );
-    await this.em.flush();
+    await this.save(transit);
   }
 
   @Transactional()
@@ -131,7 +134,7 @@ export class TransitService {
       driver.setOccupied(false);
       this.notifications.notifyAboutCancelledTransit(driver.id, transit.id);
     }
-    await this.em.flush();
+    await this.save(transit);
   }
 
   @Transactional()
@@ -144,7 +147,7 @@ export class TransitService {
   @Transactional()
   public async findDriversForTransit(transitId: string) {
     const transit = await this.finder.findFor(await this.loadEntity(transitId));
-    await this.em.flush();
+    await this.save(transit);
     return transit;
   }
 
@@ -152,7 +155,7 @@ export class TransitService {
   public async acceptTransit(driverId: string, transitId: string) {
     const transit = await this.loadEntity(transitId);
     transit.acceptBy(await this.loadDriver(driverId), Date.now());
-    await this.em.flush();
+    await this.save(transit);
   }
 
   @Transactional()
@@ -160,14 +163,14 @@ export class TransitService {
     await this.loadDriver(driverId);
     const transit = await this.loadEntity(transitId);
     transit.start(Date.now());
-    await this.em.flush();
+    await this.save(transit);
   }
 
   @Transactional()
   public async rejectTransit(driverId: string, transitId: string) {
     const transit = await this.loadEntity(transitId);
     transit.rejectBy(await this.loadDriver(driverId));
-    await this.em.flush();
+    await this.save(transit);
   }
 
   public completeTransitFromDto(
@@ -203,7 +206,7 @@ export class TransitService {
       transit.getPrice()!.toMajor(),
       `${transit.getClient().getName()} ${transit.getClient().getLastName()}`,
     );
-    await this.em.flush();
+    await this.save(transit);
     await this.events.publish({
       type: 'transit-completed',
       transitId: transit.id,
@@ -216,7 +219,12 @@ export class TransitService {
   }
 
   public async loadTransit(transitId: string) {
-    return new TransitDto(await this.loadEntity(transitId));
+    return this.details.getView(transitId);
+  }
+
+  private async save(transit: Transit) {
+    await this.em.flush();
+    await this.details.record(transitSnapshot(transit));
   }
 
   private async loadEntity(id: string): Promise<Transit> {
