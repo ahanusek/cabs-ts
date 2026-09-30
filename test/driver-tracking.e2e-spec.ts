@@ -1,3 +1,4 @@
+import { TravelledDistanceService } from '../src/driverreport/travelled-distance/travelled-distance.service';
 import { NotAcceptableException } from '@nestjs/common';
 import { DriverTrackingService } from '../src/service/driver-tracking.service';
 import { DriverStatus } from '../src/entity/driver.entity';
@@ -64,11 +65,27 @@ describe('Driver travelled distance', () => {
     ).rejects.toBeInstanceOf(NotAcceptableException);
   });
 
+  it('recalculates the interval when a position arrives late', async () => {
+    await position(start, noon);
+    await position(start, noon + 2);
+    await position(destination, noon + 1);
+    expect(await distance(noon, noon + fiveMinutes)).toBe('4.009km');
+  });
+
+  it('does not double-count a replayed position', async () => {
+    await position(start, noon);
+    const sample = await position(destination, noon + 1);
+    await application.run(() =>
+      application.app.get(TravelledDistanceService).addPosition(sample),
+    );
+    expect(await distance(noon, noon + fiveMinutes)).toBe('2.004km');
+  });
+
   async function position(
     coordinates: readonly [number, number],
     time: number,
   ) {
-    await application.run(() =>
+    return application.run(() =>
       tracking.registerPosition(driverId, ...coordinates, time),
     );
   }

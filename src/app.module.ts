@@ -1,3 +1,5 @@
+import { TravelledDistance } from './driverreport/travelled-distance/travelled-distance.entity';
+import { TravelledDistanceService } from './driverreport/travelled-distance/travelled-distance.service';
 import { SqlDriverReportCreator } from './driverreport/sql-driver-report.creator';
 import { ContractAttachmentData } from './entity/contract-attachment-data.entity';
 import { ClaimsResolver } from './claims/claims-resolver.entity';
@@ -55,6 +57,7 @@ import { ClaimAttachment } from './entity/claim-attachment.entity';
 import { ContractAttachment } from './entity/contract-attachment.entity';
 
 const entities = [
+  TravelledDistance,
   ContractAttachmentData,
   ClaimsResolver,
   CarTypeActiveCounter,
@@ -96,6 +99,7 @@ const entities = [
     DriverReportController,
   ],
   providers: [
+    TravelledDistanceService,
     SqlDriverReportCreator,
     DriverFinder,
     AppProperties,
