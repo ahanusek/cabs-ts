@@ -10,6 +10,17 @@ export class DriverReport {
 
   public sessions: Map<DriverSessionDto, TransitDto[]> = new Map();
 
+  public toJSON() {
+    return {
+      driverDto: this.driverDto,
+      attributes: this.attributes,
+      sessions: [...this.sessions].map(([session, transits]) => ({
+        session,
+        transits,
+      })),
+    };
+  }
+
   public getDriverDto() {
     return this.driverDto;
   }

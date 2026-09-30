@@ -43,7 +43,10 @@ export class DriverReportController {
     const driverDto = await this.driverService.loadDriver(driverId);
 
     driverReport.setDriverDTO(driverDto);
-    const driver = await this.driverRepository.findOne({ id: driverId });
+    const driver = await this.driverRepository.findOne(
+      { id: driverId },
+      { populate: ['attributes', 'transits', 'transits.client'] },
+    );
 
     if (!driver) {
       throw new NotFoundException(`Driver with id ${driverId} not exists`);
