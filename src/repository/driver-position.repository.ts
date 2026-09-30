@@ -1,4 +1,4 @@
-import { EntityRepository } from '@mikro-orm/postgresql';
+import { EntityRepository, raw } from '@mikro-orm/postgresql';
 import { DriverPosition } from '../entity/driver-position.entity';
 import { Driver } from '../entity/driver.entity';
 import { DriverPositionV2Dto } from '../dto/driver-position-v2.dto';
@@ -16,11 +16,10 @@ export class DriverPositionRepository extends EntityRepository<DriverPosition> {
     const results = await qb
       .select([
         'dp.driver',
-        'avg(dp.latitude) as avgLatitude',
-        'avg(dp.longitude) as avgLongitude',
-        'max(dp.seenAt) as maxSeenAt',
+        raw('avg(??)', ['dp.latitude']).as('avgLatitude'),
+        raw('avg(??)', ['dp.longitude']).as('avgLongitude'),
+        raw('max(??)', ['dp.seen_at']).as('maxSeenAt'),
       ])
-      .leftJoinAndSelect('dp.driver', 'd')
       .where({
         longitude: { $gte: longitudeMin, $lte: longitudeMax },
         latitude: { $gte: latitudeMin, $lte: latitudeMax },
@@ -29,20 +28,25 @@ export class DriverPositionRepository extends EntityRepository<DriverPosition> {
       .groupBy('dp.driver')
       .execute<
         {
-          driver: Driver;
+          driver: string;
           avgLatitude: number;
           avgLongitude: number;
           maxSeenAt: number;
         }[]
       >();
 
+    const drivers = await this.getEntityManager().find(Driver, {
+      id: { $in: results.map((position) => position.driver) },
+    });
+    const driversById = new Map(drivers.map((driver) => [driver.id, driver]));
+
     return results.map(
       (dp) =>
         new DriverPositionV2Dto(
-          dp.driver,
-          dp.avgLatitude,
-          dp.avgLongitude,
-          dp.maxSeenAt,
+          driversById.get(dp.driver)!,
+          Number(dp.avgLatitude),
+          Number(dp.avgLongitude),
+          Number(dp.maxSeenAt),
         ),
     );
   }

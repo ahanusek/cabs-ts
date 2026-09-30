@@ -1,5 +1,11 @@
 import { BaseEntity } from '../common/base.entity';
-import { Entity, Property, OneToMany, Collection, Enum } from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import {
+  Entity,
+  Property,
+  OneToMany,
+  Enum,
+} from '@mikro-orm/decorators/legacy';
 import { ContractAttachment } from './contract-attachment.entity';
 import { ContractRepository } from '../repository/contract.repository';
 

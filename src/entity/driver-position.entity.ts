@@ -1,5 +1,5 @@
 import { BaseEntity } from '../common/base.entity';
-import { Entity, Property, ManyToOne } from '@mikro-orm/core';
+import { Entity, Property, ManyToOne } from '@mikro-orm/decorators/legacy';
 import { Driver } from './driver.entity';
 import { DriverPositionRepository } from '../repository/driver-position.repository';
 

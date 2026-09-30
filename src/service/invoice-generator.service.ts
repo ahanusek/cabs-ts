@@ -12,7 +12,7 @@ export class InvoiceGenerator {
 
   public async generate(amount: number, subjectName: string) {
     const invoice = new Invoice(amount, subjectName);
-    await this.invoiceRepository.getEntityManager().persistAndFlush(invoice);
+    await this.invoiceRepository.getEntityManager().persist(invoice).flush();
     return invoice;
   }
 }

@@ -9,7 +9,7 @@ import {
   HttpStatus,
   Get,
 } from '@nestjs/common';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { CarTypeService } from '../service/car-type.service';
 import { CreateCarTypeDto } from '../dto/create-car-type.dto';
 import { CarTypeDto } from '../dto/car-type.dto';

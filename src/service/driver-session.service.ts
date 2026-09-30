@@ -37,7 +37,8 @@ export class DriverSessionService {
     await this.carTypeService.registerActiveCar(session.getCarClass());
     await this.driverSessionRepository
       .getEntityManager()
-      .persistAndFlush(session);
+      .persist(session)
+      .flush();
     return session;
   }
 

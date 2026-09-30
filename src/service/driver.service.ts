@@ -60,7 +60,7 @@ export class DriverService {
       }
     }
 
-    await this.driverRepository.getEntityManager().persistAndFlush(driver);
+    await this.driverRepository.getEntityManager().persist(driver).flush();
     return driver;
   }
 

@@ -1,5 +1,5 @@
 import { NotAcceptableException } from '@nestjs/common';
-import { Entity, Property, Enum } from '@mikro-orm/core';
+import { Entity, Property, Enum } from '@mikro-orm/decorators/legacy';
 import { BaseEntity } from '../common/base.entity';
 import { CarTypeRepository } from '../repository/car-type.repository';
 

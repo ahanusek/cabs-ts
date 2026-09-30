@@ -1,6 +1,6 @@
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { ClaimRepository } from '../repository/claim.repository';
 import { Claim } from '../entity/claim.entity';
 

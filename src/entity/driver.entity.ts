@@ -1,11 +1,11 @@
+import { Collection } from '@mikro-orm/core';
 import {
   Entity,
   Property,
   OneToMany,
   OneToOne,
-  Collection,
   Enum,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import { BaseEntity } from '../common/base.entity';
 import { Transit } from './transit.entity';
 import { DriverAttribute } from './driver-attribute.entity';

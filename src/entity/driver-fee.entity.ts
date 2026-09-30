@@ -1,6 +1,6 @@
 import { BaseEntity } from '../common/base.entity';
 import { Driver } from './driver.entity';
-import { Entity, Property, OneToOne, Enum } from '@mikro-orm/core';
+import { Entity, Property, OneToOne, Enum } from '@mikro-orm/decorators/legacy';
 import { DriverFeeRepository } from '../repository/driver-fee.repository';
 
 export enum FeeType {

@@ -22,7 +22,7 @@ export class ClientService {
     client.setLastName(lastName);
     client.setType(type);
     client.setDefaultPaymentType(paymentType);
-    await this.clientRepository.getEntityManager().persistAndFlush(client);
+    await this.clientRepository.getEntityManager().persist(client).flush();
     return client;
   }
 

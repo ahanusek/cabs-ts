@@ -1,5 +1,5 @@
 import { BaseEntity } from '../common/base.entity';
-import { Entity, Property, ManyToOne } from '@mikro-orm/core';
+import { Entity, Property, ManyToOne } from '@mikro-orm/decorators/legacy';
 import { Claim } from './claim.entity';
 import { ClaimAttachmentRepository } from '../repository/claim-attachment.repository';
 

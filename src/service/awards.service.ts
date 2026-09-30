@@ -80,7 +80,7 @@ export class AwardsService implements IAwardsService {
     account.setActive(false);
     account.setDate(Date.now());
 
-    await this.accountRepository.getEntityManager().persistAndFlush(account);
+    await this.accountRepository.getEntityManager().persist(account).flush();
   }
 
   public async activateAccount(clientId: string) {
@@ -124,7 +124,7 @@ export class AwardsService implements IAwardsService {
       miles.setSpecial(false);
       account.increaseTransactions();
 
-      await this.milesRepository.getEntityManager().persistAndFlush(miles);
+      await this.milesRepository.getEntityManager().persist(miles).flush();
       await this.accountRepository.getEntityManager().flush();
       return miles;
     }
@@ -140,7 +140,7 @@ export class AwardsService implements IAwardsService {
     _miles.setDate(Date.now());
     _miles.setSpecial(true);
     account.increaseTransactions();
-    await this.milesRepository.getEntityManager().persistAndFlush(_miles);
+    await this.milesRepository.getEntityManager().persist(_miles).flush();
     await this.accountRepository.getEntityManager().flush();
     return _miles;
   }

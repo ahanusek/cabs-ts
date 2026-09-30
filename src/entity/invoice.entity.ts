@@ -1,5 +1,5 @@
 import { BaseEntity } from '../common/base.entity';
-import { Entity, Property } from '@mikro-orm/core';
+import { Entity, Property } from '@mikro-orm/decorators/legacy';
 import { InvoiceRepository } from '../repository/invoice.repository';
 
 @Entity({ repository: () => InvoiceRepository })

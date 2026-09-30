@@ -39,7 +39,7 @@ export class ContractService {
     contract.setContractNo(
       'C/' + partnerContractsCount + '/' + createContractDto.partnerName,
     );
-    await this.contractRepository.getEntityManager().persistAndFlush(contract);
+    await this.contractRepository.getEntityManager().persist(contract).flush();
     return contract;
   }
 
@@ -131,7 +131,8 @@ export class ContractService {
     contractAttachment.setData(contractAttachmentDto.data);
     await this.contractAttachmentRepository
       .getEntityManager()
-      .persistAndFlush(contractAttachment);
+      .persist(contractAttachment)
+      .flush();
     contract.getAttachments().push(contractAttachment);
     await this.contractRepository.getEntityManager().flush();
     return new ContractAttachmentDto(contractAttachment);
@@ -145,7 +146,8 @@ export class ContractService {
     if (attachment) {
       await this.contractAttachmentRepository
         .getEntityManager()
-        .removeAndFlush(attachment);
+        .remove(attachment)
+        .flush();
     }
   }
 }

@@ -39,7 +39,7 @@ export class DriverTrackingService {
     position.setSeenAt(Date.now());
     position.setLatitude(latitude);
     position.setLongitude(longitude);
-    await this.positionRepository.getEntityManager().persistAndFlush(position);
+    await this.positionRepository.getEntityManager().persist(position).flush();
     return position;
   }
 

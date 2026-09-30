@@ -1,5 +1,5 @@
 import { BaseEntity } from '../common/base.entity';
-import { Entity, Property, OneToOne } from '@mikro-orm/core';
+import { Entity, Property, OneToOne } from '@mikro-orm/decorators/legacy';
 import { Client } from './client.entity';
 import { AwardsAccountRepository } from '../repository/awards-account.repository';
 

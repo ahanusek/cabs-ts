@@ -30,9 +30,8 @@ import { AwardsAccountController } from './controllers/awards-account.controller
 import { ClaimController } from './controllers/claim.controller';
 import { ContractController } from './controllers/contract.controller';
 import { DriverReportController } from './controllers/driver-report.controller';
-import { PostgreSqlDriver } from '@mikro-orm/postgresql';
+import ormConfig from './mikro-orm.config';
 
-// Import entities
 import { Driver } from './entity/driver.entity';
 import { CarType } from './entity/car-type.entity';
 import { Client } from './entity/client.entity';
@@ -72,23 +71,7 @@ const entities = [
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    MikroOrmModule.forRoot({
-      driver: PostgreSqlDriver,
-      host: process.env.DATABASE_HOST || 'localhost',
-      port: process.env.DATABASE_PORT
-        ? parseInt(process.env.DATABASE_PORT, 10)
-        : 5432,
-      user: process.env.DATABASE_USERNAME || 'postgres',
-      password: process.env.DATABASE_PASSWORD || 'postgres',
-      dbName: process.env.DATABASE_NAME || 'cabs',
-      entities: entities,
-      debug: process.env.NODE_ENV !== 'production',
-      allowGlobalContext: true,
-      schemaGenerator: {
-        disableForeignKeys: true,
-        createForeignKeyConstraints: true,
-      },
-    }),
+    MikroOrmModule.forRoot({ ...ormConfig, entities }),
     MikroOrmModule.forFeature(entities),
   ],
   controllers: [

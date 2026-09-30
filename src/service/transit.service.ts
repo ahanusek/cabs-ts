@@ -22,14 +22,14 @@ import { CarClass } from '../entity/car-type.entity';
 import { Address } from '../entity/address.entity';
 import { Status, Transit } from '../entity/transit.entity';
 import { DriverNotificationService } from './driver-notification.service';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { Driver, DriverStatus } from '../entity/driver.entity';
 import { DriverPositionV2Dto } from '../dto/driver-position-v2.dto';
 import { CreateTransitDto } from '../dto/create-transit.dto';
 import { Client } from '../entity/client.entity';
 import { DriverSession } from '../entity/driver-session.entity';
 import { DriverPosition } from '../entity/driver-position.entity';
-import { Transactional } from '@mikro-orm/core';
+import { Transactional } from '@mikro-orm/decorators/legacy';
 
 @Injectable()
 export class TransitService {
@@ -107,7 +107,7 @@ export class TransitService {
       ),
     );
 
-    await this.transitRepository.getEntityManager().persistAndFlush(transit);
+    await this.transitRepository.getEntityManager().persist(transit).flush();
     return transit;
   }
 

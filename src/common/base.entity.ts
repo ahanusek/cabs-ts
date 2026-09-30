@@ -1,4 +1,4 @@
-import { PrimaryKey } from '@mikro-orm/core';
+import { PrimaryKey } from '@mikro-orm/decorators/legacy';
 import { v4 as uuidv4 } from 'uuid';
 
 export abstract class BaseEntity {

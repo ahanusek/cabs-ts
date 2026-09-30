@@ -42,7 +42,7 @@ export class CarTypeService {
         this.getMinNumberOfCars(carTypeDTO.carClass),
       );
 
-      await this.carTypeRepository.getEntityManager().persistAndFlush(carType);
+      await this.carTypeRepository.getEntityManager().persist(carType).flush();
       return carType;
     }
   }
@@ -103,7 +103,7 @@ export class CarTypeService {
   public async removeCarType(carClass: CarClass) {
     const carType = await this.carTypeRepository.findByCarClass(carClass);
     if (carType) {
-      await this.carTypeRepository.getEntityManager().removeAndFlush(carType);
+      await this.carTypeRepository.getEntityManager().remove(carType).flush();
     }
   }
 

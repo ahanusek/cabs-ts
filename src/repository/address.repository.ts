@@ -10,7 +10,7 @@ export class AddressRepository extends EntityRepository<Address> {
       }
     }
 
-    await this.getEntityManager().persistAndFlush(address);
+    await this.getEntityManager().persist(address).flush();
     return address;
   }
 

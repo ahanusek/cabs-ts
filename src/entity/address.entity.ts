@@ -1,6 +1,6 @@
 import { BaseEntity } from '../common/base.entity';
-import { Entity, Property } from '@mikro-orm/core';
-import * as objectHash from 'object-hash';
+import { Entity, Property } from '@mikro-orm/decorators/legacy';
+import objectHash from 'object-hash';
 import { AddressRepository } from '../repository/address.repository';
 
 @Entity({ repository: () => AddressRepository })

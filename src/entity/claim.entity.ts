@@ -1,6 +1,12 @@
 import { BaseEntity } from '../common/base.entity';
 import { Client } from './client.entity';
-import { Entity, Property, ManyToOne, OneToOne, Enum } from '@mikro-orm/core';
+import {
+  Entity,
+  Property,
+  ManyToOne,
+  OneToOne,
+  Enum,
+} from '@mikro-orm/decorators/legacy';
 import { Transit } from './transit.entity';
 import { ClaimRepository } from '../repository/claim.repository';
 

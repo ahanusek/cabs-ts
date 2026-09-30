@@ -14,7 +14,7 @@ import { DriverReport } from '../dto/driver-report.dto';
 import { Driver } from '../entity/driver.entity';
 import { DriverAttributeName } from '../entity/driver-attribute.entity';
 import { DriverAttributeDto } from '../dto/driver-attribute.dto';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { DriverSessionDto } from '../dto/driver-session.dto';
 import { TransitDto } from '../dto/transit.dto';
 import { Status, Transit } from '../entity/transit.entity';

@@ -68,7 +68,7 @@ export class ClaimService {
     claim.setCreationDate(Date.now());
     claim.setReason(claimDTO.getReason());
     claim.setIncidentDescription(claimDTO.getIncidentDescription());
-    await this.claimRepository.getEntityManager().persistAndFlush(claim);
+    await this.claimRepository.getEntityManager().persist(claim).flush();
     return claim;
   }
 

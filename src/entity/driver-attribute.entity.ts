@@ -1,5 +1,10 @@
 import { BaseEntity } from '../common/base.entity';
-import { Entity, Property, ManyToOne, Enum } from '@mikro-orm/core';
+import {
+  Entity,
+  Property,
+  ManyToOne,
+  Enum,
+} from '@mikro-orm/decorators/legacy';
 import { Driver } from './driver.entity';
 import { DriverAttributeRepository } from '../repository/driver-attribute.repository';
 
