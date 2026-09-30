@@ -161,36 +161,13 @@ export class TransitDto {
 
   public getDistance(unit: string) {
     this.distanceUnit = unit;
+    if (unit === 'm') return `${Math.round(this.distance * 1000)}m`;
     if (unit === 'km') {
-      if (this.distance == Math.ceil(this.distance)) {
-        return new Intl.NumberFormat('en-US', {
-          style: 'unit',
-          unit: 'length-kilometer',
-        }).format(Math.round(this.distance));
-      }
-      return new Intl.NumberFormat('en-US', {
-        style: 'unit',
-        unit: 'length-kilometer',
-      }).format(this.distance);
+      return `${Number.isInteger(this.distance) ? this.distance : this.distance.toFixed(3)}km`;
     }
     if (unit === 'miles') {
-      const distance = this.distance / 1.609344;
-      if (distance == Math.ceil(distance)) {
-        return new Intl.NumberFormat('en-US', {
-          style: 'unit',
-          unit: 'length-mile',
-        }).format(Math.round(this.distance));
-      }
-      return new Intl.NumberFormat('en-US', {
-        style: 'unit',
-        unit: 'length-mile',
-      }).format(this.distance);
-    }
-    if (unit === 'm') {
-      return new Intl.NumberFormat('en-US', {
-        style: 'unit',
-        unit: 'length-meter',
-      }).format(Math.round(this.distance * 1000));
+      const miles = this.distance / 1.609344;
+      return `${Number.isInteger(miles) ? miles : miles.toFixed(3)}miles`;
     }
     throw new NotAcceptableException('Invalid unit ' + unit);
   }
