@@ -1,0 +1,352 @@
+[
+  {
+    "tag": "start",
+    "sourceCommit": "68a785fc53517e54b6ff553fce5bd0548037b19e",
+    "description": "tak się wszystko zaczęło"
+  },
+  {
+    "tag": "vo-license-testy",
+    "sourceCommit": "f20a117fce65841db9e73e454299e3698052b814",
+    "description": "VO 2.1 - DriverLicense - przygotowanie bezpieczeństwa testami integracyjnymi"
+  },
+  {
+    "tag": "vo-license",
+    "sourceCommit": "04a3144e7a140cc04b8d086f7908ae3e7a8cb2ab",
+    "description": "VO 2.1 - DriverLicense - wprowadzenie obiektu z testami jednostkowymi"
+  },
+  {
+    "tag": "vo-license-podlaczenie",
+    "sourceCommit": "434a02af010129b056b3d85f54250556c8e99db7",
+    "description": "VO 2.1 - DriverLicense - podłączenie DriverLicense do Driver i DriverService"
+  },
+  {
+    "tag": "vo-money-test",
+    "sourceCommit": "6a4181d145829e561a03d1502ece93fa2ae9f498",
+    "description": "VO 2.2 - Money - przygotowanie bezpieczeństwa testami"
+  },
+  {
+    "tag": "vo-money",
+    "sourceCommit": "b4cf167d56f955f1600e0bd2935d8fd609e60ded",
+    "description": "VO 2.2 - Money - wprowadzenie VO wraz z testami jednostkowymi"
+  },
+  {
+    "tag": "vo-money-podlaczenie",
+    "sourceCommit": "3ba7acc8f91c7d149de795998fff8ef3244c8a61",
+    "description": "VO 2.2 - Money - podłączenie Money do Transit oraz DriverFee"
+  },
+  {
+    "tag": "vo-distance-testy",
+    "sourceCommit": "7afad5ae935a8585e7f1094a62cf832f6ebdfa0e",
+    "description": "VO 2.3 - Distance - przygotowanie bezpieczeństwa testami jednostkowymi"
+  },
+  {
+    "tag": "vo-distance",
+    "sourceCommit": "ea95f327dbfa30fda504a64679c87250a2bcc30d",
+    "description": "VO 2.3 - Distance - wprowadzenie obiektu VO wraz z testami jednostkowymi"
+  },
+  {
+    "tag": "vo-distance-podlaczenie",
+    "sourceCommit": "706dc8250b92cd7d49dc7d8a179847b58447440a",
+    "description": "VO 2.3 - Distance - podłączenie obiektu Distance do TransitDTO"
+  },
+  {
+    "tag": "vo-tariff-testy",
+    "sourceCommit": "d377d9065fbfd7e191f6d94ddb30744e68bc2b40",
+    "description": "VO 2.4 - Tariff - zabezpieczenia testami jednostkowymi i integracyjnymi"
+  },
+  {
+    "tag": "vo-tariff",
+    "sourceCommit": "d01dbd284c74174953ba9b04739f6b6340f45078",
+    "description": "VO 2 4 - Tariff - wprowadzenie VO z testami jednostkowymi"
+  },
+  {
+    "tag": "vo-tariff-podlaczenie",
+    "sourceCommit": "1b8d05a9fbf24a0d491ef537ee6842e7a0472316",
+    "description": "VO 2.4 - Tariff - podłaczenie konceptu Tariff w TransitDTO i Transit"
+  },
+  {
+    "tag": "text",
+    "sourceCommit": "8eed0b2619e5888eb499f5387acbb1c898f6fa3e",
+    "description": "text"
+  },
+  {
+    "tag": "text2",
+    "sourceCommit": "da9afa8ad6625a7384eec3484a49fad0e7f3252a",
+    "description": "text"
+  },
+  {
+    "tag": "text3",
+    "sourceCommit": "f048bdc36ecf2957538994732e4e1fc17caf58c5",
+    "description": "text"
+  },
+  {
+    "tag": "agg-transit-testy",
+    "sourceCommit": "c1016f153c7d6b0662870a94ed8a7590b5bdffb1",
+    "description": "Aggregate 3.1 - Transit - przygotowanie bezpieczeństwa testami integracyjnymi"
+  },
+  {
+    "tag": "agg-transit-enkapsulacja",
+    "sourceCommit": "2ee71a2b140d4fa94fde1274bb7d0e159ca08481",
+    "description": "Aggregate 3.1 - Transit - wprowadzenie enkapsulacji w obiekcie Transit"
+  },
+  {
+    "tag": "agg-transit-unit-testy",
+    "sourceCommit": "5d8e3844f28ed2a43fb31176fbc3e3bdd8a1172a",
+    "description": "Aggregate 3.1 - Transit - obniżenie wysokości testu integraycjnego TransitLifeCycleIntegrationTest do jednostkowego TestTransitLifeCycleTest"
+  },
+  {
+    "tag": "agg-cartype-testy",
+    "sourceCommit": "af5393f281063fb72d45ab53b3b76acf9d5eeb09",
+    "description": "Aggregate 3.2 - CarType - przygotowanie bezpieczeństwa testami integracyjnymi"
+  },
+  {
+    "tag": "agg-cartype-podzial",
+    "sourceCommit": "cfd3bd5a58266cacca37a1dba64bc339adb6696a",
+    "description": "Aggregate 3.2 - CarType - Implementacja podziału obiektu, wprowadzenie CarTypeActiveCounter"
+  },
+  {
+    "tag": "agg-proxy",
+    "sourceCommit": "b8bcb2ac6ff0c4fba77e8203b70bc914479d33ce",
+    "description": "Aggregate 3.3 - CarType - mikrocykle, przykładowe użycie wzorca proxy"
+  },
+  {
+    "tag": "agg-claimsresolver-testy",
+    "sourceCommit": "66f876eff68b9c8c2bc017e15409e76cd168f654",
+    "description": "Aggregate 3.5 - ClaimsResolver - Zabezpieczenie testami"
+  },
+  {
+    "tag": "agg-claimsresolver",
+    "sourceCommit": "7c52f5fcd113149567af8cab52ddd2c84f61fd83",
+    "description": "Aggregate 3.5 - ClaimsResolver - Wprowadzenie konceptu ClaimsResolver wraz z testami jedno"
+  },
+  {
+    "tag": "agg-claimsresolver-podlaczenie",
+    "sourceCommit": "e39230b9f14a8730cfe6fda206702d71aa137c18",
+    "description": "Aggregate 3.5 - ClaimsResolver - Podłączenie konceptu ClaimsResolver do ClaimService"
+  },
+  {
+    "tag": "awardsaccount-testy",
+    "sourceCommit": "78025ca1219b7b630fd2579216ea166cab1c9bc8",
+    "description": "Aggregate 3.7 - AwardsAccount z Miles - Zabezpieczenie testami"
+  },
+  {
+    "tag": "awardsaccount-nonexpiring",
+    "sourceCommit": "f04745dbf14eeef8846103dfaba3e3d15ee3b410",
+    "description": "Aggregate 3.7 - AwardsAccount z Miles - odkrycie, że mile specjalne to po prostu mile typu"
+  },
+  {
+    "tag": "vo-miles",
+    "sourceCommit": "f94ca66a7495f4f42869d23d3c71e287b6320b47",
+    "description": "Aggregate 3.7 - AwardsAccount z Miles - dodanie VO Miles oraz implementacji ConstantUntil"
+  },
+  {
+    "tag": "vo-miles-podlaczenie",
+    "sourceCommit": "e5f4f3570f5c0819191b4be0d6bfd884e639698a",
+    "description": "Aggregate 3.7 - AwardsAccount z Miles - Podłaczenie VO Miles (ConstantUntil)"
+  },
+  {
+    "tag": "vo-miles-obserwacja-efektow",
+    "sourceCommit": "3e6e5c094ada133982e8e064885453fce7ae80cc",
+    "description": "Aggregate 3.7 - AwardsAccount z Miles - Obserwacja efektu poprzez dodanie TwoStepExpiringM"
+  },
+  {
+    "tag": "agg-awardsaccount-enkapsulacja",
+    "sourceCommit": "8febfeb972d181ec5b9ac8b070ae4c831a5c7df9",
+    "description": "Aggregate 3.7 - AwardsAccount z Miles - zwiększenie enkapsulacji"
+  },
+  {
+    "tag": "awardsaccount-usuniecie-repo",
+    "sourceCommit": "ecc52266fd872e186755c3fd4b66266e2c2bbbef",
+    "description": "Aggregate 3.7 - AwardsAccount z Miles - usunięcie repozytorium AwardedMilesRepository"
+  },
+  {
+    "tag": "agg-awardsaccount-polityki",
+    "sourceCommit": "6c62867408812148900e8586020b254659540c08",
+    "description": "Aggregate 3.8 - AwardsAccount - wprowadzenie polityk"
+  },
+  {
+    "tag": "agg-contract-testy",
+    "sourceCommit": "548559ef4aa711369ef1ef9ad0e0ca2d50950294",
+    "description": "Aggregate 3.9 - Contract - zabezpieczenie testami"
+  },
+  {
+    "tag": "agg-contract-zwiekszenie-enkapsulacji",
+    "sourceCommit": "123234cdbfa6413b7e699a56a61f6b390155cea9",
+    "description": "Aggregate 3.9 - Contract - zwiększenie enkapsulacji"
+  },
+  {
+    "tag": "agg-contract-rozbicie",
+    "sourceCommit": "c61d8d14cfd1b821557f260959db940b8210ec8f",
+    "description": "Aggregate 3.9 - Contract - Rozbicie Obiektów"
+  },
+  {
+    "tag": "cqrs-raport-testy",
+    "sourceCommit": "5468fb591b8bd905eecf3eca9a98ba697c46edd6",
+    "description": "CQRS 4.1 - DriverReportController - zabezpieczenie testami"
+  },
+  {
+    "tag": "cqrs-raport-sql",
+    "sourceCommit": "a88e38178da0410625df00127b95e7ca731a8daf",
+    "description": "CQRS 4.1 - DriverReportController - utworzenie i podłączenie SqlBasedDriverReportCreator"
+  },
+  {
+    "tag": "cqrs-raport-parallel-models",
+    "sourceCommit": "b52a109b1c6aef7c7c7bc1899eba9d1d3ae4ff7e",
+    "description": "CQRS 4.2 - DriverReportController - użycie parallel models"
+  },
+  {
+    "tag": "cqrs-raport-rekoncyliacja",
+    "sourceCommit": "221e56dcb5e83d647005024a322500d5e357245e",
+    "description": "CQRS 4.2 - DriverReportController - użycie rekoncyliacji"
+  },
+  {
+    "tag": "cqrs-drivertrackingservice-zabezpieczenie-testami",
+    "sourceCommit": "8e6194b06a4825c84f3e7ec0a2cadbe70a7bd953",
+    "description": "CQRS 4.4 - DriverTrackingService - zabezpieczenie testami"
+  },
+  {
+    "tag": "przesuniecie-czasu-do-api",
+    "sourceCommit": "5eabeee18d92dc3cb7623bcd136d11e19e067bde",
+    "description": "CQRS 4.4 - DriverTrackingService - dodanie czasu do API"
+  },
+  {
+    "tag": "cqrs-travelleddistance-wprowadzenie-nowego-modelu",
+    "sourceCommit": "53790c040443bd1ceff3592e5df4e49078bc2f87",
+    "description": "CQRS 4.4 - DriverTrackingService - nowa implementacja za pomocą TravelledDistanceService"
+  },
+  {
+    "tag": "cqrs-drivertrackingservice-obnizenie-wysokosci-testu",
+    "sourceCommit": "8b39a9563fa00e6a1e8cbb60d5d7e93dff8b543a",
+    "description": "CQRS 4.4 - DriverTrackingService - obniżenie wysokości testu"
+  },
+  {
+    "tag": "cqrs-travelleddistance-redukcja-couplingu",
+    "sourceCommit": "5687342280858a8b0cdc84c45f802999890a069d",
+    "description": "CQRS 4.4 - TravelledDistanceService - zmniejszenie couplingu do reszty legacy"
+  },
+  {
+    "tag": "archetypes-repair-legacy",
+    "sourceCommit": "73a977da1e823ac98b6a5d6bf28bad7bf01a8eb1",
+    "description": "archetypes: repair module - legacy"
+  },
+  {
+    "tag": "archetypes-repair-better",
+    "sourceCommit": "dbb882f65d9284871382b6be3961e3638ced1184",
+    "description": "archetypes: repair module - better"
+  },
+  {
+    "tag": "archetypes-contracts-legacy",
+    "sourceCommit": "ea4a1ce1dc89b332bcb5c3e755c55d89d9b6a5b1",
+    "description": "archetypes: contracts module - legacy"
+  },
+  {
+    "tag": "archetypes-contracts-better",
+    "sourceCommit": "6894403919cd8edfc0cbf08ffd285ab292519ce0",
+    "description": "archetypes: contracts module - better"
+  },
+  {
+    "tag": "cqrs-transitanalyzer-zabezpieczenie-testami",
+    "sourceCommit": "c9632e5d07567ffd8ae3f49d5341a836b93aed3e",
+    "description": "CQRS 4.5 - TransitAnalyzer - zabezpieczenie testami"
+  },
+  {
+    "tag": "cqrs-transitanalyzer-graf",
+    "sourceCommit": "f760d41ab1058338f44b07fe906cedff24da8994",
+    "description": "CQRS 4.5 - TransitAnalyzer - implementacja grafu"
+  },
+  {
+    "tag": "cqrs-transitanalyzer-podpiecie-nowego-modelu",
+    "sourceCommit": "e8f2ad3902240d7d50046f3dbee6947556fd2681",
+    "description": "CQRS 4.5 - TransitAnalyzer - podpięcie nowego modelu"
+  },
+  {
+    "tag": "cqrs-transitanalyzer-migracja-danych",
+    "sourceCommit": "792218d152b0fe7ae927d2e23bc333b4fef73f70",
+    "description": "CQRS 4.5 - TransitAnalyzer - migracja danych"
+  },
+  {
+    "tag": "bc-transitdetails",
+    "sourceCommit": "bc68d5f6782e59e49931ce625b55e69cc0a3c25f",
+    "description": "BC/Modularyzacja 9 - TransitDetails - wprowadzenie modelu odczytowego do Transit"
+  },
+  {
+    "tag": "bc-refaktoryzacja-testow",
+    "sourceCommit": "aa6ff57a860ee7b1c1425c3d5811e3654e074313",
+    "description": "BC/Modularyzacja 9 - Fixtures - testowanie na zachowaniach (z góry) i granulacja klasy Fixtures"
+  },
+  {
+    "tag": "bc-rozluznianie",
+    "sourceCommit": "1f13b673d75ddecd7aad6e63875d4ae7f3fd31c6",
+    "description": "BC/Modularyzacja 9 - Rozluźnianie zależności (couplingu) pomiędzy klasami"
+  },
+  {
+    "tag": "bc-crm-claims",
+    "sourceCommit": "cd68ee2e963eff52b81537b251c7a40d9d0cb3c5",
+    "description": "BC/Modularyzacja 9 - CRM/CLAIMS - Stworzenie modułu crm/claims. Rozcięcie zależności pomiędzy Claim, a Client i AwardsAccount/Miles"
+  },
+  {
+    "tag": "bc-agreements",
+    "sourceCommit": "c83f3c77e223102177d956d2710adf0e7f9ff812",
+    "description": "BC/Modularyzacja 9 - AGREEMENTS - Stworzenie modułu kontraktów"
+  },
+  {
+    "tag": "bc-carfleet",
+    "sourceCommit": "3e4ff298cd71a561cb99618147821c60c69c1590",
+    "description": "BC/Modularyzacja 9 - CARFLEET - Stworzenie modułu floty samochodów"
+  },
+  {
+    "tag": "bc-invocing",
+    "sourceCommit": "47391fda650682ff15808826b37291d16fa4c893",
+    "description": "BC/Modularyzacja 9 - INVOCING - Stworzenie modułu fakturowania"
+  },
+  {
+    "tag": "bc-notification",
+    "sourceCommit": "eced5fd4f9bf134d293319c177125dd9840ef160",
+    "description": "BC/Modularyzacja 9 - NOTIFICATION - Wydzielenie modułu powiadomień"
+  },
+  {
+    "tag": "bc-driverfleet",
+    "sourceCommit": "2670f200a3ec199a7db97b55118f428fa354ae1e",
+    "description": "BC/Modularyzacja 9 - DRIVERFLEET - Stworzenie modułu floty kierowców"
+  },
+  {
+    "tag": "bc-loyalty",
+    "sourceCommit": "91b934f8790a3eb3cf09340088dec1de23f31e4e",
+    "description": "BC/Modularyzacja 9 - LOYALTY - Stworzenie modułu lojalności (mile i innego rodzaju punkty)"
+  },
+  {
+    "tag": "bc-geolocation",
+    "sourceCommit": "fe6627852d5d5d34ebc8d907077fa0eb7ddad439",
+    "description": "BC/Modularyzacja 9 - GEOLOCATION - Stworzenie modułu geolokalizacji"
+  },
+  {
+    "tag": "bc-crm",
+    "sourceCommit": "15c20b0bd60631afe4374a8c96cb4c59948802e1",
+    "description": "BC/Modularyzacja 9 - CRM - przeniesienie klienta do modułu CRM"
+  },
+  {
+    "tag": "bc-tracking",
+    "sourceCommit": "96a7aecb5e2443856723083f999516eadbd701e0",
+    "description": "BC/Modularyzacja 9 - TRACKING - wydzielenie modułu śledzącego kierowcę w sesji"
+  },
+  {
+    "tag": "bc-rozbicie-transit",
+    "sourceCommit": "1cb7416fa2580f6efd98d112083d2877622f1f30",
+    "description": "BC/Modularyzacja 9 - ASSIGNMENT - Wydzielenie moduły Assigment i ozbicie klasy Transit na RequestForTransit, DriverAssignment, TransitDemand i Transit"
+  },
+  {
+    "tag": "bc-application-service-1",
+    "sourceCommit": "844c9aa8ba4b2f79d39dac96ae9e34b40fc5e311",
+    "description": "BC/Modularyzacja 9 - Wydzielenie serwisu aplikacyjnego RequestTransitService"
+  },
+  {
+    "tag": "bc-application-service-2",
+    "sourceCommit": "a3c76a76aee61dee7339b7946a5e6de37b05e2ee",
+    "description": "BC Modularyzacja 9 - Wprowadzenie serwisów aplikacyjnych ChangeDest"
+  },
+  {
+    "tag": "bc-application-service-3",
+    "sourceCommit": "f378b88b6fb050762e1f56b8a4c539c32eedd25b",
+    "description": "BC/Modularyzacja 9 - Wprowadzenie serwisów aplikacyjnych DemandService, StartTransitService i CompleteTransitService. Dalsze odchudzanie RideService"
+  }
+]

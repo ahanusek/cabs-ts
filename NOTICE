@@ -1,0 +1,5 @@
+Portions of this project are adapted from legacyfighter/cabs-java.
+https://github.com/legacyfighter/cabs-java
+Licensed under the Apache License, Version 2.0; see LICENSE.legacyfighter.
+Adaptations use TypeScript, NestJS and MikroORM instead of Java and Spring.
+The source commit for each course stage is recorded in docs/course-tags.json.
