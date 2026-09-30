@@ -12,8 +12,8 @@ import { AppProperties } from '../../config/app-properties.config';
 import { ClaimRepository } from './claim.repository';
 import { ClaimNumberGenerator } from './claim-number-generator.service';
 
-import { ClientNotificationService } from '../../service/client-notification.service';
-import { DriverNotificationService } from '../../service/driver-notification.service';
+import { ClientNotificationService } from '../../notification/client-notification.service';
+import { DriverNotificationService } from '../../notification/driver-notification.service';
 import { ClaimDto } from './claim.dto';
 import { Claim, ClaimStatus, CompletionMode } from './claim.entity';
 import { Client } from '../../entity/client.entity';

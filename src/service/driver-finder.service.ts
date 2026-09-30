@@ -8,7 +8,7 @@ import { DriverStatus } from '../entity/driver.entity';
 import { Status, Transit } from '../entity/transit.entity';
 import { CarTypeService } from '../carfleet/car-type.service';
 import { GeocodingService } from './geocoding.service';
-import { DriverNotificationService } from './driver-notification.service';
+import { DriverNotificationService } from '../notification/driver-notification.service';
 
 const EARTH_RADIUS_KM = 6371;
 const MAX_SEARCH_RADIUS_KM = 20;

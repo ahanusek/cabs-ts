@@ -1,3 +1,5 @@
+import { DomainEventsModule } from './common/domain-events-module';
+import { NotificationModule } from './notification/notification-module';
 import { InvoicingModule } from './invoicing/invoicing-module';
 import { CarFleetModule } from './carfleet/car-fleet-module';
 import { ConfigurationModule } from './config/configuration-module';
@@ -6,7 +8,7 @@ import { ClaimRefundedSubscriber } from './loyalty/claim-refunded.subscriber';
 import { TransitDetails } from './transitdetails/transit-details.entity';
 import { TransitDetailsFacade } from './transitdetails/transit-details.facade';
 import { PopulateGraphService } from './transitanalyzer/populate-graph.service';
-import { DomainEvents } from './common/domain-events';
+
 import { GraphTransitSubscriber } from './transitanalyzer/graph-transit.subscriber';
 import { CompletedTransitEdge } from './transitanalyzer/completed-transit-edge.entity';
 import { GraphTransitAnalyzer } from './transitanalyzer/graph-transit-analyzer';
@@ -31,10 +33,9 @@ import { DriverService } from './service/driver.service';
 
 import { DistanceCalculator } from './service/distance-calculator.service';
 
-import { DriverNotificationService } from './service/driver-notification.service';
 import { GeocodingService } from './service/geocoding.service';
 import { ClaimNumberGenerator } from './crm/claims/claim-number-generator.service';
-import { ClientNotificationService } from './service/client-notification.service';
+
 import { ClientService } from './service/client.service';
 import { ClientController } from './controllers/client.controller';
 import { DriverSessionService } from './service/driver-session.service';
@@ -102,6 +103,8 @@ const entities = [
 
 @Module({
   imports: [
+    DomainEventsModule,
+    NotificationModule,
     InvoicingModule,
     CarFleetModule,
     ConfigurationModule,
@@ -127,7 +130,6 @@ const entities = [
     ClaimRefundedSubscriber,
     TransitDetailsFacade,
     PopulateGraphService,
-    DomainEvents,
     GraphTransitSubscriber,
     GraphTransitAnalyzer,
     TravelledDistanceService,
@@ -135,10 +137,8 @@ const entities = [
     DriverFinder,
     DriverService,
     DistanceCalculator,
-    DriverNotificationService,
     GeocodingService,
     ClaimNumberGenerator,
-    ClientNotificationService,
     ClientService,
     DriverSessionService,
     DriverFeeService,

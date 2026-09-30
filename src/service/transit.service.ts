@@ -19,7 +19,7 @@ import { AddressDto } from '../dto/address.dto';
 import { CarClass } from '../carfleet/car-type.entity';
 import { Address } from '../entity/address.entity';
 import { Status, Transit } from '../entity/transit.entity';
-import { DriverNotificationService } from './driver-notification.service';
+import { DriverNotificationService } from '../notification/driver-notification.service';
 import { Driver } from '../entity/driver.entity';
 import { CreateTransitDto } from '../dto/create-transit.dto';
 import { Client } from '../entity/client.entity';
