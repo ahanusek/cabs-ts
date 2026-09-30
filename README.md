@@ -1,174 +1,108 @@
-### Legacy Fighter — TypeScript, NestJS i MikroORM
+# Legacy Fighter — TypeScript, NestJS i MikroORM
 
-Baza techniczna: NestJS **12.1.2**, MikroORM **7.2.3** (integracja Nest **7.1.0**), TypeScript **6.0.3**.
-Wymagany Node.js **24.15+** z linii 24 LTS albo 26+. `nvm use` wybiera Node 24.
-Wersje sprawdzone w npm 30.09.2026. `npm ci` odtwarza zależności z lockfile.
+Ukończona adaptacja etapów refaktoryzacji z [cabs-java](https://github.com/legacyfighter/cabs-java)
+na bazie [cabs-typescript](https://github.com/legacyfighter/cabs-typescript).
+Zachowuje wcześniejszą migrację tego projektu z TypeORM do MikroORM.
 
-Kod kursu pochodzi z [cabs-typescript](https://github.com/legacyfighter/cabs-typescript),
-a etapy refaktoryzacji są odtwarzane na podstawie [cabs-java](https://github.com/legacyfighter/cabs-java).
-Historyczny tag `start` zachowuje oryginalny punkt wyjścia z TypeORM.
-`course/start` oznacza bazę po aktualizacji do NestJS 12 i MikroORM 7.
+Stan końcowy: **NestJS 12.1.2**, **MikroORM 7.2.3**, integracja MikroORM/Nest **7.1.0**,
+TypeScript **6.0.3**, Jest **30.5.2**. Wersje NestJS i MikroORM sprawdzone w npm 30.09.2026.
+Wymagany Node **24.15+ z linii 24 LTS** albo **26+**; `.nvmrc` wybiera Node 24.
+TypeScript 6 pozostaje zgodny z używanym `ts-jest`.
 
-Aktualizacja korzysta z [instrukcji NestJS](https://docs.nestjs.com/migration-guide)
-i [instrukcji MikroORM](https://mikro-orm.io/docs/upgrading-v6-to-v7).
-Aplikacja pozostaje w CommonJS, korzystając z obsługi ESM w Node 24.
-Testy Jest 30 uruchamiają obsługę modułów ESM przez `--experimental-vm-modules`.
+## Analiza kursu
 
-____
-
-# Rozwój kodu
-
-Kod będzie rozwijać się wraz z cotygodniową narracją szkoleniową.
-Zarówno pojawiać się w nim będą kolejne poprawki jak i odziedziczone po firmach partnerskich nowe moduły ;-) Jak to w prawdziwym legacy.
-
-# Przeglądanie kodu
-
-Poszczególne kroki refaktoryzacyjne najlepiej przeglądać używająć tagów. Każdy krok szkoleniowy, który opisany jest w odcinku Legacy Fighter posiada na końcu planszę z nazwą odpowiedniego taga. Porównać zmiany można robiąc diffa w stosunku do poprzedniego taga z narracji.
-
-
-_____________
-
-
-
-## Installation
-
-```bash
-$ npm install
+```sh
+npm run course:list
+npm run course:diff -- agg-claimsresolver
+npm run course:check
 ```
 
-## Database Setup (PostgreSQL)
+Każdy etap ma oryginalną nazwę taga oraz punkty `course/<tag>/start` i `course/<tag>/stop`.
+Sprawdzenie mapy obejmuje **70 tagów źródłowych**. Szczegóły i wyjątki:
 
-### Option 1: Using Docker (Recommended)
+- [Instrukcja przechodzenia przez kurs](docs/COURSE.md)
+- [Mapa wszystkich etapów i commitów źródłowych](docs/course-map.md)
+- [Manifest do skryptów](docs/course-tags.json)
 
-Start PostgreSQL using Docker Compose:
+`course/start` to punkt wyjścia po aktualizacji bibliotek, a `course/stop` — ukończona adaptacja.
+Oryginalny `start` nadal wskazuje historyczny kod z TypeORM.
+Tagi `text`, `text2`, `text3` odtwarzają osobną odnogę wczesnych eksperymentów.
 
-```bash
-# Start database
-$ docker-compose up -d
+```sh
+# Samo oglądanie etapu
+git switch --detach agg-claimsresolver
 
-# Stop database
-$ docker-compose down
-
-# Stop and remove data
-$ docker-compose down -v
+# Własne eksperymenty od wskazanego etapu
+git switch -c codex/analiza-claims agg-claimsresolver
 ```
 
-Default connection settings:
-- Host: `localhost`
-- Port: `5432`
-- Database: `cabs`
-- Username: `postgres`
-- Password: `postgres`
+## Uruchomienie
 
-### Option 2: Local PostgreSQL Installation
-
-1. Install PostgreSQL 16+ on your system
-2. Create a database:
-
-```bash
-$ psql -U postgres
-postgres=# CREATE DATABASE cabs;
-postgres=# \q
+```sh
+nvm install
+nvm use
+npm ci
+cp .env.example .env
+docker compose up -d
+npm run start:dev
 ```
 
-### Environment Variables
+Domyślny PostgreSQL: `localhost:5432`, baza `cabs`, użytkownik i hasło `postgres`.
+Port API: `3000`. Ustawienia połączenia i progów biznesowych są w `.env.example`.
 
-You can customize database connection using environment variables:
+Poza środowiskiem produkcyjnym aplikacja aktualizuje schemat przy uruchomieniu.
+**Do przechodzenia między tagami używaj osobnych, pustych baz demonstracyjnych.**
+Zmiany modeli kursowych obejmują zmiany znaczenia danych, których synchronizacja schematu nie przenosi.
+Dotychczasowa baza użytkownika nie była modyfikowana podczas przygotowania adaptacji.
 
-```bash
-export DATABASE_HOST=localhost
-export DATABASE_PORT=5432
-export DATABASE_NAME=cabs
-export DATABASE_USERNAME=postgres
-export DATABASE_PASSWORD=postgres
-```
-
-Or create a `.env` file in the project root:
-
-```env
-DATABASE_HOST=localhost
-DATABASE_PORT=5432
-DATABASE_NAME=cabs
-DATABASE_USERNAME=postgres
-DATABASE_PASSWORD=postgres
-```
-
-### Database Schema
-
-MikroORM creates/updates the schema on startup only outside production.
-With `NODE_ENV=production`, apply reviewed schema changes before starting the application.
-
-To manually sync:
-
-```bash
-# Build the configuration and entities first
-$ npm run build
-
-# Review SQL before applying it
-$ npx mikro-orm schema:update --dump
-
-# Apply to a development database
-$ npx mikro-orm schema:update --run
-```
-
-### pgAdmin (Database UI)
-
-pgAdmin is included in Docker Compose for browsing the database.
-
-**URL:** http://localhost:5050
-
-**Login credentials:**
-- Email: `admin@admin.com`
-- Password: `admin`
-
-**Connect to database:**
-1. Right-click "Servers" → "Register" → "Server"
-2. **General tab:** Name = `cabs`
-3. **Connection tab:**
-   - Host: `postgres`
-   - Port: `5432`
-   - Database: `cabs`
-   - Username: `postgres`
-   - Password: `postgres`
-4. Click "Save"
-
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-### Izolowane testy PostgreSQL
-
-Testy integracyjne używają bazy `cabs_test` na porcie `55432`. Nie korzystają z bazy aplikacji z `.env`.
-Przed uruchomieniem tworzą od nowa wyłącznie schemat tej bazy testowej.
-
-```bash
-docker compose -f docker-compose.test.yml up -d --wait
-npm run test:e2e -- --runInBand
-npm run check-types
+```sh
 npm run build
-npm run lint
+npx mikro-orm schema:update --dump
+# Po ocenie SQL, wyłącznie dla właściwej bazy demonstracyjnej:
+npx mikro-orm schema:update --run
 ```
 
-Host i port bazy testowej można zmienić przez `TEST_DATABASE_HOST` i `TEST_DATABASE_PORT`.
+`NODE_ENV=production` wyłącza automatyczną synchronizację. Ten projekt nie zawiera kompletnej
+migracji danych produkcyjnych przez wszystkie historyczne etapy kursu.
+
+## Sprawdzenie projektu
+
+```sh
+docker compose -f docker-compose.test.yml up -d --wait
+npm run check-types
+npm run lint
+npm test -- --runInBand
+npm run test:e2e
+npm run build
+npm run course:check
+```
+
+Testy integracyjne odtwarzają schemat **wyłącznie bazy `cabs_test` na porcie `55432`**.
+Nie używają konfiguracji bazy aplikacji z `.env`. Skrypt końcowej wersji uruchamia je kolejno;
+na wcześniejszych tagach podaj `-- --runInBand`. Host i port można nadpisać zmiennymi
+`TEST_DATABASE_HOST` oraz `TEST_DATABASE_PORT`.
+
+Końcowe modele są objęte testami jednostkowymi i integracyjnymi, m.in. pełnego przejazdu,
+równoczesnej akceptacji, transferu części mil, przydziału kierowcy, raportów i migracji grafu.
+Workflow GitHub Actions uruchamia sprawdzenie typów, formatowania, testy i kompilację.
+
+## Graf tras
+
+```sh
+npm run build
+npm run course:populate-graph
+```
+
+Polecenie uzupełnia graf z zakończonych przejazdów w `TransitDetails` w bazie wskazanej przez `.env`.
+Powtórzenie nie duplikuje krawędzi. Wynik podaje liczbę projekcji i identyfikatory pominiętych
+rekordów z niepełnymi datami. Nowe przejazdy aktualizują graf podczas zakończenia.
+
+## Zakres materiału
+
+To repozytorium do nauki architektury. Kursowe atrapy geokodowania, odległości drogowej i wysyłania
+powiadomień pozostają atrapami. Nie jest to gotowa usługa taksówkowa do wdrożenia produkcyjnego.
+Rozdziały `repair/legacy` i `contracts/legacy` celowo zachowują przykłady przed refaktoryzacją.
+
+Instrukcje aktualizacji: [NestJS](https://docs.nestjs.com/migration-guide),
+[MikroORM 7](https://mikro-orm.io/docs/upgrading-v6-to-v7).
+Pochodzenie i licencja materiałów: [NOTICE](NOTICE), [Apache 2.0](LICENSE.legacyfighter).

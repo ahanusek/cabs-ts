@@ -18,10 +18,13 @@
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
     "test:cov": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
     "test:debug": "node --inspect-brk --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
-    "test:e2e": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest-e2e.json",
+    "test:e2e": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest-e2e.json --runInBand",
     "prepare": "husky",
     "check-types": "tsc --noEmit",
-    "course:populate-graph": "node dist/cli/populate-graph.js"
+    "course:populate-graph": "node dist/cli/populate-graph.js",
+    "course:list": "node scripts/course.mjs list",
+    "course:diff": "node scripts/course.mjs diff",
+    "course:check": "node scripts/course.mjs verify"
   },
   "dependencies": {
     "@mikro-orm/core": "7.2.3",
@@ -95,7 +98,8 @@
   "mikro-orm": {
     "configPaths": [
       "./dist/mikro-orm.config.js"
-    ]
+    ],
+    "preferTs": false
   },
   "engines": {
     "node": ">=24.15.0 <25 || >=26.0.0"

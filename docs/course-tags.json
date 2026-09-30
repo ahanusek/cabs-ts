@@ -2,7 +2,11 @@
   {
     "tag": "start",
     "sourceCommit": "68a785fc53517e54b6ff553fce5bd0548037b19e",
-    "description": "tak się wszystko zaczęło"
+    "description": "tak się wszystko zaczęło",
+    "startRef": "course/baseline/start",
+    "stopRef": "course/baseline/stop",
+    "finalTag": "course/start",
+    "track": "baseline"
   },
   {
     "tag": "vo-license-testy",
@@ -67,17 +71,20 @@
   {
     "tag": "text",
     "sourceCommit": "8eed0b2619e5888eb499f5387acbb1c898f6fa3e",
-    "description": "text"
+    "description": "text",
+    "track": "historical-experiments"
   },
   {
     "tag": "text2",
     "sourceCommit": "da9afa8ad6625a7384eec3484a49fad0e7f3252a",
-    "description": "text"
+    "description": "text",
+    "track": "historical-experiments"
   },
   {
     "tag": "text3",
     "sourceCommit": "f048bdc36ecf2957538994732e4e1fc17caf58c5",
-    "description": "text"
+    "description": "text",
+    "track": "historical-experiments"
   },
   {
     "tag": "agg-transit-testy",

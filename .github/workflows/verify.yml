@@ -1,0 +1,30 @@
+name: Verify course
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: cabs_test
+          POSTGRES_PASSWORD: cabs_test
+        ports: ['55432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d cabs_test"
+          --health-interval 2s --health-timeout 5s --health-retries 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run check-types
+      - run: npm run lint
+      - run: git diff --exit-code -- src test
+      - run: npm test -- --runInBand
+      - run: npm run test:e2e
+      - run: npm run build
