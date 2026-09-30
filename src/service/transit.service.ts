@@ -10,7 +10,7 @@ import { AddressRepository } from '../repository/address.repository';
 import { AwardsService } from './awards.service';
 import { DriverFeeService } from './driver-fee.service';
 import { GeocodingService } from './geocoding.service';
-import { InvoiceGenerator } from './invoice-generator.service';
+import { InvoiceGenerator } from '../invoicing/invoice-generator.service';
 import { DistanceCalculator } from './distance-calculator.service';
 import { DriverFinder } from './driver-finder.service';
 import { TransitDetailsFacade } from '../transitdetails/transit-details.facade';

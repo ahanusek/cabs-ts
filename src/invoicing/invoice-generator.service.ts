@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { InvoiceRepository } from '../repository/invoice.repository';
-import { Invoice } from '../entity/invoice.entity';
+import { InvoiceRepository } from './invoice.repository';
+import { Invoice } from './invoice.entity';
 
 @Injectable()
 export class InvoiceGenerator {

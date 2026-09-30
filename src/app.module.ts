@@ -1,3 +1,4 @@
+import { InvoicingModule } from './invoicing/invoicing-module';
 import { CarFleetModule } from './carfleet/car-fleet-module';
 import { ConfigurationModule } from './config/configuration-module';
 import { AgreementsModule } from './agreements/agreements-module';
@@ -29,7 +30,7 @@ import { DriverController } from './controllers/driver.controller';
 import { DriverService } from './service/driver.service';
 
 import { DistanceCalculator } from './service/distance-calculator.service';
-import { InvoiceGenerator } from './service/invoice-generator.service';
+
 import { DriverNotificationService } from './service/driver-notification.service';
 import { GeocodingService } from './service/geocoding.service';
 import { ClaimNumberGenerator } from './crm/claims/claim-number-generator.service';
@@ -66,7 +67,7 @@ import { DriverSession } from './entity/driver-session.entity';
 import { DriverPosition } from './entity/driver-position.entity';
 import { AwardsAccount } from './entity/awards-account.entity';
 import { AwardedMiles } from './entity/awarded-miles.entity';
-import { Invoice } from './entity/invoice.entity';
+import { Invoice } from './invoicing/invoice.entity';
 import { ClaimAttachment } from './crm/claims/claim-attachment.entity';
 import { ContractAttachment } from './agreements/contract-attachment.entity';
 
@@ -101,6 +102,7 @@ const entities = [
 
 @Module({
   imports: [
+    InvoicingModule,
     CarFleetModule,
     ConfigurationModule,
     AgreementsModule,
@@ -133,7 +135,6 @@ const entities = [
     DriverFinder,
     DriverService,
     DistanceCalculator,
-    InvoiceGenerator,
     DriverNotificationService,
     GeocodingService,
     ClaimNumberGenerator,
