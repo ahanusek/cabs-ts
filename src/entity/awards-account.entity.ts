@@ -1,3 +1,4 @@
+import type { MilesComparator } from '../loyalty/miles-spending-policy';
 import { Collection } from '@mikro-orm/core';
 import {
   Entity,
@@ -7,18 +8,12 @@ import {
 } from '@mikro-orm/decorators/legacy';
 import { NotAcceptableException } from '@nestjs/common';
 import { BaseEntity } from '../common/base.entity';
-import { Client, Type } from './client.entity';
+import { Client } from './client.entity';
 import { Transit } from './transit.entity';
 import { AwardedMiles } from './awarded-miles.entity';
 import { AwardsAccountRepository } from '../repository/awards-account.repository';
 import { ConstantUntil } from '../loyalty/miles/constant-until';
 import { Miles, requireMilesAmount } from '../loyalty/miles/miles';
-
-export interface SpendingContext {
-  transitCount: number;
-  claimCount: number;
-  clientType: Type;
-}
 
 @Entity({ repository: () => AwardsAccountRepository })
 export class AwardsAccount extends BaseEntity {
@@ -89,7 +84,7 @@ export class AwardsAccount extends BaseEntity {
   public remove(
     amount: number,
     moment: number,
-    context: SpendingContext,
+    strategy: MilesComparator,
   ): void {
     requireMilesAmount(amount);
     if (!this.canSpend(amount, moment)) {
@@ -97,9 +92,7 @@ export class AwardsAccount extends BaseEntity {
         'Insufficient miles or inactive account',
       );
     }
-    const grants = [...this.miles.getItems()].sort(
-      this.chooseStrategy(context, moment),
-    );
+    const grants = [...this.miles.getItems()].sort(strategy);
     let remaining = amount;
     for (const grant of grants) {
       if (remaining === 0) break;
@@ -153,28 +146,5 @@ export class AwardsAccount extends BaseEntity {
     this.miles.add(grant);
     this.transactions++;
     return grant;
-  }
-
-  private chooseStrategy(context: SpendingContext, moment: number) {
-    const byDate = (a: AwardedMiles, b: AwardedMiles) =>
-      a.getDate() - b.getDate();
-    const byExpiration = (a: AwardedMiles, b: AwardedMiles) =>
-      a.getExpirationDate() - b.getExpirationDate();
-    const nonExpiringLast = (a: AwardedMiles, b: AwardedMiles) =>
-      Number(a.cantExpire()) - Number(b.cantExpire());
-    if (context.claimCount >= 3)
-      return (a: AwardedMiles, b: AwardedMiles) => byExpiration(b, a);
-    const isSunday = new Date(moment).getDay() === 0;
-    if (
-      context.clientType === Type.VIP ||
-      (context.transitCount >= 15 && isSunday)
-    ) {
-      return (a: AwardedMiles, b: AwardedMiles) =>
-        nonExpiringLast(a, b) || byExpiration(a, b);
-    }
-    if (context.transitCount >= 15)
-      return (a: AwardedMiles, b: AwardedMiles) =>
-        nonExpiringLast(a, b) || byDate(a, b);
-    return byDate;
   }
 }
