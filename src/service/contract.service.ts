@@ -133,7 +133,7 @@ export class ContractService {
       .getEntityManager()
       .persist(contractAttachment)
       .flush();
-    contract.getAttachments().push(contractAttachment);
+    contract.attachments.add(contractAttachment);
     await this.contractRepository.getEntityManager().flush();
     return new ContractAttachmentDto(contractAttachment);
   }

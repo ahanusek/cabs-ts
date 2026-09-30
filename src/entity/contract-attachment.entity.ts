@@ -46,9 +46,7 @@ export class ContractAttachment extends BaseEntity {
   }
 
   public setData(data: string) {
-    this.data = Buffer.from(
-      '\\x' + Buffer.from(data, 'base64').toString('hex'),
-    );
+    this.data = Buffer.from(data, 'base64');
   }
 
   public getCreationDate() {
