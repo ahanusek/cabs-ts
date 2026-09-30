@@ -1,3 +1,4 @@
+import { Distance } from '../distance/distance';
 import {
   Injectable,
   NotFoundException,
@@ -75,6 +76,6 @@ export class DriverTrackingService {
       }
     }
 
-    return distanceTravelled;
+    return Distance.ofKm(distanceTravelled);
   }
 }

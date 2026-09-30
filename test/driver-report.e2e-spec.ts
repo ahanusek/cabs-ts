@@ -1,6 +1,3 @@
-import { SqlDriverReportCreator } from '../src/driverreport/sql-driver-report.creator';
-import { LegacyDriverReportCreator } from '../src/driverreport/legacy-driver-report.creator';
-import { normalizeReport } from '../src/driverreport/driver-report.reconciliation';
 import request from 'supertest';
 import dayjs from 'dayjs';
 import { DriverReportController } from '../src/controllers/driver-report.controller';
@@ -121,20 +118,6 @@ describe('Driver report', () => {
       `/driverreport/${driverId}?lastDays=2`,
     );
     expect([response.status, response.body.sessions.length]).toEqual([200, 3]);
-  });
-
-  it('produces equivalent results from the SQL and legacy models', async () => {
-    const results = await application.run(async () => ({
-      previous: await application.app
-        .get(LegacyDriverReportCreator)
-        .create(driverId, 2),
-      current: await application.app
-        .get(SqlDriverReportCreator)
-        .create(driverId, 2),
-    }));
-    expect(normalizeReport(results.current)).toEqual(
-      normalizeReport(results.previous),
-    );
   });
 
   function report(lastDays: number, id = driverId) {

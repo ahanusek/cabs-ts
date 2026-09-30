@@ -36,11 +36,13 @@ export class DriverTrackingController {
     @Param('driverId') driverId: string,
     @Body() params: { from: number; to: number },
   ): Promise<number> {
-    return this.trackingService.calculateTravelledDistance(
-      driverId,
-      params.from,
-      params.to,
-    );
+    return (
+      await this.trackingService.calculateTravelledDistance(
+        driverId,
+        params.from,
+        params.to,
+      )
+    ).toKm();
   }
 
   private toDto(driverPosition: DriverPosition) {

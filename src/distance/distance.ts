@@ -32,7 +32,7 @@ export class Distance {
       m: () => `${Math.round(this.kilometers * METERS_PER_KILOMETER)}m`,
     };
     const format = formats[unit];
-    if (!format) throw new Error(`Invalid unit ${unit}`);
+    if (!Object.hasOwn(formats, unit)) throw new Error(`Invalid unit ${unit}`);
     return format();
   }
 

@@ -8,10 +8,10 @@ export class DriverPosition extends BaseEntity {
   @ManyToOne(() => Driver)
   public driver!: Driver;
 
-  @Property({ type: 'float' })
+  @Property({ type: 'double' })
   public latitude!: number;
 
-  @Property({ type: 'float' })
+  @Property({ type: 'double' })
   public longitude!: number;
 
   @Property({ type: 'bigint', runtimeType: 'number' })

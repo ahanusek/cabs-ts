@@ -1,10 +1,10 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { DriverReportCreator } from '../driverreport/driver-report.creator';
+import { SqlDriverReportCreator } from '../driverreport/sql-driver-report.creator';
 import { DriverReportView } from '../driverreport/driver-report.view';
 
 @Controller('driverreport')
 export class DriverReportController {
-  constructor(private readonly reports: DriverReportCreator) {}
+  constructor(private readonly reports: SqlDriverReportCreator) {}
 
   @Get(':driverId')
   public loadReportForDriver(
