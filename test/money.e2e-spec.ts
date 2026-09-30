@@ -1,3 +1,6 @@
+import { DriverService } from '../src/service/driver.service';
+import { TransitDetails } from '../src/transitdetails/transit-details.entity';
+import { transitSnapshot } from '../src/transitdetails/transit-snapshot';
 import { Money } from '../src/money/money';
 import { Transit } from '../src/entity/transit.entity';
 import { DriverFee, FeeType } from '../src/entity/driver-fee.entity';
@@ -31,6 +34,27 @@ describe('Money persistence and driver fees', () => {
     expect(loaded.getTariff().getName()).toBe('Sylwester');
   });
 
+  it('includes all twelve months and uses the fee recorded at completion', async () => {
+    const transit = aCompletedTransit(new Money(4400));
+    transit.setCompleteAt(new Date('2021-12-15T12:00:00').getTime());
+    transit.setDriversFee(new Money(3400));
+    await fixture.orm.em
+      .fork()
+      .persist([transit, new TransitDetails(transitSnapshot(transit))])
+      .flush();
+    const payments = await fixture.run(() =>
+      fixture.app
+        .get(DriverService)
+        .calculateDriverYearlyPayment(transit.getDriver()!.id, 2021),
+    );
+    expect([...payments]).toEqual(
+      Array.from({ length: 12 }, (_, index) => [
+        index + 1,
+        index === 11 ? 34 : 0,
+      ]),
+    );
+  });
+
   it.each([
     [FeeType.FLAT, 10, 0, 3400],
     [FeeType.PERCENTAGE, 30, 0, 1320],
@@ -45,7 +69,9 @@ describe('Money persistence and driver fees', () => {
       driver.setFee(fee);
       await em.persist(transit).flush();
       const result = await fixture.run(() =>
-        fixture.app.get(DriverFeeService).calculateDriverFee(transit.id),
+        fixture.app
+          .get(DriverFeeService)
+          .calculateDriverFee(driver.id, transit.getPrice()!),
       );
       expect(result.toInt()).toBe(expected);
     },

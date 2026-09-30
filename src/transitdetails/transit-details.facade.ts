@@ -22,6 +22,20 @@ export class TransitDetailsFacade {
     return structuredClone((await this.find(transitId)).view);
   }
 
+  public async driverEarnings(
+    driverId: string,
+    from: number,
+    to: number,
+  ): Promise<number> {
+    const rows = await this.em.execute<{ total: string }[]>(
+      `select coalesce(sum((view->>'driverFee')::numeric), 0) as total
+       from transit_details where driver_id = ? and status = 'completed'
+       and complete_at between ? and ?`,
+      [driverId, from, to],
+    );
+    return Number(rows[0].total);
+  }
+
   public countByClient(clientId: string) {
     return this.em.count(TransitDetails, { clientId });
   }

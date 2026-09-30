@@ -9,7 +9,7 @@ import {
 import { NotAcceptableException } from '@nestjs/common';
 import { BaseEntity } from '../common/base.entity';
 import { Client } from './client.entity';
-import { Transit } from './transit.entity';
+
 import { AwardedMiles } from './awarded-miles.entity';
 import { AwardsAccountRepository } from '../repository/awards-account.repository';
 import { ConstantUntil } from '../loyalty/miles/constant-until';
@@ -60,11 +60,11 @@ export class AwardsAccount extends BaseEntity {
   public addExpiringMiles(
     amount: number,
     expiration: number,
-    transit: Transit,
+    transitId: string,
     now: number,
   ): AwardedMiles | null {
     if (!this.isActive) return null;
-    return this.addMiles(new ConstantUntil(amount, expiration), now, transit);
+    return this.addMiles(new ConstantUntil(amount, expiration), now, transitId);
   }
 
   public addNonExpiringMiles(amount: number, now: number): AwardedMiles {
@@ -140,9 +140,9 @@ export class AwardsAccount extends BaseEntity {
   private addMiles(
     miles: Miles,
     now: number,
-    transit: Transit | null,
+    transitId: string | null,
   ): AwardedMiles {
-    const grant = new AwardedMiles(this, miles, now, transit);
+    const grant = new AwardedMiles(this, miles, now, transitId);
     this.miles.add(grant);
     this.transactions++;
     return grant;

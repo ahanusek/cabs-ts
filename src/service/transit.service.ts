@@ -200,7 +200,9 @@ export class TransitService {
       this.distanceBetween(transit.getFrom(), address),
     );
     driver.setOccupied(false);
-    transit.setDriversFee(await this.fees.calculateDriverFee(transitId));
+    transit.setDriversFee(
+      await this.fees.calculateDriverFee(driver.id, transit.getPrice()!),
+    );
     await this.awards.registerMiles(transit.getClient().id, transitId);
     await this.invoices.generate(
       transit.getPrice()!.toMajor(),

@@ -62,7 +62,7 @@ export class AwardsService {
     const grant = account.addExpiringMiles(
       this.properties.getDefaultMilesBonus(),
       expiration,
-      transit,
+      transit.id,
       now,
     );
     await this.em.flush();

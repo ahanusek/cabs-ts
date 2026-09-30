@@ -1,3 +1,4 @@
+import { TransitDetailsFacade } from '../transitdetails/transit-details.facade';
 import { DriverLicense } from '../driverfleet/driver-license';
 import {
   Injectable,
@@ -11,11 +12,9 @@ import { CreateDriverDto } from '../dto/create-driver.dto';
 import { DriverRepository } from '../repository/driver.repository';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { DriverAttributeRepository } from '../repository/driver-attribute.repository';
-import { TransitRepository } from '../repository/transit.repository';
-import { DriverFeeService } from './driver-fee.service';
+
 import dayjs from 'dayjs';
 import { DriverAttribute } from '../entity/driver-attribute.entity';
-import { Transit } from '../entity/transit.entity';
 
 @Injectable()
 export class DriverService {
@@ -24,9 +23,7 @@ export class DriverService {
     private driverRepository: DriverRepository,
     @InjectRepository(DriverAttribute)
     private driverAttributeRepository: DriverAttributeRepository,
-    @InjectRepository(Transit)
-    private transitRepository: TransitRepository,
-    private driverFeeService: DriverFeeService,
+    private readonly details: TransitDetailsFacade,
   ) {}
 
   public async createDriver({
@@ -143,24 +140,7 @@ export class DriverService {
     const from = yearMonth.startOf('month');
     const to = yearMonth.endOf('month');
 
-    const transitsList =
-      await this.transitRepository.findAllByDriverAndDateTimeBetween(
-        driver,
-        from.valueOf(),
-        to.valueOf(),
-      );
-
-    const fees = await Promise.all(
-      transitsList.map((t) =>
-        this.driverFeeService.calculateDriverFee(t.getId()),
-      ),
-    );
-    const sum = fees.reduce(
-      (prev, curr) => (prev ?? 0) + (curr?.toMajor() ?? 0),
-      0,
-    );
-
-    return sum;
+    return this.details.driverEarnings(driverId, from.valueOf(), to.valueOf());
   }
 
   public async calculateDriverYearlyPayment(
@@ -168,9 +148,12 @@ export class DriverService {
     year: number,
   ): Promise<Map<number, number>> {
     const payments = new Map();
-    const months = Array.from({ length: 5 }).map((_, i) => i);
+    const months = Array.from({ length: 12 }, (_, index) => index + 1);
     for (const m of months) {
-      payments.set(m, this.calculateDriverMonthlyPayment(driverId, year, m));
+      payments.set(
+        m,
+        await this.calculateDriverMonthlyPayment(driverId, year, m),
+      );
     }
     return payments;
   }

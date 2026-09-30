@@ -33,9 +33,9 @@ describe('Miles spending policies', () => {
       const transit = aCompletedTransit(Money.fromMajor(80));
       const grants = [
         account.addNonExpiringMiles(5, 1),
-        account.addExpiringMiles(15, moment + 100, transit, 4)!,
-        account.addExpiringMiles(10, moment + 200, transit, 3)!,
-        account.addExpiringMiles(5, moment + 300, transit, 2)!,
+        account.addExpiringMiles(15, moment + 100, transit.id, 4)!,
+        account.addExpiringMiles(10, moment + 200, transit.id, 3)!,
+        account.addExpiringMiles(5, moment + 300, transit.id, 2)!,
       ];
       account.remove(
         21,

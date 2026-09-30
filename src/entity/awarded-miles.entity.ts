@@ -4,7 +4,6 @@ import { type MilesSnapshot, restoreMiles } from '../loyalty/miles/miles-json';
 import { BaseEntity } from '../common/base.entity';
 import { Entity, Property, ManyToOne } from '@mikro-orm/decorators/legacy';
 import { Client } from './client.entity';
-import { Transit } from './transit.entity';
 
 @Entity()
 export class AwardedMiles extends BaseEntity {
@@ -15,14 +14,14 @@ export class AwardedMiles extends BaseEntity {
     account: AwardsAccount,
     miles: Miles,
     date: number,
-    transit: Transit | null,
+    transitId: string | null,
   ) {
     super();
     this.account = account;
     this.client = account.getClient();
     this.miles = miles.snapshot();
     this.date = date;
-    this.transit = transit;
+    this.transitId = transitId;
   }
 
   @ManyToOne(() => Client)
@@ -34,8 +33,8 @@ export class AwardedMiles extends BaseEntity {
   @Property({ type: 'bigint', runtimeType: 'number' })
   private date: number = Date.now();
 
-  @ManyToOne(() => Transit, { nullable: true })
-  public transit: Transit | null = null;
+  @Property({ type: 'uuid', nullable: true })
+  public transitId: string | null = null;
 
   public getClient() {
     return this.client;
@@ -77,7 +76,7 @@ export class AwardedMiles extends BaseEntity {
     return this.getExpirationDate() === Infinity;
   }
 
-  public setTransit(transit: Transit | null) {
-    this.transit = transit;
+  public setTransitId(transitId: string | null) {
+    this.transitId = transitId;
   }
 }

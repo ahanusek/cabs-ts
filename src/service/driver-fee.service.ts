@@ -2,40 +2,21 @@ import { Money } from '../money/money';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { DriverFeeRepository } from '../repository/driver-fee.repository';
-import { TransitRepository } from '../repository/transit.repository';
+
 import { FeeType, DriverFee } from '../entity/driver-fee.entity';
-import { Transit } from '../entity/transit.entity';
 
 @Injectable()
 export class DriverFeeService {
   constructor(
     @InjectRepository(DriverFee)
     private driverFeeRepository: DriverFeeRepository,
-    @InjectRepository(Transit)
-    private transitRepository: TransitRepository,
   ) {}
 
-  public async calculateDriverFee(transitId: string) {
-    const transit = await this.transitRepository.findOne({ id: transitId });
-    if (!transit) {
-      throw new NotFoundException('transit does not exist, id = ' + transitId);
-    }
-    if (transit.getDriversFee() != null) {
-      return transit.getDriversFee()!;
-    }
-    const transitPrice = transit.getPrice() ?? Money.ZERO;
-
-    const driver = transit.getDriver();
-
-    if (!driver) {
-      throw new NotFoundException(
-        'driver not exist for transit = ' + transitId,
-      );
-    }
-    const driverFee = await this.driverFeeRepository.findByDriver(driver);
+  public async calculateDriverFee(driverId: string, transitPrice: Money) {
+    const driverFee = await this.driverFeeRepository.findByDriverId(driverId);
     if (!driverFee) {
       throw new NotFoundException(
-        'driver Fees not defined for driver, driver id = ' + driver.getId(),
+        'driver Fees not defined for driver, driver id = ' + driverId,
       );
     }
     let finalFee;

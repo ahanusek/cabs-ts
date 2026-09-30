@@ -9,7 +9,7 @@ import {
   Enum,
 } from '@mikro-orm/decorators/legacy';
 import { BaseEntity } from '../common/base.entity';
-import { Transit } from './transit.entity';
+
 import { DriverAttribute } from './driver-attribute.entity';
 import { DriverFee } from './driver-fee.entity';
 import { DriverRepository } from '../repository/driver.repository';
@@ -56,20 +56,12 @@ export class Driver extends BaseEntity {
   @OneToMany(() => DriverAttribute, (driverAttribute) => driverAttribute.driver)
   public attributes = new Collection<DriverAttribute>(this);
 
-  @OneToMany(() => Transit, (transit) => transit.driver)
-  public transits = new Collection<Transit>(this);
-
   public getAttributes() {
     return this.attributes.getItems();
   }
 
   public setAttributes(attributes: DriverAttribute[]) {
     this.attributes.set(attributes);
-  }
-
-  public calculateEarningsForTransit(transit: Transit) {
-    console.log(transit);
-    return null;
   }
 
   public setLastName(lastName: string) {
@@ -134,9 +126,5 @@ export class Driver extends BaseEntity {
 
   public setOccupied(isOccupied: boolean) {
     this.isOccupied = isOccupied;
-  }
-
-  public getTransits() {
-    return this.transits.getItems();
   }
 }
