@@ -1,3 +1,5 @@
+import { EntityManager } from '@mikro-orm/postgresql';
+import { Transactional } from '@mikro-orm/decorators/legacy';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { ClientRepository } from '../repository/client.repository';
@@ -27,6 +29,7 @@ export class ClaimService {
     private clientNotificationService: ClientNotificationService,
     private driverNotificationService: DriverNotificationService,
     private appProperties: AppProperties,
+    private readonly em: EntityManager,
   ) {}
 
   public async create(claimDTO: ClaimDto): Promise<Claim> {
@@ -79,6 +82,7 @@ export class ClaimService {
     return claim;
   }
 
+  @Transactional()
   public async tryToResolveAutomatically(id: string): Promise<Claim> {
     const claim = await this.find(id);
     if (

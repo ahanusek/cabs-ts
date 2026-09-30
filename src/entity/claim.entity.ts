@@ -4,7 +4,6 @@ import {
   Entity,
   Property,
   ManyToOne,
-  OneToOne,
   Enum,
 } from '@mikro-orm/decorators/legacy';
 import { Transit } from './transit.entity';
@@ -26,10 +25,10 @@ export enum CompletionMode {
 
 @Entity({ repository: () => ClaimRepository })
 export class Claim extends BaseEntity {
-  @ManyToOne(() => Client)
+  @ManyToOne(() => Client, { eager: true })
   public owner!: Client;
 
-  @OneToOne(() => Transit, { owner: true })
+  @ManyToOne(() => Transit, { eager: true })
   public transit!: Transit;
 
   @Property({ type: 'bigint' })
