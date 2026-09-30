@@ -1,334 +1,212 @@
-import { AwardsAccountDto } from '../dto/awards-account.dto';
-import { AwardedMiles } from '../entity/awarded-miles.entity';
 import {
   Injectable,
   NotFoundException,
   NotAcceptableException,
 } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
+import { EntityManager } from '@mikro-orm/postgresql';
+import { Transactional } from '@mikro-orm/decorators/legacy';
+import { AwardsAccountDto } from '../dto/awards-account.dto';
+import { AwardedMiles } from '../entity/awarded-miles.entity';
+import { AwardsAccount } from '../entity/awards-account.entity';
+import { Client, Type } from '../entity/client.entity';
+import { Transit } from '../entity/transit.entity';
 import { ClientRepository } from '../repository/client.repository';
 import { TransitRepository } from '../repository/transit.repository';
-import { AppProperties } from '../config/app-properties.config';
 import { AwardsAccountRepository } from '../repository/awards-account.repository';
 import { AwardedMilesRepository } from '../repository/awarded-miles.repository';
-import { AwardsAccount } from '../entity/awards-account.entity';
+import { AppProperties } from '../config/app-properties.config';
+import { ConstantUntil } from '../loyalty/miles/constant-until';
+import { requireMilesAmount } from '../loyalty/miles/miles';
 import dayjs from 'dayjs';
-import { Client, Type } from '../entity/client.entity';
-import orderBy from 'lodash.orderby';
-import { Transit } from '../entity/transit.entity';
-
-export interface IAwardsService {
-  findBy: (clientId: string) => Promise<AwardsAccountDto>;
-
-  registerToProgram: (clientId: string) => Promise<void>;
-
-  activateAccount: (clientId: string) => Promise<void>;
-
-  deactivateAccount: (clientId: string) => Promise<void>;
-
-  registerMiles: (
-    clientId: string,
-    transitId: string,
-  ) => Promise<AwardedMiles | null>;
-
-  registerNonExpiringMiles: (
-    clientId: string,
-    miles: number,
-  ) => Promise<AwardedMiles>;
-
-  removeMiles: (clientId: string, miles: number) => Promise<void>;
-
-  calculateBalance: (clientId: string) => Promise<number>;
-
-  transferMiles: (
-    fromClientId: string,
-    toClientId: string,
-    miles: number,
-  ) => Promise<void>;
-}
 
 @Injectable()
-export class AwardsService implements IAwardsService {
+export class AwardsService {
   constructor(
-    @InjectRepository(Client)
-    private clientRepository: ClientRepository,
-    @InjectRepository(Transit)
-    private transitRepository: TransitRepository,
+    @InjectRepository(Client) private readonly clients: ClientRepository,
+    @InjectRepository(Transit) private readonly transits: TransitRepository,
     @InjectRepository(AwardsAccount)
-    private accountRepository: AwardsAccountRepository,
+    private readonly accounts: AwardsAccountRepository,
     @InjectRepository(AwardedMiles)
-    private milesRepository: AwardedMilesRepository,
-    private appProperties: AppProperties,
+    private readonly miles: AwardedMilesRepository,
+    private readonly properties: AppProperties,
+    private readonly em: EntityManager,
   ) {}
 
   public async findBy(clientId: string): Promise<AwardsAccountDto> {
-    const account = await this.getAccountForClient(clientId);
-
-    return new AwardsAccountDto(account);
+    return new AwardsAccountDto(await this.getAccountForClient(clientId));
   }
 
-  public async registerToProgram(clientId: string) {
-    const client = await this.clientRepository.findOne(
-      { id: clientId },
-      { populate: ['claims'] },
-    );
-
-    if (!client) {
-      throw new NotFoundException('Client does not exists, id = ' + clientId);
-    }
-
+  public async registerToProgram(clientId: string): Promise<void> {
     const account = new AwardsAccount();
-
-    account.setClient(client);
-    account.setActive(false);
-    account.setDate(Date.now());
-
-    await this.accountRepository.getEntityManager().persist(account).flush();
+    account.setClient(await this.getClient(clientId));
+    await this.em.persist(account).flush();
   }
 
-  public async activateAccount(clientId: string) {
+  public async activateAccount(clientId: string): Promise<void> {
     const account = await this.getAccountForClient(clientId);
-
     account.setActive(true);
-
-    await this.accountRepository.getEntityManager().flush();
+    await this.em.flush();
   }
 
-  public async deactivateAccount(clientId: string) {
+  public async deactivateAccount(clientId: string): Promise<void> {
     const account = await this.getAccountForClient(clientId);
-
     account.setActive(false);
-
-    await this.accountRepository.getEntityManager().flush();
+    await this.em.flush();
   }
 
-  public async registerMiles(clientId: string, transitId: string) {
+  @Transactional()
+  public async registerMiles(
+    clientId: string,
+    transitId: string,
+  ): Promise<AwardedMiles | null> {
     const account = await this.getAccountForClient(clientId);
-    const transit = await this.transitRepository.findOne({ id: transitId });
-
-    if (!transit) {
-      throw new NotFoundException('transit does not exists, id = ' + transitId);
-    }
-
-    const now = Date.now();
-    if (!account.isAwardActive()) {
-      return null;
-    } else {
-      const miles = new AwardedMiles();
-      miles.setTransit(transit);
-      miles.setDate(Date.now());
-      miles.setClient(account.getClient());
-      miles.setMiles(this.appProperties.getDefaultMilesBonus());
-      miles.setExpirationDate(
-        dayjs(now)
-          .add(this.appProperties.getMilesExpirationInDays(), 'days')
-          .valueOf(),
-      );
-      miles.setNonExpiring(false);
-      account.increaseTransactions();
-
-      await this.milesRepository.getEntityManager().persist(miles).flush();
-      await this.accountRepository.getEntityManager().flush();
-      return miles;
-    }
-  }
-
-  public async registerNonExpiringMiles(clientId: string, miles: number) {
-    const account = await this.getAccountForClient(clientId);
-
-    const _miles = new AwardedMiles();
-    _miles.setTransit(null);
-    _miles.setClient(account.getClient());
-    _miles.setMiles(miles);
-    _miles.setDate(Date.now());
-    _miles.setNonExpiring(true);
+    const transit = await this.transits.findOne({ id: transitId });
+    if (!transit)
+      throw new NotFoundException(`Transit ${transitId} does not exist`);
+    if (!account.isAwardActive()) return null;
+    const expiration = dayjs()
+      .add(this.properties.getMilesExpirationInDays(), 'days')
+      .valueOf();
+    const miles = new AwardedMiles();
+    miles.setClient(account.getClient());
+    miles.setTransit(transit);
+    miles.setMiles(
+      new ConstantUntil(this.properties.getDefaultMilesBonus(), expiration),
+    );
     account.increaseTransactions();
-    await this.milesRepository.getEntityManager().persist(_miles).flush();
-    await this.accountRepository.getEntityManager().flush();
-    return _miles;
+    await this.em.persist(miles).flush();
+    return miles;
   }
 
-  public async removeMiles(clientId: string, miles: number) {
-    const client = await this.clientRepository.findOne(
-      { id: clientId },
-      { populate: ['claims'] },
+  @Transactional()
+  public async registerNonExpiringMiles(
+    clientId: string,
+    amount: number,
+  ): Promise<AwardedMiles> {
+    const account = await this.getAccountForClient(clientId);
+    const miles = new AwardedMiles();
+    miles.setClient(account.getClient());
+    miles.setMiles(ConstantUntil.forever(amount));
+    account.increaseTransactions();
+    await this.em.persist(miles).flush();
+    return miles;
+  }
+
+  public async calculateBalance(clientId: string): Promise<number> {
+    const client = await this.getClient(clientId);
+    const miles = await this.miles.findAllByClient(client);
+    const now = Date.now();
+    return miles.reduce(
+      (balance, grant) => balance + grant.getMilesAmount(now),
+      0,
     );
-    if (!client) {
-      throw new NotFoundException(
-        `Client with id ${clientId} doest not exists`,
-      );
-    }
-
-    const account = await this.accountRepository.findByClient(client);
-
-    if (!account) {
-      throw new NotFoundException(
-        `Awards account for client id ${clientId} doest not exists`,
-      );
-    } else {
-      const balance = await this.calculateBalance(clientId);
-      if (balance >= miles && account.isAwardActive()) {
-        let milesList = await this.milesRepository.findAllByClient(client);
-        const transitsCounter = (
-          await this.transitRepository.findByClient(client)
-        ).length;
-
-        // TODO: verify below sorter
-        if (client.getClaims().length >= 3) {
-          // milesList.sort(Comparator.comparing(AwardedMiles::getExpirationDate, Comparators.nullsHigh()).reversed().thenComparing(Comparators.nullsHigh()));
-          milesList = orderBy(milesList, [(item) => item.getExpirationDate()]);
-        } else if (client.getType() === Type.VIP) {
-          // milesList.sort(Comparator.comparing(AwardedMiles::isSpecial).thenComparing(AwardedMiles::getExpirationDate, Comparators.nullsLow()));
-          milesList = orderBy(milesList, [
-            (item) => item.cantExpire(),
-            (item) => item.getExpirationDate(),
-          ]);
-        } else if (transitsCounter >= 15 && this.isSunday()) {
-          // milesList.sort(Comparator.comparing(AwardedMiles::isSpecial).thenComparing(AwardedMiles::getExpirationDate, Comparators.nullsLow()));
-          milesList = orderBy(milesList, [
-            (item) => item.cantExpire(),
-            (item) => item.getExpirationDate(),
-          ]);
-        } else if (transitsCounter >= 15) {
-          // milesList.sort(Comparator.comparing(AwardedMiles::isSpecial).thenComparing(AwardedMiles::getDate));
-          milesList = orderBy(milesList, [
-            (item) => item.cantExpire(),
-            (item) => item.getDate(),
-          ]);
-        } else {
-          // milesList.sort(Comparator.comparing(AwardedMiles::getDate));
-          milesList = orderBy(milesList, (item) => item.getDate());
-        }
-        for (const iter of milesList) {
-          if (miles <= 0) {
-            break;
-          }
-          if (
-            iter.cantExpire() ||
-            (iter.getExpirationDate() &&
-              dayjs(iter.getExpirationDate()).isAfter(dayjs()))
-          ) {
-            if (iter.getMiles() <= miles) {
-              miles -= iter.getMiles();
-              iter.setMiles(0);
-            } else {
-              iter.setMiles(iter.getMiles() - miles);
-              miles = 0;
-            }
-          }
-        }
-        await this.milesRepository.getEntityManager().flush();
-      } else {
-        throw new NotAcceptableException(
-          'Insufficient miles, id = ' +
-            clientId +
-            ', miles requested = ' +
-            miles,
-        );
-      }
-    }
   }
 
-  public async calculateBalance(clientId: string) {
-    const client = await this.clientRepository.findOne(
-      { id: clientId },
-      { populate: ['claims'] },
-    );
-    if (!client) {
-      throw new NotFoundException(
-        `Client with id ${clientId} doest not exists`,
+  @Transactional()
+  public async removeMiles(clientId: string, amount: number): Promise<void> {
+    requireMilesAmount(amount);
+    const account = await this.getAccountForClient(clientId);
+    if (
+      !account.isAwardActive() ||
+      (await this.calculateBalance(clientId)) < amount
+    ) {
+      throw new NotAcceptableException(
+        'Insufficient miles or inactive account',
       );
     }
-    const milesList = await this.milesRepository.findAllByClient(client);
-
-    const sum = milesList
-      .filter(
-        (t) =>
-          (t.getExpirationDate() != null &&
-            t.getExpirationDate() &&
-            dayjs(t.getExpirationDate()).isAfter(dayjs())) ||
-          t.cantExpire(),
-      )
-      .map((t) => t.getMiles())
-      .reduce((prev, curr) => prev + curr, 0);
-
-    return sum;
+    const client = account.getClient();
+    await this.em.populate(client, ['claims']);
+    const grants = await this.miles.findAllByClient(client);
+    const transitCount = await this.transits.count({ client });
+    grants.sort(this.chooseStrategy(client, transitCount));
+    this.consume(grants, amount, Date.now());
+    await this.em.flush();
   }
 
+  @Transactional()
   public async transferMiles(
     fromClientId: string,
     toClientId: string,
-    miles: number,
-  ) {
-    const fromClient = await this.clientRepository.findOne({
-      id: fromClientId,
-    });
-    if (!fromClient) {
-      throw new NotFoundException(
-        `Client with id ${fromClientId} doest not exists`,
+    amount: number,
+  ): Promise<void> {
+    requireMilesAmount(amount);
+    const from = await this.getAccountForClient(fromClientId);
+    const to = await this.getAccountForClient(toClientId);
+    if (
+      !from.isAwardActive() ||
+      (await this.calculateBalance(fromClientId)) < amount
+    )
+      return;
+    if (from.id === to.id || amount === 0) return;
+    const grants = await this.miles.findAllByClient(from.getClient());
+    const now = Date.now();
+    let remaining = amount;
+    for (const grant of grants) {
+      if (remaining === 0) break;
+      const transferred = Math.min(grant.getMilesAmount(now), remaining);
+      if (transferred === 0) continue;
+      grant.subtract(transferred, now);
+      const received = new AwardedMiles();
+      received.setClient(to.getClient());
+      received.setDate(grant.getDate());
+      received.setMiles(
+        new ConstantUntil(transferred, grant.getExpirationDate()),
       );
+      this.em.persist(received);
+      remaining -= transferred;
     }
-    const accountFrom = await this.getAccountForClient(fromClient);
-    const accountTo = await this.getAccountForClient(toClientId);
+    from.increaseTransactions();
+    to.increaseTransactions();
+    await this.em.flush();
+  }
 
-    const balanceFromClient = await this.calculateBalance(fromClientId);
-    if (balanceFromClient >= miles && accountFrom.isAwardActive()) {
-      const milesList = await this.milesRepository.findAllByClient(fromClient);
-
-      for (const iter of milesList) {
-        if (
-          iter.cantExpire() ||
-          dayjs(iter.getExpirationDate()).isAfter(dayjs())
-        ) {
-          if (iter.getMiles() <= miles) {
-            iter.setClient(accountTo.getClient());
-            miles -= iter.getMiles();
-          } else {
-            iter.setMiles(iter.getMiles() - miles);
-            const _miles = new AwardedMiles();
-
-            _miles.setClient(accountTo.getClient());
-            _miles.setNonExpiring(iter.cantExpire() ?? false);
-            _miles.setExpirationDate(iter.getExpirationDate() || Date.now());
-            _miles.setMiles(miles);
-
-            miles -= iter.getMiles();
-
-            await this.milesRepository.getEntityManager().persist(_miles);
-          }
-        }
-      }
-
-      accountFrom.increaseTransactions();
-      accountTo.increaseTransactions();
-
-      await this.accountRepository.getEntityManager().flush();
+  private consume(grants: AwardedMiles[], amount: number, now: number): void {
+    let remaining = amount;
+    for (const grant of grants) {
+      if (remaining === 0) break;
+      const consumed = Math.min(grant.getMilesAmount(now), remaining);
+      grant.subtract(consumed, now);
+      remaining -= consumed;
     }
   }
 
-  private isSunday() {
-    return dayjs().get('day') === 0;
+  private chooseStrategy(client: Client, transitCount: number) {
+    const byDate = (a: AwardedMiles, b: AwardedMiles) =>
+      a.getDate() - b.getDate();
+    const byExpiration = (a: AwardedMiles, b: AwardedMiles) =>
+      a.getExpirationDate() - b.getExpirationDate();
+    const nonExpiringLast = (a: AwardedMiles, b: AwardedMiles) =>
+      Number(a.cantExpire()) - Number(b.cantExpire());
+    if (client.getClaims().length >= 3)
+      return (a: AwardedMiles, b: AwardedMiles) => byExpiration(b, a);
+    if (
+      client.getType() === Type.VIP ||
+      (transitCount >= 15 && dayjs().day() === 0)
+    ) {
+      return (a: AwardedMiles, b: AwardedMiles) =>
+        nonExpiringLast(a, b) || byExpiration(a, b);
+    }
+    if (transitCount >= 15)
+      return (a: AwardedMiles, b: AwardedMiles) =>
+        nonExpiringLast(a, b) || byDate(a, b);
+    return byDate;
   }
 
-  private async getAccountForClient(clientId: string | Client) {
-    const client =
-      typeof clientId === 'string'
-        ? await this.clientRepository.findOne({ id: clientId })
-        : clientId;
-    if (!client) {
+  private async getClient(id: string): Promise<Client> {
+    const client = await this.clients.findOne({ id });
+    if (!client) throw new NotFoundException(`Client ${id} does not exist`);
+    return client;
+  }
+
+  private async getAccountForClient(clientId: string): Promise<AwardsAccount> {
+    const account = await this.accounts.findByClient(
+      await this.getClient(clientId),
+    );
+    if (!account)
       throw new NotFoundException(
-        `Client with id ${clientId} doest not exists`,
+        `Awards account for ${clientId} does not exist`,
       );
-    }
-
-    const account = await this.accountRepository.findByClient(client);
-
-    if (!account) {
-      throw new NotFoundException(
-        `Awards account for client id ${clientId} doest not exists`,
-      );
-    }
-
     return account;
   }
 }

@@ -1,7 +1,10 @@
+import type { MilesSnapshot } from './miles-json';
+
 export interface Miles {
   getAmountFor(moment: number): number;
   subtract(amount: number, moment: number): Miles;
   expiresAt(): number;
+  snapshot(): MilesSnapshot;
 }
 
 export function requireMilesAmount(amount: number): void {

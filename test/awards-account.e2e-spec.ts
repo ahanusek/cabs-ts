@@ -1,3 +1,4 @@
+import { ConstantUntil } from '../src/loyalty/miles/constant-until';
 import { NotAcceptableException } from '@nestjs/common';
 import { AwardsService } from '../src/service/awards.service';
 import { AwardedMiles } from '../src/entity/awarded-miles.entity';
@@ -59,7 +60,7 @@ describe('Awards account — legacy behavior', () => {
     await application.run(async () => {
       await awards.activateAccount(clientId);
       const miles = await awards.registerMiles(clientId, transitId);
-      miles!.setExpirationDate(Date.now() - 1000);
+      miles!.setMiles(new ConstantUntil(10, Date.now() - 1000));
       await application.orm.em.flush();
       await awards.registerNonExpiringMiles(clientId, 20);
     });
@@ -109,6 +110,17 @@ describe('Awards account — legacy behavior', () => {
       await application.orm.em.flush();
     });
     expect(await balance()).toBe(20);
+  });
+
+  it('transfers exactly the requested part without losing remaining miles', async () => {
+    const destination = await anotherAccount();
+    await application.run(async () => {
+      await awards.activateAccount(clientId);
+      await awards.registerNonExpiringMiles(clientId, 20);
+      await awards.registerNonExpiringMiles(clientId, 10);
+      await awards.transferMiles(clientId, destination, 7);
+    });
+    expect([await balance(), await balance(destination)]).toEqual([23, 7]);
   });
 
   async function grantThirtyMiles() {

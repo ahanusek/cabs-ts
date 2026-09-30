@@ -1,3 +1,4 @@
+import type { MilesSnapshot } from './miles-json';
 import { Miles, requireMilesAmount } from './miles';
 
 export class ConstantUntil implements Miles {
@@ -23,6 +24,14 @@ export class ConstantUntil implements Miles {
       throw new RangeError('Insufficient miles');
     }
     return new ConstantUntil(this.amount - amount, this.expiration);
+  }
+
+  public snapshot(): MilesSnapshot {
+    return {
+      kind: 'constant',
+      amount: this.amount,
+      expiration: Number.isFinite(this.expiration) ? this.expiration : null,
+    };
   }
 
   public expiresAt(): number {
