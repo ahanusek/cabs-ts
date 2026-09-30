@@ -76,6 +76,10 @@ export class AwardsAccount extends BaseEntity {
     return this.addMiles(ConstantUntil.forever(amount), now, null);
   }
 
+  public getMiles(): readonly AwardedMiles[] {
+    return [...this.miles.getItems()];
+  }
+
   public calculateBalance(moment: number): number {
     return this.miles
       .getItems()

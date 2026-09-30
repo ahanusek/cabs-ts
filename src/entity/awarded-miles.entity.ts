@@ -5,9 +5,8 @@ import { BaseEntity } from '../common/base.entity';
 import { Entity, Property, ManyToOne } from '@mikro-orm/decorators/legacy';
 import { Client } from './client.entity';
 import { Transit } from './transit.entity';
-import { AwardedMilesRepository } from '../repository/awarded-miles.repository';
 
-@Entity({ repository: () => AwardedMilesRepository })
+@Entity()
 export class AwardedMiles extends BaseEntity {
   @ManyToOne(() => AwardsAccount)
   public account: AwardsAccount;

@@ -10,7 +10,6 @@ import { Transit } from '../entity/transit.entity';
 import { ClientRepository } from '../repository/client.repository';
 import { TransitRepository } from '../repository/transit.repository';
 import { AwardsAccountRepository } from '../repository/awards-account.repository';
-import { AwardedMilesRepository } from '../repository/awarded-miles.repository';
 import { AppProperties } from '../config/app-properties.config';
 import dayjs from 'dayjs';
 
@@ -21,8 +20,6 @@ export class AwardsService {
     @InjectRepository(Transit) private readonly transits: TransitRepository,
     @InjectRepository(AwardsAccount)
     private readonly accounts: AwardsAccountRepository,
-    @InjectRepository(AwardedMiles)
-    private readonly miles: AwardedMilesRepository,
     private readonly properties: AppProperties,
     private readonly em: EntityManager,
   ) {}
