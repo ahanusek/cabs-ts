@@ -1,3 +1,4 @@
+import request from 'supertest';
 import dayjs from 'dayjs';
 import { DriverReportController } from '../src/controllers/driver-report.controller';
 import { DriverSession } from '../src/entity/driver-session.entity';
@@ -45,6 +46,12 @@ describe('Driver report', () => {
         transit.setDriver(driver);
         transit.setCompleteAt(start + 3600000);
         application.orm.em.persist([session, transit]);
+        if (daysAgo === 0) {
+          const second = aCompletedTransit(Money.fromMajor(90));
+          second.setDriver(driver);
+          second.setCompleteAt(start + 5400000);
+          application.orm.em.persist(second);
+        }
         if (daysAgo === 2) {
           const claim = new Claim();
           claim.setOwner(transit.getClient());
@@ -66,17 +73,12 @@ describe('Driver report', () => {
     [1, 2],
     [2, 3],
   ])('includes sessions from the last %i days', async (days, count) => {
-    expect((await report(days)).getSessions().size).toBe(count);
+    expect((await report(days)).sessions.length).toBe(count);
   });
 
   it('excludes private medical remarks', async () => {
     const result = await report(2);
-    expect(
-      result
-        .getAttributes()
-        .map((attribute) => attribute.getName())
-        .sort(),
-    ).toEqual(
+    expect(result.attributes.map((attribute) => attribute.name).sort()).toEqual(
       [
         DriverAttributeName.COMPANY_NAME,
         DriverAttributeName.PENALTY_POINTS,
@@ -86,24 +88,36 @@ describe('Driver report', () => {
 
   it('associates a claim with the transit in its session', async () => {
     const result = await report(2);
-    const transits = [...result.getSessions()].find(
-      ([session]) => session.getCarBrand() === 'Car 2',
-    )![1];
-    expect(
-      transits.map((transit) => transit.getClaimDTO()?.getReason()),
-    ).toEqual(['Too fast']);
+    const transits = result.sessions.find(
+      ({ session }) => session.carBrand === 'Car 2',
+    )!.transits;
+    expect(transits.map((transit) => transit.claimDto?.reason)).toEqual([
+      'Too fast',
+    ]);
   });
 
   it('retains drivers without attributes or sessions', async () => {
     const driver = anActiveDriver();
     await application.orm.em.fork().persist(driver).flush();
     const result = await report(0, driver.id);
-    expect(result.getSessions().size).toBe(0);
+    expect(result.sessions.length).toBe(0);
   });
 
   it('serializes sessions into JSON', async () => {
     const result = JSON.parse(JSON.stringify(await report(2)));
     expect(result.sessions).toHaveLength(3);
+  });
+
+  it('returns every transit from a session', async () => {
+    const result = await report(0);
+    expect(result.sessions[0].transits).toHaveLength(2);
+  });
+
+  it('accepts the report period as an HTTP query parameter', async () => {
+    const response = await request(application.app.getHttpServer()).get(
+      `/driverreport/${driverId}?lastDays=2`,
+    );
+    expect([response.status, response.body.sessions.length]).toEqual([200, 3]);
   });
 
   function report(lastDays: number, id = driverId) {

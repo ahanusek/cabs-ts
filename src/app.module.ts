@@ -1,3 +1,4 @@
+import { SqlDriverReportCreator } from './driverreport/sql-driver-report.creator';
 import { ContractAttachmentData } from './entity/contract-attachment-data.entity';
 import { ClaimsResolver } from './claims/claims-resolver.entity';
 import { CarTypeActiveCounter } from './entity/car-type-active-counter.entity';
@@ -95,6 +96,7 @@ const entities = [
     DriverReportController,
   ],
   providers: [
+    SqlDriverReportCreator,
     DriverFinder,
     AppProperties,
     DriverService,

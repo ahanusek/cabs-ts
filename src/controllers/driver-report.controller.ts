@@ -1,100 +1,16 @@
-import { DriverService } from '../service/driver.service';
-import { DriverRepository } from '../repository/driver.repository';
-import { InjectRepository } from '@mikro-orm/nestjs';
-import { ClaimRepository } from '../repository/claim.repository';
-import { DriverSessionRepository } from '../repository/driver-session.repository';
-import {
-  Body,
-  Controller,
-  Get,
-  NotFoundException,
-  Param,
-} from '@nestjs/common';
-import { DriverReport } from '../dto/driver-report.dto';
-import { Driver } from '../entity/driver.entity';
-import { DriverAttributeName } from '../entity/driver-attribute.entity';
-import { DriverAttributeDto } from '../dto/driver-attribute.dto';
-import dayjs from 'dayjs';
-import { DriverSessionDto } from '../dto/driver-session.dto';
-import { TransitDto } from '../dto/transit.dto';
-import { Status, Transit } from '../entity/transit.entity';
-import { ClaimDto } from '../dto/claim.dto';
-import { Claim } from '../entity/claim.entity';
-import { DriverSession } from '../entity/driver-session.entity';
+import { Controller, Get, Param, Query } from '@nestjs/common';
+import { SqlDriverReportCreator } from '../driverreport/sql-driver-report.creator';
+import { DriverReportView } from '../driverreport/driver-report.view';
 
 @Controller('driverreport')
 export class DriverReportController {
-  constructor(
-    private driverService: DriverService,
-    @InjectRepository(Driver)
-    private driverRepository: DriverRepository,
-    @InjectRepository(Claim)
-    private claimRepository: ClaimRepository,
-    @InjectRepository(DriverSession)
-    private driverSessionRepository: DriverSessionRepository,
-  ) {}
+  constructor(private readonly reports: SqlDriverReportCreator) {}
 
   @Get(':driverId')
-  public async loadReportForDriver(
+  public loadReportForDriver(
     @Param('driverId') driverId: string,
-    @Body() body: { lastDays: number },
-  ): Promise<DriverReport> {
-    const driverReport = new DriverReport();
-    const driverDto = await this.driverService.loadDriver(driverId);
-
-    driverReport.setDriverDTO(driverDto);
-    const driver = await this.driverRepository.findOne(
-      { id: driverId },
-      { populate: ['attributes', 'transits', 'transits.client'] },
-    );
-
-    if (!driver) {
-      throw new NotFoundException(`Driver with id ${driverId} not exists`);
-    }
-
-    driver
-      .getAttributes()
-      .filter(
-        (attr) =>
-          attr.getName() !== DriverAttributeName.MEDICAL_EXAMINATION_REMARKS,
-      )
-      .forEach((attr) =>
-        driverReport.getAttributes().push(new DriverAttributeDto(attr)),
-      );
-
-    const beggingOfToday = dayjs().startOf('day');
-    const since = beggingOfToday.subtract(body.lastDays, 'days');
-    const allByDriverAndLoggedAtAfter =
-      await this.driverSessionRepository.findAllByDriverAndLoggedAtAfter(
-        driver,
-        since.valueOf(),
-      );
-    const sessionsWithTransits: Map<DriverSessionDto, TransitDto[]> = new Map();
-    for (const session of allByDriverAndLoggedAtAfter) {
-      const dto = new DriverSessionDto(session);
-      const transitsInSession: Transit[] = Array.from(
-        driver?.getTransits(),
-      ).filter(
-        (t) =>
-          t.getStatus() === Status.COMPLETED &&
-          !dayjs(t.getCompleteAt()).isBefore(session.getLoggedAt()) &&
-          !dayjs(t.getCompleteAt()).isAfter(session.getLoggedOutAt()),
-      );
-
-      const transitsDtosInSession: TransitDto[] = [];
-      for (const t of transitsInSession) {
-        const transitDTO = new TransitDto(t);
-        const byOwnerAndTransit =
-          await this.claimRepository.findByOwnerAndTransit(t.getClient(), t);
-        if (byOwnerAndTransit.length) {
-          const claim = new ClaimDto(byOwnerAndTransit[0]);
-          transitDTO.setClaimDTO(claim);
-        }
-        transitsDtosInSession.push(transitDTO);
-      }
-      sessionsWithTransits.set(dto, transitsDtosInSession);
-    }
-    driverReport.setSessions(sessionsWithTransits);
-    return driverReport;
+    @Query() query: { lastDays?: number | string },
+  ): Promise<DriverReportView> {
+    return this.reports.create(driverId, Number(query.lastDays ?? 0));
   }
 }
