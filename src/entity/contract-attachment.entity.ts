@@ -6,7 +6,6 @@ import {
   Enum,
 } from '@mikro-orm/decorators/legacy';
 import { Contract } from './contract.entity';
-import { ContractAttachmentRepository } from '../repository/contract-attachment.repository';
 
 export enum ContractAttachmentStatus {
   PROPOSED = 'proposed',
@@ -15,13 +14,10 @@ export enum ContractAttachmentStatus {
   REJECTED = 'rejected',
 }
 
-@Entity({ repository: () => ContractAttachmentRepository })
+@Entity()
 export class ContractAttachment extends BaseEntity {
   @ManyToOne(() => Contract)
   public contract!: Contract;
-
-  @Property({ type: 'blob' })
-  private data!: Buffer;
 
   @Property({ type: 'bigint', runtimeType: 'number' })
   private creationDate: number = Date.now();
@@ -40,14 +36,6 @@ export class ContractAttachment extends BaseEntity {
     default: ContractAttachmentStatus.PROPOSED,
   })
   private status: ContractAttachmentStatus = ContractAttachmentStatus.PROPOSED;
-
-  public getData() {
-    return this.data;
-  }
-
-  public setData(data: string) {
-    this.data = Buffer.from(data, 'base64');
-  }
 
   public getCreationDate() {
     return this.creationDate;

@@ -1,3 +1,4 @@
+import { ContractAttachmentData } from '../entity/contract-attachment-data.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Transactional } from '@mikro-orm/decorators/legacy';
@@ -65,7 +66,20 @@ export class ContractService {
   }
 
   public async findDto(id: string): Promise<ContractDto> {
-    return new ContractDto(await this.find(id));
+    const contract = await this.find(id);
+    const payloads = await this.em.find(ContractAttachmentData, {
+      attachmentId: { $in: contract.getAttachmentIds() },
+    });
+    const dataById = new Map(
+      payloads.map((payload) => [payload.attachmentId, payload]),
+    );
+    const attachments = contract.getAttachments().map((attachment) => {
+      const payload = dataById.get(attachment.id);
+      if (!payload)
+        throw new NotFoundException('Attachment content does not exist');
+      return new ContractAttachmentDto(attachment, payload.getData(), id);
+    });
+    return new ContractDto(contract, attachments);
   }
 
   @Transactional()
@@ -74,9 +88,11 @@ export class ContractService {
     dto: CreateContractAttachmentDto,
   ): Promise<ContractAttachmentDto> {
     const contract = await this.find(contractId);
-    const attachment = contract.proposeAttachment(dto.data);
+    const attachment = contract.proposeAttachment();
+    const data = Buffer.from(dto.data, 'base64');
+    this.em.persist(new ContractAttachmentData(attachment.id, data));
     await this.em.flush();
-    return new ContractAttachmentDto(attachment, contractId);
+    return new ContractAttachmentDto(attachment, data, contractId);
   }
 
   @Transactional()
@@ -85,6 +101,7 @@ export class ContractService {
     attachmentId: string,
   ): Promise<void> {
     (await this.find(contractId)).removeAttachment(attachmentId);
+    await this.em.nativeDelete(ContractAttachmentData, { attachmentId });
     await this.em.flush();
   }
 }

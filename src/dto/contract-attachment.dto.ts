@@ -20,10 +20,14 @@ export class ContractAttachmentDto {
 
   private status: ContractAttachmentStatus;
 
-  constructor(attachment: ContractAttachment, contractId?: string) {
+  constructor(
+    attachment: ContractAttachment,
+    data: Buffer,
+    contractId: string,
+  ) {
     this.id = attachment.getId();
-    this.data = attachment.getData().toString();
-    this.contractId = contractId || attachment.getContract().getId();
+    this.data = data.toString();
+    this.contractId = contractId;
     this.creationDate = attachment.getCreationDate();
     this.rejectedAt = attachment.getRejectedAt();
     this.acceptedAt = attachment.getAcceptedAt();

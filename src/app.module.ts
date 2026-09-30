@@ -1,3 +1,4 @@
+import { ContractAttachmentData } from './entity/contract-attachment-data.entity';
 import { ClaimsResolver } from './claims/claims-resolver.entity';
 import { CarTypeActiveCounter } from './entity/car-type-active-counter.entity';
 import { DriverFinder } from './service/driver-finder.service';
@@ -53,6 +54,7 @@ import { ClaimAttachment } from './entity/claim-attachment.entity';
 import { ContractAttachment } from './entity/contract-attachment.entity';
 
 const entities = [
+  ContractAttachmentData,
   ClaimsResolver,
   CarTypeActiveCounter,
   Driver,

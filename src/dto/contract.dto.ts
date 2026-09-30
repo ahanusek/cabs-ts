@@ -22,7 +22,7 @@ export class ContractDto {
 
   private attachments: ContractAttachmentDto[] = [];
 
-  constructor(contract: Contract) {
+  constructor(contract: Contract, attachments: ContractAttachmentDto[] = []) {
     this.setContractNo(contract.getContractNo());
     this.setAcceptedAt(contract.getAcceptedAt());
     this.setRejectedAt(contract.getRejectedAt());
@@ -31,11 +31,7 @@ export class ContractDto {
     this.setStatus(contract.getStatus());
     this.setPartnerName(contract.getPartnerName());
     this.setSubject(contract.getSubject());
-    for (const attachment of contract.getAttachments()) {
-      this.attachments.push(
-        new ContractAttachmentDto(attachment, contract.getId()),
-      );
-    }
+    this.attachments = attachments;
     this.setId(contract.getId());
   }
 

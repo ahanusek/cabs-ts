@@ -61,10 +61,9 @@ export class Contract extends BaseEntity {
     this.contractNo = contractNo;
   }
 
-  public proposeAttachment(data: string): ContractAttachment {
+  public proposeAttachment(): ContractAttachment {
     const attachment = new ContractAttachment();
     attachment.setContract(this);
-    attachment.setData(data);
     this.attachments.add(attachment);
     return attachment;
   }
@@ -140,6 +139,10 @@ export class Contract extends BaseEntity {
   public getSubject() {
     return this.subject;
   }
+  public getAttachmentIds(): string[] {
+    return this.attachments.getItems().map((attachment) => attachment.id);
+  }
+
   public getAttachments(): readonly ContractAttachment[] {
     return [...this.attachments.getItems()];
   }
