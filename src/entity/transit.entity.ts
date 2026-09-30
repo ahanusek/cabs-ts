@@ -163,6 +163,26 @@ export class Transit extends BaseEntity {
     this.setKm(distance.toKm());
   }
 
+  public changeDestinationTo(address: Address, distance: Distance) {
+    if (this.status === Status.COMPLETED)
+      throw new ForbiddenException('Transit is completed');
+    this.to = address;
+    this.setKm(distance.toKm());
+  }
+
+  public shouldStopWaiting(now: number) {
+    return (
+      this.status === Status.CANCELLED || (this.published ?? 0) + 300000 < now
+    );
+  }
+
+  public failDriverAssignment() {
+    this.status = Status.DRIVER_ASSIGNMENT_FAILED;
+    this.driver = null;
+    this.setKm(0);
+    this.awaitingDriversResponses = 0;
+  }
+
   public getCarType() {
     return this.carType as CarClass;
   }

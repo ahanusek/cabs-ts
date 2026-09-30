@@ -197,22 +197,18 @@ export class TransitService {
       throw new NotFoundException('Transit does not exist, id = ' + transitId);
     }
 
-    if (transit.getStatus() === Status.COMPLETED) {
-      throw new NotAcceptableException(
-        "Address 'to' cannot be changed, id = " + transitId,
-      );
-    }
-
     // FIXME later: add some exceptions handling
     const geoFrom = this.geocodingService.geocodeAddress(transit.getFrom());
     const geoTo = this.geocodingService.geocodeAddress(savedAddress);
-    transit.setTo(savedAddress);
-    transit.setKm(
-      this.distanceCalculator.calculateByMap(
-        geoFrom[0],
-        geoFrom[1],
-        geoTo[0],
-        geoTo[1],
+    transit.changeDestinationTo(
+      savedAddress,
+      Distance.ofKm(
+        this.distanceCalculator.calculateByMap(
+          geoFrom[0],
+          geoFrom[1],
+          geoTo[0],
+          geoTo[1],
+        ),
       ),
     );
 
@@ -301,18 +297,8 @@ export class TransitService {
           distanceToCheck++;
 
           // FIXME: to refactor when the final business logic will be determined
-          if (
-            dayjs(transit.getPublished())
-              .add(300, 'seconds')
-              .isBefore(dayjs()) ||
-            distanceToCheck >= 20 ||
-            // Should it be here? How is it even possible due to previous status check above loop?
-            transit.getStatus() === Status.CANCELLED
-          ) {
-            transit.setStatus(Status.DRIVER_ASSIGNMENT_FAILED);
-            transit.setDriver(null);
-            transit.setKm(0);
-            transit.setAwaitingDriversResponses(0);
+          if (transit.shouldStopWaiting(Date.now()) || distanceToCheck >= 20) {
+            transit.failDriverAssignment();
             await this.transitRepository.getEntityManager().flush();
             return transit;
           }
