@@ -25,6 +25,7 @@ export class DriverTrackingService {
     driverId: string,
     latitude: number,
     longitude: number,
+    seenAt: number,
   ): Promise<DriverPosition> {
     const driver = await this.driverRepository.findOne({ id: driverId });
     if (!driver) {
@@ -37,7 +38,7 @@ export class DriverTrackingService {
     }
     const position = new DriverPosition();
     position.setDriver(driver);
-    position.setSeenAt(Date.now());
+    position.setSeenAt(seenAt);
     position.setLatitude(latitude);
     position.setLongitude(longitude);
     await this.positionRepository.getEntityManager().persist(position).flush();

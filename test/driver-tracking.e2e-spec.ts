@@ -58,7 +58,9 @@ describe('Driver travelled distance', () => {
     driver.setStatus(DriverStatus.INACTIVE);
     await application.orm.em.fork().persist(driver).flush();
     await expect(
-      application.run(() => tracking.registerPosition(driver.id, ...start)),
+      application.run(() =>
+        tracking.registerPosition(driver.id, ...start, noon),
+      ),
     ).rejects.toBeInstanceOf(NotAcceptableException);
   });
 
@@ -66,14 +68,9 @@ describe('Driver travelled distance', () => {
     coordinates: readonly [number, number],
     time: number,
   ) {
-    const clock = jest.spyOn(Date, 'now').mockReturnValue(time);
-    try {
-      await application.run(() =>
-        tracking.registerPosition(driverId, ...coordinates),
-      );
-    } finally {
-      clock.mockRestore();
-    }
+    await application.run(() =>
+      tracking.registerPosition(driverId, ...coordinates, time),
+    );
   }
 
   async function distance(from: number, to: number) {
