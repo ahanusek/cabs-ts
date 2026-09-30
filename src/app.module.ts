@@ -1,3 +1,6 @@
+import { ContractsModule } from './contracts/contracts.module';
+import { DocumentHeader } from './contracts/model/document-header.entity';
+import { DocumentContent } from './contracts/model/document-content.entity';
 import { RepairModule } from './repair/repair.module';
 import { Party } from './party/party.entity';
 import { PartyRelationship } from './party/party-relationship.entity';
@@ -60,6 +63,8 @@ import { ClaimAttachment } from './entity/claim-attachment.entity';
 import { ContractAttachment } from './entity/contract-attachment.entity';
 
 const entities = [
+  DocumentHeader,
+  DocumentContent,
   Party,
   PartyRelationship,
   TravelledDistance,
@@ -86,6 +91,7 @@ const entities = [
 
 @Module({
   imports: [
+    ContractsModule,
     RepairModule,
     ConfigModule.forRoot(),
     MikroOrmModule.forRoot({ ...ormConfig, entities }),
