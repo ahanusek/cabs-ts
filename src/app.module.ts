@@ -1,3 +1,4 @@
+import { PopulateGraphService } from './transitanalyzer/populate-graph.service';
 import { DomainEvents } from './common/domain-events';
 import { GraphTransitSubscriber } from './transitanalyzer/graph-transit.subscriber';
 import { CompletedTransitEdge } from './transitanalyzer/completed-transit-edge.entity';
@@ -116,6 +117,7 @@ const entities = [
     DriverReportController,
   ],
   providers: [
+    PopulateGraphService,
     DomainEvents,
     GraphTransitSubscriber,
     GraphTransitAnalyzer,

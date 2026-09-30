@@ -20,7 +20,8 @@
     "test:debug": "node --inspect-brk --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
     "test:e2e": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest-e2e.json",
     "prepare": "husky",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "course:populate-graph": "node dist/cli/populate-graph.js"
   },
   "dependencies": {
     "@mikro-orm/core": "7.2.3",
