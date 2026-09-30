@@ -1,7 +1,7 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';
-import { Contract, ContractStatus } from '../entity/contract.entity';
-import { ContractAttachmentStatus } from '../entity/contract-attachment.entity';
+import { Contract, ContractStatus } from './contract.entity';
+import { ContractAttachmentStatus } from './contract-attachment.entity';
 
 describe('Contract aggregate without attachment payloads', () => {
   let metadata: MikroORM;

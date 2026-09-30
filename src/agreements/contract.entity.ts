@@ -11,7 +11,7 @@ import {
   ContractAttachment,
   ContractAttachmentStatus,
 } from './contract-attachment.entity';
-import { ContractRepository } from '../repository/contract.repository';
+import { ContractRepository } from './contract.repository';
 
 export enum ContractStatus {
   NEGOTIATIONS_IN_PROGRESS = 'negotiations_in_progress',

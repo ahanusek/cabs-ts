@@ -1,4 +1,4 @@
-import { Contract, ContractStatus } from '../entity/contract.entity';
+import { Contract, ContractStatus } from './contract.entity';
 import { ContractAttachmentDto } from './contract-attachment.dto';
 
 export class ContractDto {

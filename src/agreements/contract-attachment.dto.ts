@@ -1,7 +1,7 @@
 import {
   ContractAttachment,
   ContractAttachmentStatus,
-} from '../entity/contract-attachment.entity';
+} from './contract-attachment.entity';
 
 export class ContractAttachmentDto {
   private id: string;

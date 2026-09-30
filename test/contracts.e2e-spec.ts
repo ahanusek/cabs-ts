@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { NotAcceptableException } from '@nestjs/common';
-import { ContractService } from '../src/service/contract.service';
-import { ContractStatus } from '../src/entity/contract.entity';
-import { ContractAttachmentStatus } from '../src/entity/contract-attachment.entity';
+import { ContractService } from '../src/agreements/contract.service';
+import { ContractStatus } from '../src/agreements/contract.entity';
+import { ContractAttachmentStatus } from '../src/agreements/contract-attachment.entity';
 import { createTestApplication } from './support/test-application';
 
 describe('Contract lifecycle', () => {

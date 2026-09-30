@@ -1,14 +1,14 @@
-import { ContractAttachmentData } from '../entity/contract-attachment-data.entity';
+import { ContractAttachmentData } from './contract-attachment-data.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Transactional } from '@mikro-orm/decorators/legacy';
 import { EntityManager } from '@mikro-orm/postgresql';
-import { ContractRepository } from '../repository/contract.repository';
-import { ContractDto } from '../dto/contract.dto';
-import { Contract } from '../entity/contract.entity';
-import { ContractAttachmentDto } from '../dto/contract-attachment.dto';
-import { CreateContractDto } from '../dto/create-contract.dto';
-import { CreateContractAttachmentDto } from '../dto/create-contract-attachment.dto';
+import { ContractRepository } from './contract.repository';
+import { ContractDto } from './contract.dto';
+import { Contract } from './contract.entity';
+import { ContractAttachmentDto } from './contract-attachment.dto';
+import { CreateContractDto } from './create-contract.dto';
+import { CreateContractAttachmentDto } from './create-contract-attachment.dto';
 
 @Injectable()
 export class ContractService {

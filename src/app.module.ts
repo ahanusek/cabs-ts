@@ -1,3 +1,4 @@
+import { AgreementsModule } from './agreements/agreements-module';
 import { ClaimRefundedSubscriber } from './loyalty/claim-refunded.subscriber';
 import { TransitDetails } from './transitdetails/transit-details.entity';
 import { TransitDetailsFacade } from './transitdetails/transit-details.facade';
@@ -15,7 +16,7 @@ import { PartyRelationship } from './party/party-relationship.entity';
 import { TravelledDistance } from './driverreport/travelled-distance/travelled-distance.entity';
 import { TravelledDistanceService } from './driverreport/travelled-distance/travelled-distance.service';
 import { SqlDriverReportCreator } from './driverreport/sql-driver-report.creator';
-import { ContractAttachmentData } from './entity/contract-attachment-data.entity';
+import { ContractAttachmentData } from './agreements/contract-attachment-data.entity';
 import { ClaimsResolver } from './crm/claims/claims-resolver.entity';
 import { CarTypeActiveCounter } from './entity/car-type-active-counter.entity';
 import { DriverFinder } from './service/driver-finder.service';
@@ -42,13 +43,13 @@ import { DriverTrackingService } from './service/driver-tracking.service';
 import { DriverTrackingController } from './controllers/driver-tracking.controller';
 import { AwardsService } from './service/awards.service';
 import { ClaimService } from './crm/claims/claim.service';
-import { ContractService } from './service/contract.service';
+
 import { TransitService } from './service/transit.service';
 import { TransitAnalyzerController } from './controllers/transit-analyzer.controller';
 import { TransitController } from './controllers/transit.controller';
 import { AwardsAccountController } from './controllers/awards-account.controller';
 import { ClaimController } from './crm/claims/claim.controller';
-import { ContractController } from './controllers/contract.controller';
+
 import { DriverReportController } from './controllers/driver-report.controller';
 import ormConfig from './mikro-orm.config';
 
@@ -58,7 +59,7 @@ import { Client } from './entity/client.entity';
 import { Transit } from './entity/transit.entity';
 import { Address } from './entity/address.entity';
 import { Claim } from './crm/claims/claim.entity';
-import { Contract } from './entity/contract.entity';
+import { Contract } from './agreements/contract.entity';
 import { DriverFee } from './entity/driver-fee.entity';
 import { DriverAttribute } from './entity/driver-attribute.entity';
 import { DriverSession } from './entity/driver-session.entity';
@@ -67,7 +68,7 @@ import { AwardsAccount } from './entity/awards-account.entity';
 import { AwardedMiles } from './entity/awarded-miles.entity';
 import { Invoice } from './entity/invoice.entity';
 import { ClaimAttachment } from './crm/claims/claim-attachment.entity';
-import { ContractAttachment } from './entity/contract-attachment.entity';
+import { ContractAttachment } from './agreements/contract-attachment.entity';
 
 const entities = [
   TransitDetails,
@@ -100,6 +101,7 @@ const entities = [
 
 @Module({
   imports: [
+    AgreementsModule,
     ContractsModule,
     RepairModule,
     ConfigModule.forRoot(),
@@ -116,7 +118,6 @@ const entities = [
     TransitController,
     AwardsAccountController,
     ClaimController,
-    ContractController,
     DriverReportController,
   ],
   providers: [
@@ -144,7 +145,6 @@ const entities = [
     DriverTrackingService,
     AwardsService,
     ClaimService,
-    ContractService,
     TransitService,
   ],
 })
