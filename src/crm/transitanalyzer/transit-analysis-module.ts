@@ -5,14 +5,14 @@ import { GraphTransitSubscriber } from './graph-transit.subscriber';
 import { PopulateGraphService } from './populate-graph.service';
 import { TransitAnalyzerController } from './transit-analyzer.controller';
 import { CompletedTransitEdge } from './completed-transit-edge.entity';
-import { Transit } from '../../entity/transit.entity';
+
 import { Address } from '../../geolocation/address/address.entity';
 import { DomainEventsModule } from '../../common/domain-events-module';
 
 @Module({
   imports: [
     DomainEventsModule,
-    MikroOrmModule.forFeature([CompletedTransitEdge, Transit, Address]),
+    MikroOrmModule.forFeature([CompletedTransitEdge, Address]),
   ],
   providers: [
     GraphTransitAnalyzer,

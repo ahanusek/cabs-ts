@@ -1,8 +1,8 @@
+import { randomUUID } from 'node:crypto';
 import { DomainEvents } from '../src/common/domain-events';
 import { TransitAnalyzerController } from '../src/crm/transitanalyzer/transit-analyzer.controller';
-import { Money } from '../src/money/money';
+
 import { aClient } from './support/client.fixtures';
-import { aCompletedTransit } from './support/transit.fixtures';
 import { anAddress } from './support/address.fixtures';
 import { createTestApplication } from './support/test-application';
 
@@ -92,19 +92,10 @@ describe('Analysis of consecutive transits', () => {
       });
       application.orm.em.persist([...clients, ...addresses]);
       for (const [from, to, startMinute, owner = 0] of routes) {
-        const transit = aCompletedTransit(Money.fromMajor(50));
-        transit.setClient(clients[owner]);
-        transit.setFrom(addresses[from]);
-        transit.setTo(addresses[to]);
         const started = Date.UTC(2021, 0, 1) + startMinute * minute;
-        transit.setDateTime(started);
-        transit.published = started;
-        transit.started = started;
-        transit.setCompleteAt(started + 10 * minute);
-        application.orm.em.persist(transit);
         await application.app.get(DomainEvents).publish({
           type: 'transit-completed',
-          transitId: transit.id,
+          transitId: randomUUID(),
           clientId: clients[owner].id,
           fromHash: addresses[from].getHash(),
           toHash: addresses[to].getHash(),

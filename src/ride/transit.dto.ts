@@ -1,6 +1,7 @@
+import type { TransitView } from './details/transit-view';
 import { Tariff } from '../pricing/tariff';
 import { Distance } from '../geolocation/distance';
-import { Status, Transit } from '../entity/transit.entity';
+import { Status } from './transit.entity';
 import { DriverDto } from '../driverfleet/driver.dto';
 import { ClaimDto } from '../crm/claims/claim.dto';
 import { AddressDto } from '../geolocation/address/address.dto';
@@ -57,36 +58,8 @@ export class TransitDto {
 
   public clientDto: ClientDto;
 
-  constructor(transit: Transit) {
-    this.id = transit.getId();
-    this.distance = transit.getKm();
-    this.factor = transit.factor;
-    const price = transit.getPrice();
-    if (price) {
-      this.price = price.toMajor();
-    }
-    this.date = transit.getDateTime() ?? 0;
-    this.status = transit.getStatus();
-    this.setTariff(transit.getTariff());
-    for (const d of transit.getProposedDrivers()) {
-      this.proposedDrivers.push(new DriverDto(d));
-    }
-    this.to = new AddressDto(transit.getTo());
-    this.from = new AddressDto(transit.getFrom());
-    this.carClass = transit.getCarType();
-    this.clientDto = new ClientDto(transit.getClient());
-    if (transit.getDriversFee() != null) {
-      this.driverFee = transit.getDriversFee()!.toMajor();
-    }
-    const estimatedPrice = transit.getEstimatedPrice();
-    if (estimatedPrice) {
-      this.estimatedPrice = estimatedPrice.toMajor();
-    }
-    this.dateTime = transit.getDateTime() ?? 0;
-    this.published = transit.getPublished() ?? 0;
-    this.acceptedAt = transit.getAcceptedAt();
-    this.started = transit.getStarted();
-    this.completeAt = transit.getCompleteAt() ?? null;
+  constructor(view: TransitView) {
+    Object.assign(this, view);
   }
 
   public getKmRate() {

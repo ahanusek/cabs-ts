@@ -1,12 +1,14 @@
+import { aClient } from './support/client.fixtures';
+import {
+  historicalRide,
+  persistHistoricalRide,
+} from './support/historical-ride.fixtures';
 import { AwardsService } from '../src/loyalty/awards.service';
 import { Type } from '../src/crm/client.entity';
-import { TransitDetails } from '../src/transitdetails/transit-details.entity';
-import { transitSnapshot } from '../src/transitdetails/transit-snapshot';
 import { Claim, ClaimStatus } from '../src/crm/claims/claim.entity';
 import { ClaimService } from '../src/crm/claims/claim.service';
 import { Money } from '../src/money/money';
 import { createTestApplication } from './support/test-application';
-import { aCompletedTransit } from './support/transit.fixtures';
 
 describe('Automatic claims resolution', () => {
   let fixture: Awaited<ReturnType<typeof createTestApplication>>;
@@ -49,16 +51,13 @@ describe('Automatic claims resolution', () => {
   });
 
   async function aClaim(type = Type.NORMAL): Promise<Claim> {
-    const transit = aCompletedTransit(new Money(4400));
-    transit.getClient().setType(type);
-    transit.getClient().setType(type);
-    await fixture.orm.em
-      .fork()
-      .persist([transit, new TransitDetails(transitSnapshot(transit))])
-      .flush();
+    const client = aClient();
+    client.setType(type);
+    const ride = historicalRide({ client, price: new Money(4400) });
+    await persistHistoricalRide(fixture.orm.em.fork(), ride);
     const claim = new Claim();
-    claim.setTransitId(transit.id);
-    claim.setOwner(transit.getClient().id, transit.getClient().getType());
+    claim.setTransitId(ride.details.transitId);
+    claim.setOwner(client.id, client.getType());
     claim.setReason('Incorrect route');
     claim.setStatus(ClaimStatus.NEW);
     claim.setClaimNo(claim.id);

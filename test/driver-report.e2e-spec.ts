@@ -1,5 +1,7 @@
-import { TransitDetails } from '../src/transitdetails/transit-details.entity';
-import { transitSnapshot } from '../src/transitdetails/transit-snapshot';
+import {
+  historicalRide,
+  persistHistoricalRide,
+} from './support/historical-ride.fixtures';
 import request from 'supertest';
 import dayjs from 'dayjs';
 import { DriverReportController } from '../src/driverfleet/driverreport/driver-report.controller';
@@ -11,7 +13,6 @@ import {
 import { Claim, ClaimStatus } from '../src/crm/claims/claim.entity';
 import { CarClass } from '../src/carfleet/car-type.entity';
 import { Money } from '../src/money/money';
-import { aCompletedTransit } from './support/transit.fixtures';
 import { anActiveDriver } from './support/driver.fixtures';
 import { createTestApplication } from './support/test-application';
 
@@ -45,27 +46,26 @@ describe('Driver report', () => {
         session.setCarBrand(`Car ${daysAgo}`);
         session.setCarClass(CarClass.REGULAR);
         session.setPlatesNumber('WU123');
-        const transit = aCompletedTransit(Money.fromMajor(80));
-        transit.setDriver(driver);
-        transit.setCompleteAt(start + 3600000);
-        application.orm.em.persist([
-          session,
-          transit,
-          new TransitDetails(transitSnapshot(transit)),
-        ]);
-        if (daysAgo === 0) {
-          const second = aCompletedTransit(Money.fromMajor(90));
-          second.setDriver(driver);
-          second.setCompleteAt(start + 5400000);
-          application.orm.em.persist([
-            second,
-            new TransitDetails(transitSnapshot(second)),
-          ]);
-        }
+        const ride = historicalRide({
+          driver,
+          completeAt: start + 3600000,
+          price: Money.fromMajor(80),
+        });
+        application.orm.em.persist(session);
+        await persistHistoricalRide(application.orm.em, ride);
+        if (daysAgo === 0)
+          await persistHistoricalRide(
+            application.orm.em,
+            historicalRide({
+              driver,
+              completeAt: start + 5400000,
+              price: Money.fromMajor(90),
+            }),
+          );
         if (daysAgo === 2) {
           const claim = new Claim();
-          claim.setOwner(transit.getClient().id, transit.getClient().getType());
-          claim.setTransitId(transit.id);
+          claim.setOwner(ride.client.id, ride.client.getType());
+          claim.setTransitId(ride.details.transitId);
           claim.setClaimNo(claim.id);
           claim.setCreationDate(start);
           claim.setReason('Too fast');

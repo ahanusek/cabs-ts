@@ -1,8 +1,9 @@
+import { RequestForTransit } from '../src/ride/request-for-transit.entity';
 import { RideFixtures } from './support/ride.fixtures';
 
-import { TransitDetailsFacade } from '../src/transitdetails/transit-details.facade';
+import { TransitDetailsFacade } from '../src/ride/details/transit-details.facade';
 
-import { Status, Transit } from '../src/entity/transit.entity';
+import { Status } from '../src/ride/transit.entity';
 
 import { createTestApplication } from './support/test-application';
 
@@ -18,7 +19,9 @@ describe('Transit details', () => {
   it('reads a requested transit without loading its aggregate', async () => {
     await application.run(async () => {
       const transit = await rides.requestRide();
-      await application.orm.em.nativeDelete(Transit, { id: transit.id });
+      await application.orm.em.nativeDelete(RequestForTransit, {
+        id: transit.id,
+      });
       application.orm.em.clear();
       const view = await application.app
         .get(TransitDetailsFacade)

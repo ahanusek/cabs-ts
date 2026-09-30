@@ -1,4 +1,7 @@
-import { TransitDetailsFacade } from '../transitdetails/transit-details.facade';
+import { EntityManager } from '@mikro-orm/postgresql';
+import { LockMode } from '@mikro-orm/core';
+import { Transactional } from '@mikro-orm/decorators/legacy';
+import { TransitDetailsFacade } from '../ride/details/transit-details.facade';
 import { DriverLicense } from './driver-license';
 import {
   Injectable,
@@ -19,12 +22,49 @@ import { DriverAttribute } from './driver-attribute.entity';
 @Injectable()
 export class DriverService {
   constructor(
+    private readonly em: EntityManager,
     @InjectRepository(Driver)
     private driverRepository: DriverRepository,
     @InjectRepository(DriverAttribute)
     private driverAttributeRepository: DriverAttributeRepository,
     private readonly details: TransitDetailsFacade,
   ) {}
+
+  public async findAvailable(driverIds: string[]): Promise<DriverDto[]> {
+    const drivers = await this.driverRepository.find({
+      id: { $in: driverIds },
+    });
+    return drivers
+      .filter(
+        (driver) =>
+          driver.getStatus() === DriverStatus.ACTIVE && !driver.getOccupied(),
+      )
+      .map((driver) => new DriverDto(driver));
+  }
+
+  public async loadDrivers(driverIds: string[]): Promise<DriverDto[]> {
+    return (await this.driverRepository.find({ id: { $in: driverIds } })).map(
+      (driver) => new DriverDto(driver),
+    );
+  }
+
+  @Transactional()
+  public async reserve(driverId: string) {
+    const driver = await this.em.findOneOrFail(Driver, driverId, {
+      lockMode: LockMode.PESSIMISTIC_WRITE,
+    });
+    if (driver.getOccupied() || driver.getStatus() !== DriverStatus.ACTIVE)
+      throw new ForbiddenException('Driver is unavailable');
+    driver.setOccupied(true);
+    await this.em.flush();
+  }
+
+  @Transactional()
+  public async release(driverId: string) {
+    const driver = await this.driverRepository.findOneOrFail(driverId);
+    driver.setOccupied(false);
+    await this.em.flush();
+  }
 
   public async ensureExists(driverId: string): Promise<void> {
     await this.loadDriver(driverId);

@@ -1,4 +1,4 @@
-import { TransitDto } from './transit.dto';
+import { TransitDto } from '../ride/transit.dto';
 
 describe('Tariffs displayed to the passenger', () => {
   beforeEach(() => jest.useFakeTimers());

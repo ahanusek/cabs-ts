@@ -43,6 +43,7 @@ export interface ReportAddress {
 }
 
 export interface TransitView {
+  driverId?: string | null;
   id: string;
   tariff: string;
   status: string;

@@ -8,6 +8,8 @@ import type { TransitView } from './transit-view';
 
 export interface TransitSnapshot {
   view: TransitView;
+  fromHash: string;
+  toHash: string;
   driverId: string | null;
   fromAddressId: string;
   toAddressId: string;
@@ -37,10 +39,15 @@ export class TransitDetails {
   @Property()
   public status: string;
 
+  @Property() public fromHash: string;
+  @Property() public toHash: string;
+
   @Property({ type: 'json' })
   public view: TransitView;
 
   constructor(snapshot: TransitSnapshot) {
+    this.fromHash = snapshot.fromHash;
+    this.toHash = snapshot.toHash;
     this.transitId = snapshot.view.id;
     this.clientId = snapshot.view.clientDto.id;
     this.driverId = snapshot.driverId;

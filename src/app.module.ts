@@ -1,3 +1,8 @@
+import { RideModule } from './ride/ride-module';
+import { AssignmentModule } from './assignment/assignment-module';
+import { DriverAssignment } from './assignment/driver-assignment.entity';
+import { TransitDemand } from './ride/transit-demand.entity';
+import { RequestForTransit } from './ride/request-for-transit.entity';
 import { TrackingModule } from './tracking/tracking-module';
 import { DriverReportModule } from './driverfleet/driverreport/driver-report-module';
 import { TransitAnalysisModule } from './crm/transitanalyzer/transit-analysis-module';
@@ -7,7 +12,7 @@ import { LoyaltyModule } from './loyalty/loyalty-module';
 import { ClaimsQueriesModule } from './crm/claims/claims-queries-module';
 import { ClientAccessModule } from './crm/client-access-module';
 import { DriverFleetModule } from './driverfleet/driver-fleet-module';
-import { TransitDetailsModule } from './transitdetails/transit-details-module';
+import { TransitDetailsModule } from './ride/details/transit-details-module';
 import { DomainEventsModule } from './common/domain-events-module';
 import { NotificationModule } from './notification/notification-module';
 import { InvoicingModule } from './invoicing/invoicing-module';
@@ -15,7 +20,7 @@ import { CarFleetModule } from './carfleet/car-fleet-module';
 import { ConfigurationModule } from './config/configuration-module';
 import { AgreementsModule } from './agreements/agreements-module';
 
-import { TransitDetails } from './transitdetails/transit-details.entity';
+import { TransitDetails } from './ride/details/transit-details.entity';
 
 import { CompletedTransitEdge } from './crm/transitanalyzer/completed-transit-edge.entity';
 
@@ -30,21 +35,17 @@ import { TravelledDistance } from './driverfleet/driverreport/travelled-distance
 import { ContractAttachmentData } from './agreements/contract-attachment-data.entity';
 import { ClaimsResolver } from './crm/claims/claims-resolver.entity';
 import { CarTypeActiveCounter } from './carfleet/car-type-active-counter.entity';
-import { DriverFinder } from './service/driver-finder.service';
+
 import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ConfigModule } from '@nestjs/config';
-
-import { TransitService } from './service/transit.service';
-
-import { TransitController } from './controllers/transit.controller';
 
 import ormConfig from './mikro-orm.config';
 
 import { Driver } from './driverfleet/driver.entity';
 import { CarType } from './carfleet/car-type.entity';
 import { Client } from './crm/client.entity';
-import { Transit } from './entity/transit.entity';
+import { Transit } from './ride/transit.entity';
 import { Address } from './geolocation/address/address.entity';
 import { Claim } from './crm/claims/claim.entity';
 import { Contract } from './agreements/contract.entity';
@@ -59,6 +60,9 @@ import { ClaimAttachment } from './crm/claims/claim-attachment.entity';
 import { ContractAttachment } from './agreements/contract-attachment.entity';
 
 const entities = [
+  DriverAssignment,
+  TransitDemand,
+  RequestForTransit,
   TransitDetails,
   CompletedTransitEdge,
   DocumentHeader,
@@ -89,6 +93,8 @@ const entities = [
 
 @Module({
   imports: [
+    RideModule,
+    AssignmentModule,
     TrackingModule,
     DriverReportModule,
     TransitAnalysisModule,
@@ -109,9 +115,6 @@ const entities = [
     RepairModule,
     ConfigModule.forRoot(),
     MikroOrmModule.forRoot({ ...ormConfig, entities }),
-    MikroOrmModule.forFeature(entities),
   ],
-  controllers: [TransitController],
-  providers: [DriverFinder, TransitService],
 })
 export class AppModule {}

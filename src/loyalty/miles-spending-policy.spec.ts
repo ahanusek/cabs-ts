@@ -1,10 +1,10 @@
+import { randomUUID } from 'node:crypto';
 import { MikroORM } from '@mikro-orm/postgresql';
 import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';
 import { AwardsAccount } from './awards-account.entity';
 import { Type } from '../crm/client.entity';
 import { aClient } from '../../test/support/client.fixtures';
-import { aCompletedTransit } from '../../test/support/transit.fixtures';
-import { Money } from '../money/money';
+
 import { chooseMilesSpendingPolicy } from './miles-spending-policy';
 
 describe('Miles spending policies', () => {
@@ -30,12 +30,12 @@ describe('Miles spending policies', () => {
       const moment = new Date(2021, 0, day, 12).getTime();
       const account = new AwardsAccount(aClient().id, 0);
       account.activate();
-      const transit = aCompletedTransit(Money.fromMajor(80));
+      const transitId = randomUUID();
       const grants = [
         account.addNonExpiringMiles(5, 1),
-        account.addExpiringMiles(15, moment + 100, transit.id, 4)!,
-        account.addExpiringMiles(10, moment + 200, transit.id, 3)!,
-        account.addExpiringMiles(5, moment + 300, transit.id, 2)!,
+        account.addExpiringMiles(15, moment + 100, transitId, 4)!,
+        account.addExpiringMiles(10, moment + 200, transitId, 3)!,
+        account.addExpiringMiles(5, moment + 300, transitId, 2)!,
       ];
       account.remove(
         21,

@@ -1,6 +1,6 @@
 import { ClientService } from '../crm/client.service';
 import { ClaimsQueries } from '../crm/claims/claims-queries';
-import { TransitDetailsFacade } from '../transitdetails/transit-details.facade';
+import { TransitDetailsFacade } from '../ride/details/transit-details.facade';
 
 import { chooseMilesSpendingPolicy } from './miles-spending-policy';
 import { Injectable, NotFoundException } from '@nestjs/common';

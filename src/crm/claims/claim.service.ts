@@ -1,6 +1,6 @@
 import { ClientService } from '../client.service';
 import { DomainEvents } from '../../common/domain-events';
-import { TransitDetailsFacade } from '../../transitdetails/transit-details.facade';
+import { TransitDetailsFacade } from '../../ride/details/transit-details.facade';
 import { ClaimsResolver, WhoToAsk } from './claims-resolver.entity';
 import { Money } from '../../money/money';
 import { EntityManager } from '@mikro-orm/postgresql';

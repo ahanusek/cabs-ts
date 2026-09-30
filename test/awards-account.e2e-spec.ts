@@ -4,7 +4,10 @@ import { AwardsService } from '../src/loyalty/awards.service';
 import { AwardedMiles } from '../src/loyalty/awarded-miles.entity';
 import { Money } from '../src/money/money';
 import { aClient } from './support/client.fixtures';
-import { aCompletedTransit } from './support/transit.fixtures';
+import {
+  historicalRide,
+  persistHistoricalRide,
+} from './support/historical-ride.fixtures';
 import { createTestApplication } from './support/test-application';
 
 describe('Awards account — legacy behavior', () => {
@@ -20,10 +23,10 @@ describe('Awards account — legacy behavior', () => {
   afterAll(async () => application.close());
   beforeEach(async () => {
     await application.run(async () => {
-      const transit = aCompletedTransit(Money.fromMajor(80));
-      clientId = transit.getClient().id;
-      transitId = transit.id;
-      await application.orm.em.persist(transit).flush();
+      const ride = historicalRide({ price: Money.fromMajor(80) });
+      clientId = ride.client.id;
+      transitId = ride.details.transitId;
+      await persistHistoricalRide(application.orm.em, ride);
       await awards.registerToProgram(clientId);
     });
   });

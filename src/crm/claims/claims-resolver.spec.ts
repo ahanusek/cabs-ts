@@ -1,16 +1,14 @@
+import { randomUUID } from 'node:crypto';
 import { ClaimsResolver, WhoToAsk } from './claims-resolver.entity';
 import { Claim, ClaimStatus } from './claim.entity';
 import { Type } from '../client.entity';
 import { Money } from '../../money/money';
-import { aCompletedTransit } from '../../../test/support/transit.fixtures';
 
 const rules = { vipThreshold: new Money(5000), minimumTransits: 10 };
 function aClaim(type = Type.NORMAL) {
-  const transit = aCompletedTransit(new Money(4400));
-  transit.getClient().setType(type);
   const claim = new Claim();
-  claim.setOwner(transit.getClient().id, transit.getClient().getType());
-  claim.setTransitId(transit.id);
+  claim.setOwner(randomUUID(), type);
+  claim.setTransitId(randomUUID());
   return claim;
 }
 

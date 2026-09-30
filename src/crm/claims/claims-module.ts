@@ -7,7 +7,7 @@ import { Claim } from './claim.entity';
 import { ClaimsResolver } from './claims-resolver.entity';
 import { ClaimAttachment } from './claim-attachment.entity';
 import { ClientAccessModule } from '../client-access-module';
-import { TransitDetailsModule } from '../../transitdetails/transit-details-module';
+import { TransitDetailsModule } from '../../ride/details/transit-details-module';
 import { ConfigurationModule } from '../../config/configuration-module';
 import { NotificationModule } from '../../notification/notification-module';
 import { DomainEventsModule } from '../../common/domain-events-module';

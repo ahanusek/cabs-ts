@@ -1,3 +1,4 @@
+import { RouteService } from './route.service';
 import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { GeocodingService } from './geocoding.service';
@@ -6,8 +7,8 @@ import { Address } from './address/address.entity';
 
 @Module({
   imports: [MikroOrmModule.forFeature([Address])],
-  providers: [GeocodingService, DistanceCalculator],
+  providers: [RouteService, GeocodingService, DistanceCalculator],
   controllers: [],
-  exports: [GeocodingService, DistanceCalculator],
+  exports: [RouteService, GeocodingService, DistanceCalculator],
 })
 export class GeolocationModule {}

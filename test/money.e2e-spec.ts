@@ -1,51 +1,59 @@
-import { DriverService } from '../src/driverfleet/driver.service';
-import { TransitDetails } from '../src/transitdetails/transit-details.entity';
-import { transitSnapshot } from '../src/transitdetails/transit-snapshot';
 import { Money } from '../src/money/money';
-import { Transit } from '../src/entity/transit.entity';
 import { DriverFee, FeeType } from '../src/driverfleet/driver-fee.entity';
 import { DriverFeeService } from '../src/driverfleet/driver-fee.service';
+import { DriverService } from '../src/driverfleet/driver.service';
+import { RequestForTransit } from '../src/ride/request-for-transit.entity';
+import { Tariff } from '../src/pricing/tariff';
+import { Distance } from '../src/geolocation/distance';
 import { createTestApplication } from './support/test-application';
-import { aCompletedTransit } from './support/transit.fixtures';
+import {
+  historicalRide,
+  persistHistoricalRide,
+} from './support/historical-ride.fixtures';
+import { anActiveDriver } from './support/driver.fixtures';
 
 describe('Money persistence and driver fees', () => {
   let fixture: Awaited<ReturnType<typeof createTestApplication>>;
   beforeAll(async () => {
     fixture = await createTestApplication();
   });
-  afterAll(() => fixture?.close());
+  afterAll(async () => fixture.close());
 
   it('round-trips an amount with cents through PostgreSQL', async () => {
     const em = fixture.orm.em.fork();
-    const transit = aCompletedTransit(new Money(1012));
-    await em.persist(transit).flush();
+    const fee = new DriverFee(FeeType.FLAT, anActiveDriver(), 1, 10.12);
+    await em.persist(fee).flush();
     em.clear();
-    const loaded = await em.findOneOrFail(Transit, transit.id);
-    expect(loaded.getPrice()!.toInt()).toBe(1012);
+    expect((await em.findOneOrFail(DriverFee, fee.id)).getMin().toInt()).toBe(
+      1012,
+    );
   });
 
-  it('persists the tariff selected when the transit was created', async () => {
+  it('persists the tariff selected for the original estimate', async () => {
     const em = fixture.orm.em.fork();
-    const transit = aCompletedTransit(new Money(4400));
-    transit.setDateTime(new Date('2021-12-31T12:00:00').getTime());
-    await em.persist(transit).flush();
+    const request = new RequestForTransit(
+      Tariff.ofTime(new Date('2021-12-31T12:00:00')),
+      Distance.ofKm(10),
+    );
+    await em.persist(request).flush();
     em.clear();
-    const loaded = await em.findOneOrFail(Transit, transit.id);
-    expect(loaded.getTariff().getName()).toBe('Sylwester');
+    expect(
+      (await em.findOneOrFail(RequestForTransit, request.id))
+        .getEstimatedPrice()
+        .toMajor(),
+    ).toBe(46);
   });
 
   it('includes all twelve months and uses the fee recorded at completion', async () => {
-    const transit = aCompletedTransit(new Money(4400));
-    transit.setCompleteAt(new Date('2021-12-15T12:00:00').getTime());
-    transit.setDriversFee(new Money(3400));
-    await fixture.orm.em
-      .fork()
-      .persist([transit, new TransitDetails(transitSnapshot(transit))])
-      .flush();
+    const ride = historicalRide({
+      completeAt: new Date('2021-12-15T12:00:00').getTime(),
+    });
+    ride.details.view.driverFee = 34;
+    await persistHistoricalRide(fixture.orm.em.fork(), ride);
     const payments = await fixture.run(() =>
       fixture.app
         .get(DriverService)
-        .calculateDriverYearlyPayment(transit.getDriver()!.id, 2021),
+        .calculateDriverYearlyPayment(ride.driver.id, 2021),
     );
     expect([...payments]).toEqual(
       Array.from({ length: 12 }, (_, index) => [
@@ -62,18 +70,17 @@ describe('Money persistence and driver fees', () => {
   ])(
     'calculates %s fees including the minimum',
     async (type, amount, minimum, expected) => {
-      const em = fixture.orm.em.fork();
-      const transit = aCompletedTransit(new Money(4400));
-      const driver = transit.getDriver()!;
-      const fee = new DriverFee(type, driver, amount, minimum);
-      driver.setFee(fee);
-      await em.persist(transit).flush();
-      const result = await fixture.run(() =>
+      const driver = anActiveDriver();
+      await fixture.orm.em
+        .fork()
+        .persist(new DriverFee(type, driver, amount, minimum))
+        .flush();
+      const fee = await fixture.run(() =>
         fixture.app
           .get(DriverFeeService)
-          .calculateDriverFee(driver.id, transit.getPrice()!),
+          .calculateDriverFee(driver.id, new Money(4400)),
       );
-      expect(result.toInt()).toBe(expected);
+      expect(fee.toInt()).toBe(expected);
     },
   );
 });

@@ -1,35 +1,34 @@
-import { Status, Transit } from '../src/entity/transit.entity';
+import {
+  historicalRide,
+  persistHistoricalRide,
+} from './support/historical-ride.fixtures';
+import { Status } from '../src/ride/details/status';
 import { PopulateGraphService } from '../src/crm/transitanalyzer/populate-graph.service';
 import { GraphTransitAnalyzer } from '../src/crm/transitanalyzer/graph-transit-analyzer';
 import { CompletedTransitEdge } from '../src/crm/transitanalyzer/completed-transit-edge.entity';
-import { Money } from '../src/money/money';
-import { aCompletedTransit } from './support/transit.fixtures';
+
 import { anAddress } from './support/address.fixtures';
 import { createTestApplication } from './support/test-application';
 
 describe('Backfilling the graph from historical transits', () => {
   let application: Awaited<ReturnType<typeof createTestApplication>>;
-  let first: Transit;
-  let second: Transit;
-  let incomplete: Transit;
+  let first: ReturnType<typeof historicalRide>;
+  let second: ReturnType<typeof historicalRide>;
+  let incomplete: ReturnType<typeof historicalRide>;
   beforeAll(async () => {
     application = await createTestApplication();
-    first = aCompletedTransit(Money.fromMajor(50));
-    first.started = 0;
-    first.setCompleteAt(600000);
-    second = aCompletedTransit(Money.fromMajor(50));
-    second.setClient(first.getClient());
-    second.setFrom(first.getTo());
-    second.setTo(anAddress());
-    second.started = 900000;
-    second.setCompleteAt(1200000);
-    incomplete = aCompletedTransit(Money.fromMajor(50));
-    const draft = aCompletedTransit(Money.fromMajor(50));
-    draft.setStatus(Status.DRAFT);
-    await application.orm.em
-      .fork()
-      .persist([first, second, incomplete, draft])
-      .flush();
+    first = historicalRide({ started: 0, completeAt: 600000 });
+    second = historicalRide({
+      client: first.client,
+      from: first.to,
+      to: anAddress(),
+      started: 900000,
+      completeAt: 1200000,
+    });
+    incomplete = historicalRide();
+    const draft = historicalRide({ status: Status.DRAFT });
+    for (const ride of [first, second, incomplete, draft])
+      await persistHistoricalRide(application.orm.em.fork(), ride);
   });
   afterAll(async () => application.close());
 
@@ -39,7 +38,7 @@ describe('Backfilling the graph from historical transits', () => {
     );
     expect(result).toEqual({
       projected: 2,
-      skippedTransitIds: [incomplete.id],
+      skippedTransitIds: [incomplete.details.transitId],
     });
   });
 
@@ -62,12 +61,12 @@ describe('Backfilling the graph from historical transits', () => {
     const route = await application.run(() =>
       application.app
         .get(GraphTransitAnalyzer)
-        .analyze(first.getClient().id, first.getFrom().getHash()),
+        .analyze(first.client.id, first.from.getHash()),
     );
     expect(route).toEqual([
-      first.getFrom().getHash(),
-      first.getTo().getHash(),
-      second.getTo().getHash(),
+      first.from.getHash(),
+      first.to.getHash(),
+      second.to.getHash(),
     ]);
   });
 });

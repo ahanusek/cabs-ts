@@ -1,3 +1,4 @@
+import { TrackingQueries } from './tracking-queries';
 import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { DriverSessionService } from './driver-session.service';
@@ -17,8 +18,8 @@ import { CarFleetModule } from '../carfleet/car-fleet-module';
     CarFleetModule,
     MikroOrmModule.forFeature([DriverSession, DriverPosition]),
   ],
-  providers: [DriverSessionService, DriverTrackingService],
+  providers: [TrackingQueries, DriverSessionService, DriverTrackingService],
   controllers: [DriverSessionController, DriverTrackingController],
-  exports: [DriverSessionService, DriverTrackingService],
+  exports: [TrackingQueries, DriverSessionService, DriverTrackingService],
 })
 export class TrackingModule {}
