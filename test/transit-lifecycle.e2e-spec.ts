@@ -1,4 +1,4 @@
-import { AwardsService } from '../src/service/awards.service';
+import { AwardsService } from '../src/loyalty/awards.service';
 import { GraphTransitAnalyzer } from '../src/transitanalyzer/graph-transit-analyzer';
 import { DriverFee, FeeType } from '../src/driverfleet/driver-fee.entity';
 import { TransitService } from '../src/service/transit.service';

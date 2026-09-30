@@ -1,6 +1,6 @@
-import { AwardsService } from '../service/awards.service';
+import { AwardsService } from './awards.service';
 import { Controller, Get, Param, Post } from '@nestjs/common';
-import { AwardsAccountDto } from '../dto/awards-account.dto';
+import { AwardsAccountDto } from './awards-account.dto';
 
 @Controller('clients')
 export class AwardsAccountController {

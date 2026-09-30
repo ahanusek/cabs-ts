@@ -1,5 +1,5 @@
-import { ClientDto } from './client.dto';
-import { AwardsAccount } from '../entity/awards-account.entity';
+import { ClientDto } from '../dto/client.dto';
+import { AwardsAccount } from './awards-account.entity';
 
 export class AwardsAccountDto {
   private client: ClientDto;
@@ -10,9 +10,9 @@ export class AwardsAccountDto {
 
   private transactions: number;
 
-  constructor(account: AwardsAccount) {
+  constructor(account: AwardsAccount, client: ClientDto) {
     this.isActive = account.isAwardActive();
-    this.client = new ClientDto(account.getClient());
+    this.client = client;
     this.transactions = account.getTransactions();
     this.date = account.getDate();
   }

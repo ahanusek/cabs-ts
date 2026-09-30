@@ -7,7 +7,7 @@ import { ClientRepository } from '../repository/client.repository';
 import { TransitRepository } from '../repository/transit.repository';
 import { DriverRepository } from '../driverfleet/driver.repository';
 import { AddressRepository } from '../repository/address.repository';
-import { AwardsService } from './awards.service';
+import { AwardsService } from '../loyalty/awards.service';
 import { DriverFeeService } from '../driverfleet/driver-fee.service';
 import { GeocodingService } from './geocoding.service';
 import { InvoiceGenerator } from '../invoicing/invoice-generator.service';

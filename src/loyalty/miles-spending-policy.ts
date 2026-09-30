@@ -1,4 +1,4 @@
-import { AwardedMiles } from '../entity/awarded-miles.entity';
+import { AwardedMiles } from './awarded-miles.entity';
 import { Type } from '../entity/client.entity';
 
 export type MilesComparator = (

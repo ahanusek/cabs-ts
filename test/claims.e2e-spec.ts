@@ -1,4 +1,4 @@
-import { AwardsService } from '../src/service/awards.service';
+import { AwardsService } from '../src/loyalty/awards.service';
 import { Type } from '../src/entity/client.entity';
 import { TransitDetails } from '../src/transitdetails/transit-details.entity';
 import { transitSnapshot } from '../src/transitdetails/transit-snapshot';

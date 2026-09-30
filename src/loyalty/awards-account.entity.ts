@@ -1,19 +1,13 @@
-import type { MilesComparator } from '../loyalty/miles-spending-policy';
+import type { MilesComparator } from './miles-spending-policy';
 import { Collection } from '@mikro-orm/core';
-import {
-  Entity,
-  Property,
-  OneToOne,
-  OneToMany,
-} from '@mikro-orm/decorators/legacy';
+import { Entity, Property, OneToMany } from '@mikro-orm/decorators/legacy';
 import { NotAcceptableException } from '@nestjs/common';
 import { BaseEntity } from '../common/base.entity';
-import { Client } from './client.entity';
 
 import { AwardedMiles } from './awarded-miles.entity';
-import { AwardsAccountRepository } from '../repository/awards-account.repository';
-import { ConstantUntil } from '../loyalty/miles/constant-until';
-import { Miles, requireMilesAmount } from '../loyalty/miles/miles';
+import { AwardsAccountRepository } from './awards-account.repository';
+import { ConstantUntil } from './miles/constant-until';
+import { Miles, requireMilesAmount } from './miles/miles';
 
 @Entity({ repository: () => AwardsAccountRepository })
 export class AwardsAccount extends BaseEntity {
@@ -26,15 +20,15 @@ export class AwardsAccount extends BaseEntity {
   @Property({ default: 0, type: 'integer' })
   private transactions = 0;
 
-  @OneToOne(() => Client, { owner: true, eager: true })
-  public client: Client;
+  @Property({ type: 'uuid', unique: true })
+  public clientId: string;
 
   @OneToMany(() => AwardedMiles, (grant) => grant.account, { eager: true })
   private miles = new Collection<AwardedMiles>(this);
 
-  constructor(client: Client, date = Date.now()) {
+  constructor(clientId: string, date = Date.now()) {
     super();
-    this.client = client;
+    this.clientId = clientId;
     this.date = date;
   }
 
@@ -47,8 +41,8 @@ export class AwardsAccount extends BaseEntity {
   public isAwardActive(): boolean {
     return this.isActive;
   }
-  public getClient(): Client {
-    return this.client;
+  public getClientId(): string {
+    return this.clientId;
   }
   public getDate(): number {
     return this.date;

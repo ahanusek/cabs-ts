@@ -1,7 +1,7 @@
 import { ConstantUntil } from '../src/loyalty/miles/constant-until';
 import { NotAcceptableException } from '@nestjs/common';
-import { AwardsService } from '../src/service/awards.service';
-import { AwardedMiles } from '../src/entity/awarded-miles.entity';
+import { AwardsService } from '../src/loyalty/awards.service';
+import { AwardedMiles } from '../src/loyalty/awarded-miles.entity';
 import { Money } from '../src/money/money';
 import { aClient } from './support/client.fixtures';
 import { aCompletedTransit } from './support/transit.fixtures';
@@ -105,7 +105,7 @@ describe('Awards account — legacy behavior', () => {
       await awards.registerNonExpiringMiles(clientId, 20);
       application.orm.em.clear();
       const grants = await application.orm.em.find(AwardedMiles, {
-        client: clientId,
+        clientId,
       });
       grants[0].setDate(Date.UTC(1989, 11, 12));
       await application.orm.em.flush();

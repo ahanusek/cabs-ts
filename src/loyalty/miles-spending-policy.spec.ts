@@ -1,6 +1,6 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';
-import { AwardsAccount } from '../entity/awards-account.entity';
+import { AwardsAccount } from './awards-account.entity';
 import { Type } from '../entity/client.entity';
 import { aClient } from '../../test/support/client.fixtures';
 import { aCompletedTransit } from '../../test/support/transit.fixtures';
@@ -28,7 +28,7 @@ describe('Miles spending policies', () => {
     'uses the rule for %s',
     (_name, clientType, transitCount, claimCount, day, expected) => {
       const moment = new Date(2021, 0, day, 12).getTime();
-      const account = new AwardsAccount(aClient(), 0);
+      const account = new AwardsAccount(aClient().id, 0);
       account.activate();
       const transit = aCompletedTransit(Money.fromMajor(80));
       const grants = [

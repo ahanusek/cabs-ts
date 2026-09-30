@@ -4,7 +4,7 @@ import {
   type OnModuleDestroy,
 } from '@nestjs/common';
 import { DomainEvents } from '../common/domain-events';
-import { AwardsService } from '../service/awards.service';
+import { AwardsService } from './awards.service';
 
 interface ClaimRefunded {
   type: 'claim-refunded';

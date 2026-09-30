@@ -1,9 +1,8 @@
 import { AwardsAccount } from './awards-account.entity';
-import type { Miles } from '../loyalty/miles/miles';
-import { type MilesSnapshot, restoreMiles } from '../loyalty/miles/miles-json';
+import type { Miles } from './miles/miles';
+import { type MilesSnapshot, restoreMiles } from './miles/miles-json';
 import { BaseEntity } from '../common/base.entity';
 import { Entity, Property, ManyToOne } from '@mikro-orm/decorators/legacy';
-import { Client } from './client.entity';
 
 @Entity()
 export class AwardedMiles extends BaseEntity {
@@ -18,14 +17,14 @@ export class AwardedMiles extends BaseEntity {
   ) {
     super();
     this.account = account;
-    this.client = account.getClient();
+    this.clientId = account.getClientId();
     this.miles = miles.snapshot();
     this.date = date;
     this.transitId = transitId;
   }
 
-  @ManyToOne(() => Client)
-  public client!: Client;
+  @Property({ type: 'uuid' })
+  public clientId: string;
 
   @Property({ type: 'json' })
   private miles!: MilesSnapshot;
@@ -35,14 +34,6 @@ export class AwardedMiles extends BaseEntity {
 
   @Property({ type: 'uuid', nullable: true })
   public transitId: string | null = null;
-
-  public getClient() {
-    return this.client;
-  }
-
-  public setClient(client: Client) {
-    this.client = client;
-  }
 
   public getMiles(): Miles {
     return restoreMiles(this.miles);

@@ -1,6 +1,6 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';
-import { AwardsAccount } from '../entity/awards-account.entity';
+import { AwardsAccount } from './awards-account.entity';
 import { aClient } from '../../test/support/client.fixtures';
 
 describe('Awards account aggregate', () => {
@@ -48,7 +48,7 @@ describe('Awards account aggregate', () => {
   });
 
   function activeAccount(): AwardsAccount {
-    const account = new AwardsAccount(aClient(), 0);
+    const account = new AwardsAccount(aClient().id, 0);
     account.activate();
     return account;
   }
