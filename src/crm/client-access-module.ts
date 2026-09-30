@@ -1,12 +1,13 @@
+import { ClientController } from './client.controller';
 import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
-import { ClientService } from '../service/client.service';
-import { Client } from '../entity/client.entity';
+import { ClientService } from './client.service';
+import { Client } from './client.entity';
 
 @Module({
   imports: [MikroOrmModule.forFeature([Client])],
   providers: [ClientService],
-  controllers: [],
+  controllers: [ClientController],
   exports: [ClientService],
 })
 export class ClientAccessModule {}

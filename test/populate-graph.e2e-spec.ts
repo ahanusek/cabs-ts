@@ -1,7 +1,7 @@
 import { Status, Transit } from '../src/entity/transit.entity';
-import { PopulateGraphService } from '../src/transitanalyzer/populate-graph.service';
-import { GraphTransitAnalyzer } from '../src/transitanalyzer/graph-transit-analyzer';
-import { CompletedTransitEdge } from '../src/transitanalyzer/completed-transit-edge.entity';
+import { PopulateGraphService } from '../src/crm/transitanalyzer/populate-graph.service';
+import { GraphTransitAnalyzer } from '../src/crm/transitanalyzer/graph-transit-analyzer';
+import { CompletedTransitEdge } from '../src/crm/transitanalyzer/completed-transit-edge.entity';
 import { Money } from '../src/money/money';
 import { aCompletedTransit } from './support/transit.fixtures';
 import { anAddress } from './support/address.fixtures';

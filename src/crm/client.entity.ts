@@ -2,7 +2,7 @@ import { BaseEntity } from '../common/base.entity';
 
 import { Entity, Property, Enum } from '@mikro-orm/decorators/legacy';
 
-import { ClientRepository } from '../repository/client.repository';
+import { ClientRepository } from './client.repository';
 
 export enum ClientType {
   INDIVIDUAL = 'individual',

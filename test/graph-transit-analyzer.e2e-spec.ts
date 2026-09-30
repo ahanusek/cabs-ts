@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { GraphTransitAnalyzer } from '../src/transitanalyzer/graph-transit-analyzer';
+import { GraphTransitAnalyzer } from '../src/crm/transitanalyzer/graph-transit-analyzer';
 import { createTestApplication } from './support/test-application';
 
 const minute = 60000;

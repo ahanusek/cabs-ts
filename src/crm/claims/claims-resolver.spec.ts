@@ -1,6 +1,6 @@
 import { ClaimsResolver, WhoToAsk } from './claims-resolver.entity';
 import { Claim, ClaimStatus } from './claim.entity';
-import { Type } from '../../entity/client.entity';
+import { Type } from '../client.entity';
 import { Money } from '../../money/money';
 import { aCompletedTransit } from '../../../test/support/transit.fixtures';
 

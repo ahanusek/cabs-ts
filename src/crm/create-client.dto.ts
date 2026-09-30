@@ -1,4 +1,4 @@
-import { PaymentType, Type } from '../entity/client.entity';
+import { PaymentType, Type } from './client.entity';
 import { IsEnum, IsNotEmpty } from 'class-validator';
 
 export class CreateClientDto {

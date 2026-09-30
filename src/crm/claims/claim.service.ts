@@ -1,3 +1,4 @@
+import { ClientService } from '../client.service';
 import { DomainEvents } from '../../common/domain-events';
 import { TransitDetailsFacade } from '../../transitdetails/transit-details.facade';
 import { ClaimsResolver, WhoToAsk } from './claims-resolver.entity';
@@ -6,7 +7,6 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import { Transactional } from '@mikro-orm/decorators/legacy';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { ClientRepository } from '../../repository/client.repository';
 
 import { AppProperties } from '../../config/app-properties.config';
 import { ClaimRepository } from './claim.repository';
@@ -16,13 +16,11 @@ import { ClientNotificationService } from '../../notification/client-notificatio
 import { DriverNotificationService } from '../../notification/driver-notification.service';
 import { ClaimDto } from './claim.dto';
 import { Claim, ClaimStatus, CompletionMode } from './claim.entity';
-import { Client } from '../../entity/client.entity';
 
 @Injectable()
 export class ClaimService {
   constructor(
-    @InjectRepository(Client)
-    private clientRepository: ClientRepository,
+    private readonly clients: ClientService,
     private readonly details: TransitDetailsFacade,
     @InjectRepository(Claim)
     private claimRepository: ClaimRepository,
@@ -51,9 +49,7 @@ export class ClaimService {
   }
 
   public async update(claimDTO: ClaimDto, claim: Claim) {
-    const client = await this.clientRepository.findOne({
-      id: claimDTO.getClientId(),
-    });
+    const client = await this.clients.load(claimDTO.getClientId());
     await this.details.find(claimDTO.getTransitId());
     if (client == null) {
       throw new NotFoundException('Client does not exists');
@@ -63,7 +59,7 @@ export class ClaimService {
     } else {
       claim.setStatus(ClaimStatus.NEW);
     }
-    claim.setOwner(client.id, client.getType());
+    claim.setOwner(client.getId(), client.getType());
     claim.setTransitId(claimDTO.getTransitId());
     claim.setCreationDate(Date.now());
     claim.setReason(claimDTO.getReason());

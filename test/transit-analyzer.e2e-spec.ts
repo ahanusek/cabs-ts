@@ -1,5 +1,5 @@
 import { DomainEvents } from '../src/common/domain-events';
-import { TransitAnalyzerController } from '../src/controllers/transit-analyzer.controller';
+import { TransitAnalyzerController } from '../src/crm/transitanalyzer/transit-analyzer.controller';
 import { Money } from '../src/money/money';
 import { aClient } from './support/client.fixtures';
 import { aCompletedTransit } from './support/transit.fixtures';

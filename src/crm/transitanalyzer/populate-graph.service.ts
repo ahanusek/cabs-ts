@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { Status, Transit } from '../entity/transit.entity';
-import { TransitRepository } from '../repository/transit.repository';
+import { Status, Transit } from '../../entity/transit.entity';
+import { TransitRepository } from '../../repository/transit.repository';
 import { GraphTransitAnalyzer } from './graph-transit-analyzer';
 
 const PAGE_SIZE = 100;

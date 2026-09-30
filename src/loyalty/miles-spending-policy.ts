@@ -1,5 +1,5 @@
 import { AwardedMiles } from './awarded-miles.entity';
-import { Type } from '../entity/client.entity';
+import { Type } from '../crm/client.entity';
 
 export type MilesComparator = (
   first: AwardedMiles,

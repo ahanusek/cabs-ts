@@ -1,3 +1,5 @@
+import { TransitAnalysisModule } from './crm/transitanalyzer/transit-analysis-module';
+import { ClaimsModule } from './crm/claims/claims-module';
 import { GeolocationModule } from './geolocation/geolocation-module';
 import { LoyaltyModule } from './loyalty/loyalty-module';
 import { ClaimsQueriesModule } from './crm/claims/claims-queries-module';
@@ -13,11 +15,8 @@ import { AgreementsModule } from './agreements/agreements-module';
 
 import { TransitDetails } from './transitdetails/transit-details.entity';
 
-import { PopulateGraphService } from './transitanalyzer/populate-graph.service';
+import { CompletedTransitEdge } from './crm/transitanalyzer/completed-transit-edge.entity';
 
-import { GraphTransitSubscriber } from './transitanalyzer/graph-transit.subscriber';
-import { CompletedTransitEdge } from './transitanalyzer/completed-transit-edge.entity';
-import { GraphTransitAnalyzer } from './transitanalyzer/graph-transit-analyzer';
 import { ContractsModule } from './contracts/contracts.module';
 import { DocumentHeader } from './contracts/model/document-header.entity';
 import { DocumentContent } from './contracts/model/document-content.entity';
@@ -35,29 +34,22 @@ import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ConfigModule } from '@nestjs/config';
 
-import { ClaimNumberGenerator } from './crm/claims/claim-number-generator.service';
-
-import { ClientController } from './controllers/client.controller';
 import { DriverSessionService } from './service/driver-session.service';
 import { DriverSessionController } from './controllers/driver-session.controller';
 
 import { DriverTrackingService } from './service/driver-tracking.service';
 import { DriverTrackingController } from './controllers/driver-tracking.controller';
 
-import { ClaimService } from './crm/claims/claim.service';
-
 import { TransitService } from './service/transit.service';
-import { TransitAnalyzerController } from './controllers/transit-analyzer.controller';
-import { TransitController } from './controllers/transit.controller';
 
-import { ClaimController } from './crm/claims/claim.controller';
+import { TransitController } from './controllers/transit.controller';
 
 import { DriverReportController } from './controllers/driver-report.controller';
 import ormConfig from './mikro-orm.config';
 
 import { Driver } from './driverfleet/driver.entity';
 import { CarType } from './carfleet/car-type.entity';
-import { Client } from './entity/client.entity';
+import { Client } from './crm/client.entity';
 import { Transit } from './entity/transit.entity';
 import { Address } from './geolocation/address/address.entity';
 import { Claim } from './crm/claims/claim.entity';
@@ -103,6 +95,8 @@ const entities = [
 
 @Module({
   imports: [
+    TransitAnalysisModule,
+    ClaimsModule,
     GeolocationModule,
     LoyaltyModule,
     ClaimsQueriesModule,
@@ -122,25 +116,17 @@ const entities = [
     MikroOrmModule.forFeature(entities),
   ],
   controllers: [
-    ClientController,
     DriverSessionController,
     DriverTrackingController,
-    TransitAnalyzerController,
     TransitController,
-    ClaimController,
     DriverReportController,
   ],
   providers: [
-    PopulateGraphService,
-    GraphTransitSubscriber,
-    GraphTransitAnalyzer,
     TravelledDistanceService,
     SqlDriverReportCreator,
     DriverFinder,
-    ClaimNumberGenerator,
     DriverSessionService,
     DriverTrackingService,
-    ClaimService,
     TransitService,
   ],
 })

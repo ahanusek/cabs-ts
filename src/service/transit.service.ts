@@ -3,7 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Transactional } from '@mikro-orm/decorators/legacy';
 import { EntityManager } from '@mikro-orm/postgresql';
-import { ClientRepository } from '../repository/client.repository';
+import { ClientRepository } from '../crm/client.repository';
 import { TransitRepository } from '../repository/transit.repository';
 import { DriverRepository } from '../driverfleet/driver.repository';
 import { AddressRepository } from '../geolocation/address/address.repository';
@@ -22,7 +22,7 @@ import { Status, Transit } from '../entity/transit.entity';
 import { DriverNotificationService } from '../notification/driver-notification.service';
 import { Driver } from '../driverfleet/driver.entity';
 import { CreateTransitDto } from '../dto/create-transit.dto';
-import { Client } from '../entity/client.entity';
+import { Client } from '../crm/client.entity';
 import { Distance } from '../geolocation/distance';
 
 @Injectable()

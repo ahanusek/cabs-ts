@@ -1,4 +1,4 @@
-import { Client, ClientType, PaymentType, Type } from '../entity/client.entity';
+import { Client, ClientType, PaymentType, Type } from './client.entity';
 
 export class ClientDto {
   private id: string;

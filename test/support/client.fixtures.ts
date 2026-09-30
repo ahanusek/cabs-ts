@@ -1,4 +1,4 @@
-import { Client, PaymentType, Type } from '../../src/entity/client.entity';
+import { Client, PaymentType, Type } from '../../src/crm/client.entity';
 
 export function aClient(): Client {
   const client = new Client();

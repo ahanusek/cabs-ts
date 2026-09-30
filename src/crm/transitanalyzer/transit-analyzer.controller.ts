@@ -1,10 +1,10 @@
 import { Controller, Get, Param, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { GraphTransitAnalyzer } from '../transitanalyzer/graph-transit-analyzer';
-import { AddressRepository } from '../geolocation/address/address.repository';
-import { Address } from '../geolocation/address/address.entity';
-import { AnalyzedAddressesDto } from '../dto/analyzed-addresses.dto';
-import { AddressDto } from '../geolocation/address/address.dto';
+import { GraphTransitAnalyzer } from './graph-transit-analyzer';
+import { AddressRepository } from '../../geolocation/address/address.repository';
+import { Address } from '../../geolocation/address/address.entity';
+import { AnalyzedAddressesDto } from './analyzed-addresses.dto';
+import { AddressDto } from '../../geolocation/address/address.dto';
 
 @Controller('transitAnalyze')
 export class TransitAnalyzerController {

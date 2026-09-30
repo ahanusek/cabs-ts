@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { MikroORM } from '@mikro-orm/postgresql';
 import { RequestContext } from '@mikro-orm/core';
 import { AppModule } from '../app.module';
-import { PopulateGraphService } from '../transitanalyzer/populate-graph.service';
+import { PopulateGraphService } from '../crm/transitanalyzer/populate-graph.service';
 
 async function populateGraph(): Promise<void> {
   const application = await NestFactory.createApplicationContext(AppModule);

@@ -1,5 +1,5 @@
 import { AwardsService } from '../src/loyalty/awards.service';
-import { GraphTransitAnalyzer } from '../src/transitanalyzer/graph-transit-analyzer';
+import { GraphTransitAnalyzer } from '../src/crm/transitanalyzer/graph-transit-analyzer';
 import { DriverFee, FeeType } from '../src/driverfleet/driver-fee.entity';
 import { TransitService } from '../src/service/transit.service';
 import { Status, Transit } from '../src/entity/transit.entity';

@@ -1,5 +1,5 @@
 import { AwardsService } from '../src/loyalty/awards.service';
-import { Type } from '../src/entity/client.entity';
+import { Type } from '../src/crm/client.entity';
 import { TransitDetails } from '../src/transitdetails/transit-details.entity';
 import { transitSnapshot } from '../src/transitdetails/transit-snapshot';
 import { Claim, ClaimStatus } from '../src/crm/claims/claim.entity';

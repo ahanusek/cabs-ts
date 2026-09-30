@@ -14,7 +14,7 @@ import {
   Enum,
 } from '@mikro-orm/decorators/legacy';
 import { Driver } from '../driverfleet/driver.entity';
-import { Client, PaymentType } from './client.entity';
+import { Client, PaymentType } from '../crm/client.entity';
 import { Address } from '../geolocation/address/address.entity';
 import { CarClass } from '../carfleet/car-type.entity';
 import { TransitRepository } from '../repository/transit.repository';

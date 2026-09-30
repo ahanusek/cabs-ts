@@ -3,7 +3,7 @@ import {
   type OnModuleInit,
   type OnModuleDestroy,
 } from '@nestjs/common';
-import { DomainEvents, type DomainEvent } from '../common/domain-events';
+import { DomainEvents, type DomainEvent } from '../../common/domain-events';
 import { GraphTransitAnalyzer } from './graph-transit-analyzer';
 import type { TransitCompleted } from './transit-completed';
 

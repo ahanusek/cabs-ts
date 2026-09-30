@@ -7,9 +7,9 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { ClientService } from '../service/client.service';
-import { CreateClientDto } from '../dto/create-client.dto';
-import { ClientDto } from '../dto/client.dto';
+import { ClientService } from './client.service';
+import { CreateClientDto } from './create-client.dto';
+import { ClientDto } from './client.dto';
 
 @Controller('clients')
 export class ClientController {

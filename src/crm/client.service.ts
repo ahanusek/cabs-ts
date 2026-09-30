@@ -1,8 +1,8 @@
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ClientRepository } from '../repository/client.repository';
-import { Client, PaymentType, Type } from '../entity/client.entity';
-import { ClientDto } from '../dto/client.dto';
+import { ClientRepository } from './client.repository';
+import { Client, PaymentType, Type } from './client.entity';
+import { ClientDto } from './client.dto';
 
 @Injectable()
 export class ClientService {
