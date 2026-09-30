@@ -23,16 +23,16 @@ export class ContractAttachment extends BaseEntity {
   @Property({ type: 'blob' })
   private data!: Buffer;
 
-  @Property({ type: 'bigint' })
+  @Property({ type: 'bigint', runtimeType: 'number' })
   private creationDate: number = Date.now();
 
-  @Property({ nullable: true, type: 'bigint' })
+  @Property({ nullable: true, type: 'bigint', runtimeType: 'number' })
   private acceptedAt: number | null = null;
 
-  @Property({ nullable: true, type: 'bigint' })
+  @Property({ nullable: true, type: 'bigint', runtimeType: 'number' })
   private rejectedAt: number | null = null;
 
-  @Property({ nullable: true, type: 'bigint' })
+  @Property({ nullable: true, type: 'bigint', runtimeType: 'number' })
   private changeDate?: number;
 
   @Enum({

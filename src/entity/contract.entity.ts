@@ -30,16 +30,16 @@ export class Contract extends BaseEntity {
   @Property()
   public subject!: string;
 
-  @Property({ type: 'bigint' })
+  @Property({ type: 'bigint', runtimeType: 'number' })
   public creationDate: number = Date.now();
 
-  @Property({ nullable: true, type: 'bigint' })
+  @Property({ nullable: true, type: 'bigint', runtimeType: 'number' })
   public acceptedAt: number | null = null;
 
-  @Property({ nullable: true, type: 'bigint' })
+  @Property({ nullable: true, type: 'bigint', runtimeType: 'number' })
   public rejectedAt: number | null = null;
 
-  @Property({ nullable: true, type: 'bigint' })
+  @Property({ nullable: true, type: 'bigint', runtimeType: 'number' })
   public changeDate: number | null = null;
 
   @Enum({

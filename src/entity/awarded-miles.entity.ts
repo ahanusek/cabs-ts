@@ -12,10 +12,10 @@ export class AwardedMiles extends BaseEntity {
   @Property()
   private miles!: number;
 
-  @Property({ type: 'bigint' })
+  @Property({ type: 'bigint', runtimeType: 'number' })
   private date: number = Date.now();
 
-  @Property({ nullable: true, type: 'bigint' })
+  @Property({ nullable: true, type: 'bigint', runtimeType: 'number' })
   private expirationDate: number | null = null;
 
   @Property({ nullable: true, type: 'boolean' })

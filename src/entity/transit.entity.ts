@@ -66,7 +66,7 @@ export class Transit extends BaseEntity {
   @Enum(() => Status)
   public status!: Status;
 
-  @Property({ type: 'bigint', nullable: true })
+  @Property({ type: 'bigint', runtimeType: 'number', nullable: true })
   public date?: number;
 
   @ManyToOne(() => Address, { eager: true })
@@ -75,10 +75,10 @@ export class Transit extends BaseEntity {
   @ManyToOne(() => Address, { eager: true })
   public to!: Address;
 
-  @Property({ nullable: true, type: 'bigint' })
+  @Property({ nullable: true, type: 'bigint', runtimeType: 'number' })
   public acceptedAt: number | null = null;
 
-  @Property({ nullable: true, type: 'bigint' })
+  @Property({ nullable: true, type: 'bigint', runtimeType: 'number' })
   public started: number | null = null;
 
   @Property({ default: 0 })
@@ -108,10 +108,10 @@ export class Transit extends BaseEntity {
   @Property({ nullable: true, type: MoneyType })
   public driversFee?: Money;
 
-  @Property({ type: 'bigint', nullable: true })
+  @Property({ type: 'bigint', runtimeType: 'number', nullable: true })
   public dateTime?: number;
 
-  @Property({ type: 'bigint', nullable: true })
+  @Property({ type: 'bigint', runtimeType: 'number', nullable: true })
   public published?: number;
 
   @ManyToOne(() => Client, { eager: true })
@@ -120,7 +120,7 @@ export class Transit extends BaseEntity {
   @Enum(() => CarClass)
   public carType!: CarClass;
 
-  @Property({ type: 'bigint', nullable: true })
+  @Property({ type: 'bigint', runtimeType: 'number', nullable: true })
   public completeAt?: number;
 
   public changePickupTo(

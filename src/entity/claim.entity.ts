@@ -31,13 +31,13 @@ export class Claim extends BaseEntity {
   @ManyToOne(() => Transit, { eager: true })
   public transit!: Transit;
 
-  @Property({ type: 'bigint' })
+  @Property({ type: 'bigint', runtimeType: 'number' })
   public creationDate!: number;
 
-  @Property({ nullable: true, type: 'bigint' })
+  @Property({ nullable: true, type: 'bigint', runtimeType: 'number' })
   public completionDate: number | null = null;
 
-  @Property({ nullable: true, type: 'bigint' })
+  @Property({ nullable: true, type: 'bigint', runtimeType: 'number' })
   public changeDate: number | null = null;
 
   @Property()

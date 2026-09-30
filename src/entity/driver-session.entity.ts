@@ -11,10 +11,10 @@ import { DriverSessionRepository } from '../repository/driver-session.repository
 
 @Entity({ repository: () => DriverSessionRepository })
 export class DriverSession extends BaseEntity {
-  @Property({ nullable: true, type: 'bigint' })
+  @Property({ nullable: true, type: 'bigint', runtimeType: 'number' })
   public loggedAt?: number;
 
-  @Property({ nullable: true, type: 'bigint' })
+  @Property({ nullable: true, type: 'bigint', runtimeType: 'number' })
   public loggedOutAt: number | null = null;
 
   @ManyToOne(() => Driver)

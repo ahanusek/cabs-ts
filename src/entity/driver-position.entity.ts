@@ -14,7 +14,7 @@ export class DriverPosition extends BaseEntity {
   @Property({ type: 'float' })
   public longitude!: number;
 
-  @Property({ type: 'bigint' })
+  @Property({ type: 'bigint', runtimeType: 'number' })
   public seenAt!: number;
 
   public getDriver() {

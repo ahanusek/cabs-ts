@@ -5,7 +5,7 @@ import { AwardsAccountRepository } from '../repository/awards-account.repository
 
 @Entity({ repository: () => AwardsAccountRepository })
 export class AwardsAccount extends BaseEntity {
-  @Property({ type: 'bigint' })
+  @Property({ type: 'bigint', runtimeType: 'number' })
   public date: number = Date.now();
 
   @Property({ default: false, type: 'boolean' })

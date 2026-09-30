@@ -8,7 +8,7 @@ export class ClaimAttachment extends BaseEntity {
   @ManyToOne(() => Claim)
   private claim!: Claim;
 
-  @Property({ type: 'bigint' })
+  @Property({ type: 'bigint', runtimeType: 'number' })
   private creationDate!: number;
 
   @Property({ nullable: true, type: 'varchar' })

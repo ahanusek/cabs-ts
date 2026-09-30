@@ -68,7 +68,10 @@ export class AwardsService implements IAwardsService {
   }
 
   public async registerToProgram(clientId: string) {
-    const client = await this.clientRepository.findOne({ id: clientId });
+    const client = await this.clientRepository.findOne(
+      { id: clientId },
+      { populate: ['claims'] },
+    );
 
     if (!client) {
       throw new NotFoundException('Client does not exists, id = ' + clientId);
@@ -146,7 +149,10 @@ export class AwardsService implements IAwardsService {
   }
 
   public async removeMiles(clientId: string, miles: number) {
-    const client = await this.clientRepository.findOne({ id: clientId });
+    const client = await this.clientRepository.findOne(
+      { id: clientId },
+      { populate: ['claims'] },
+    );
     if (!client) {
       throw new NotFoundException(
         `Client with id ${clientId} doest not exists`,
@@ -224,7 +230,10 @@ export class AwardsService implements IAwardsService {
   }
 
   public async calculateBalance(clientId: string) {
-    const client = await this.clientRepository.findOne({ id: clientId });
+    const client = await this.clientRepository.findOne(
+      { id: clientId },
+      { populate: ['claims'] },
+    );
     if (!client) {
       throw new NotFoundException(
         `Client with id ${clientId} doest not exists`,
