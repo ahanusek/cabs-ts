@@ -124,7 +124,10 @@ export class ClaimService {
         claim.getOwner().id,
       );
       if (claim.getOwner().getType() === Type.VIP)
-        await this.awardsService.registerSpecialMiles(claim.getOwner().id, 10);
+        await this.awardsService.registerNonExpiringMiles(
+          claim.getOwner().id,
+          10,
+        );
     }
     if (result.whoToAsk === WhoToAsk.DRIVER && claim.getTransit().getDriver()) {
       this.driverNotificationService.askDriverForDetailsAboutClaim(

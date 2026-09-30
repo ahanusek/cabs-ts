@@ -49,7 +49,7 @@ describe('Awards account — legacy behavior', () => {
     await application.run(async () => {
       await awards.activateAccount(clientId);
       await awards.registerMiles(clientId, transitId);
-      await awards.registerSpecialMiles(clientId, 20);
+      await awards.registerNonExpiringMiles(clientId, 20);
     });
     const account = await application.run(() => awards.findBy(clientId));
     expect([account.getTransactions(), await balance()]).toEqual([2, 30]);
@@ -61,7 +61,7 @@ describe('Awards account — legacy behavior', () => {
       const miles = await awards.registerMiles(clientId, transitId);
       miles!.setExpirationDate(Date.now() - 1000);
       await application.orm.em.flush();
-      await awards.registerSpecialMiles(clientId, 20);
+      await awards.registerNonExpiringMiles(clientId, 20);
     });
     expect(await balance()).toBe(20);
   });
@@ -83,7 +83,7 @@ describe('Awards account — legacy behavior', () => {
     const destination = await anotherAccount();
     await application.run(async () => {
       await awards.activateAccount(clientId);
-      await awards.registerSpecialMiles(clientId, 10);
+      await awards.registerNonExpiringMiles(clientId, 10);
       await awards.transferMiles(clientId, destination, 10);
     });
     expect([await balance(), await balance(destination)]).toEqual([0, 10]);
@@ -92,7 +92,7 @@ describe('Awards account — legacy behavior', () => {
   it('leaves the balance unchanged when transferring from an inactive account', async () => {
     const destination = await anotherAccount();
     await application.run(async () => {
-      await awards.registerSpecialMiles(clientId, 10);
+      await awards.registerNonExpiringMiles(clientId, 10);
       await awards.transferMiles(clientId, destination, 5);
     });
     expect([await balance(), await balance(destination)]).toEqual([10, 0]);
@@ -100,7 +100,7 @@ describe('Awards account — legacy behavior', () => {
 
   it('keeps non-expiring grants after regular grants expire', async () => {
     await application.run(async () => {
-      await awards.registerSpecialMiles(clientId, 20);
+      await awards.registerNonExpiringMiles(clientId, 20);
       application.orm.em.clear();
       const grants = await application.orm.em.find(AwardedMiles, {
         client: clientId,
