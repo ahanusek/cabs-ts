@@ -1,4 +1,3 @@
-import { BaseEntity } from '../common/base.entity';
 import { Collection } from '@mikro-orm/core';
 import {
   Entity,
@@ -6,7 +5,12 @@ import {
   OneToMany,
   Enum,
 } from '@mikro-orm/decorators/legacy';
-import { ContractAttachment } from './contract-attachment.entity';
+import { NotAcceptableException, NotFoundException } from '@nestjs/common';
+import { BaseEntity } from '../common/base.entity';
+import {
+  ContractAttachment,
+  ContractAttachmentStatus,
+} from './contract-attachment.entity';
 import { ContractRepository } from '../repository/contract.repository';
 
 export enum ContractStatus {
@@ -17,109 +21,137 @@ export enum ContractStatus {
 
 @Entity({ repository: () => ContractRepository })
 export class Contract extends BaseEntity {
-  @OneToMany(
-    () => ContractAttachment,
-    (contractAttachment) => contractAttachment.contract,
-    { eager: true },
-  )
-  public attachments = new Collection<ContractAttachment>(this);
+  @OneToMany(() => ContractAttachment, (attachment) => attachment.contract, {
+    eager: true,
+    orphanRemoval: true,
+  })
+  private attachments = new Collection<ContractAttachment>(this);
 
   @Property()
-  public partnerName!: string;
+  public partnerName: string;
 
   @Property()
-  public subject!: string;
+  private subject: string;
 
   @Property({ type: 'bigint', runtimeType: 'number' })
-  public creationDate: number = Date.now();
+  private creationDate = Date.now();
 
   @Property({ nullable: true, type: 'bigint', runtimeType: 'number' })
-  public acceptedAt: number | null = null;
+  private acceptedAt: number | null = null;
 
   @Property({ nullable: true, type: 'bigint', runtimeType: 'number' })
-  public rejectedAt: number | null = null;
+  private rejectedAt: number | null = null;
 
   @Property({ nullable: true, type: 'bigint', runtimeType: 'number' })
-  public changeDate: number | null = null;
+  private changeDate: number | null = null;
 
   @Enum({
     items: () => ContractStatus,
     default: ContractStatus.NEGOTIATIONS_IN_PROGRESS,
   })
-  public status: ContractStatus = ContractStatus.NEGOTIATIONS_IN_PROGRESS;
+  private status = ContractStatus.NEGOTIATIONS_IN_PROGRESS;
 
   @Property()
-  public contractNo!: string;
+  private contractNo: string;
+
+  constructor(partnerName: string, subject: string, contractNo: string) {
+    super();
+    this.partnerName = partnerName;
+    this.subject = subject;
+    this.contractNo = contractNo;
+  }
+
+  public proposeAttachment(data: string): ContractAttachment {
+    const attachment = new ContractAttachment();
+    attachment.setContract(this);
+    attachment.setData(data);
+    this.attachments.add(attachment);
+    return attachment;
+  }
+
+  public accept(moment: number): void {
+    if (
+      this.attachments
+        .getItems()
+        .some(
+          (attachment) =>
+            attachment.getStatus() !==
+            ContractAttachmentStatus.ACCEPTED_BY_BOTH_SIDES,
+        )
+    ) {
+      throw new NotAcceptableException(
+        'Not all attachments accepted by both sides',
+      );
+    }
+    this.status = ContractStatus.ACCEPTED;
+    this.acceptedAt = moment;
+    this.changeDate = moment;
+  }
+
+  public reject(moment: number): void {
+    this.status = ContractStatus.REJECTED;
+    this.rejectedAt = moment;
+    this.changeDate = moment;
+  }
+
+  public acceptAttachment(id: string, moment: number): void {
+    const attachment = this.findAttachment(id);
+    const status = attachment.getStatus();
+    attachment.setStatus(
+      status === ContractAttachmentStatus.ACCEPTED_BY_ONE_SIDE ||
+        status === ContractAttachmentStatus.ACCEPTED_BY_BOTH_SIDES
+        ? ContractAttachmentStatus.ACCEPTED_BY_BOTH_SIDES
+        : ContractAttachmentStatus.ACCEPTED_BY_ONE_SIDE,
+    );
+    attachment.setAcceptedAt(moment);
+  }
+
+  public rejectAttachment(id: string, moment: number): void {
+    const attachment = this.findAttachment(id);
+    attachment.setStatus(ContractAttachmentStatus.REJECTED);
+    attachment.setRejectedAt(moment);
+  }
+
+  public removeAttachment(id: string): void {
+    this.attachments.remove(this.findAttachment(id));
+  }
 
   public getCreationDate() {
     return this.creationDate;
   }
-
-  public setCreationDate(creationDate: number) {
-    this.creationDate = creationDate;
-  }
-
   public getAcceptedAt() {
     return this.acceptedAt;
   }
-
-  public setAcceptedAt(acceptedAt: number) {
-    this.acceptedAt = acceptedAt;
-  }
-
   public getRejectedAt() {
     return this.rejectedAt;
   }
-
-  public setRejectedAt(rejectedAt: number) {
-    this.rejectedAt = rejectedAt;
-  }
-
   public getChangeDate() {
     return this.changeDate;
   }
-
-  public setChangeDate(changeDate: number) {
-    this.changeDate = changeDate;
-  }
-
   public getStatus() {
     return this.status;
   }
-
-  public setStatus(status: ContractStatus) {
-    this.status = status;
-  }
-
   public getContractNo() {
     return this.contractNo;
   }
-
-  public setContractNo(contractNo: string) {
-    this.contractNo = contractNo;
-  }
-
-  public getAttachments() {
-    return this.attachments.getItems();
-  }
-
-  public setAttachments(attachments: ContractAttachment[]) {
-    this.attachments.set(attachments);
-  }
-
   public getPartnerName() {
     return this.partnerName;
   }
-
-  public setPartnerName(partnerName: string) {
-    this.partnerName = partnerName;
-  }
-
   public getSubject() {
     return this.subject;
   }
+  public getAttachments(): readonly ContractAttachment[] {
+    return [...this.attachments.getItems()];
+  }
 
-  public setSubject(subject: string) {
-    this.subject = subject;
+  private findAttachment(id: string): ContractAttachment {
+    const attachment = this.attachments
+      .getItems()
+      .find((item) => item.id === id);
+    if (!attachment)
+      throw new NotFoundException(
+        'Attachment does not belong to this contract',
+      );
+    return attachment;
   }
 }

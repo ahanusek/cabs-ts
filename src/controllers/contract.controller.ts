@@ -38,7 +38,7 @@ export class ContractController {
     @Param('contractId') contractId: string,
     @Param('attachmentId') attachmentId: string,
   ) {
-    await this.contractService.rejectAttachment(attachmentId);
+    await this.contractService.rejectAttachment(contractId, attachmentId);
   }
 
   @Post(':contractId/attachment/:attachmentId/accept')
@@ -46,7 +46,7 @@ export class ContractController {
     @Param('contractId') contractId: string,
     @Param('attachmentId') attachmentId: string,
   ) {
-    await this.contractService.acceptAttachment(attachmentId);
+    await this.contractService.acceptAttachment(contractId, attachmentId);
   }
 
   @Delete(':contractId/attachment/:attachmentId')

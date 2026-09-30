@@ -1,17 +1,10 @@
-import {
-  Injectable,
-  NotFoundException,
-  NotAcceptableException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
+import { Transactional } from '@mikro-orm/decorators/legacy';
+import { EntityManager } from '@mikro-orm/postgresql';
 import { ContractRepository } from '../repository/contract.repository';
-import { ContractAttachmentRepository } from '../repository/contract-attachment.repository';
 import { ContractDto } from '../dto/contract.dto';
-import { Contract, ContractStatus } from '../entity/contract.entity';
-import {
-  ContractAttachment,
-  ContractAttachmentStatus,
-} from '../entity/contract-attachment.entity';
+import { Contract } from '../entity/contract.entity';
 import { ContractAttachmentDto } from '../dto/contract-attachment.dto';
 import { CreateContractDto } from '../dto/create-contract.dto';
 import { CreateContractAttachmentDto } from '../dto/create-contract-attachment.dto';
@@ -19,135 +12,79 @@ import { CreateContractAttachmentDto } from '../dto/create-contract-attachment.d
 @Injectable()
 export class ContractService {
   constructor(
-    @InjectRepository(Contract)
-    private contractRepository: ContractRepository,
-    @InjectRepository(ContractAttachment)
-    private contractAttachmentRepository: ContractAttachmentRepository,
+    @InjectRepository(Contract) private readonly contracts: ContractRepository,
+    private readonly em: EntityManager,
   ) {}
 
-  public async createContract(createContractDto: CreateContractDto) {
-    const contract = new Contract();
-    contract.setPartnerName(createContractDto.partnerName);
-    contract.setCreationDate(Date.now());
-    const partnerContractsCount =
-      (
-        await this.contractRepository.findByPartnerName(
-          createContractDto.partnerName,
-        )
-      ).length + 1;
-    contract.setSubject(createContractDto.subject);
-    contract.setContractNo(
-      'C/' + partnerContractsCount + '/' + createContractDto.partnerName,
+  public async createContract(dto: CreateContractDto): Promise<Contract> {
+    const sequence =
+      (await this.contracts.count({ partnerName: dto.partnerName })) + 1;
+    const contract = new Contract(
+      dto.partnerName,
+      dto.subject,
+      `C/${sequence}/${dto.partnerName}`,
     );
-    await this.contractRepository.getEntityManager().persist(contract).flush();
+    await this.em.persist(contract).flush();
     return contract;
   }
 
-  public async acceptContract(id: string) {
-    const contract = await this.find(id);
-    const attachments =
-      await this.contractAttachmentRepository.findByContract(contract);
-    if (
-      attachments.every(
-        (a) =>
-          a.getStatus() === ContractAttachmentStatus.ACCEPTED_BY_BOTH_SIDES,
-      )
-    ) {
-      contract.setStatus(ContractStatus.ACCEPTED);
-      contract.setAcceptedAt(Date.now());
-      await this.contractRepository.getEntityManager().flush();
-    } else {
-      throw new NotAcceptableException(
-        'Not all attachments accepted by both sides',
-      );
-    }
+  @Transactional()
+  public async acceptContract(id: string): Promise<void> {
+    (await this.find(id)).accept(Date.now());
+    await this.em.flush();
   }
 
-  public async rejectContract(id: string) {
-    const contract = await this.find(id);
-    contract.setStatus(ContractStatus.REJECTED);
-    await this.contractRepository.getEntityManager().flush();
+  @Transactional()
+  public async rejectContract(id: string): Promise<void> {
+    (await this.find(id)).reject(Date.now());
+    await this.em.flush();
   }
 
-  public async rejectAttachment(attachmentId: string) {
-    const contractAttachment = await this.contractAttachmentRepository.findOne({
-      id: attachmentId,
-    });
-    if (!contractAttachment) {
-      throw new NotFoundException('Contract attachment does not exist');
-    }
-    contractAttachment.setStatus(ContractAttachmentStatus.REJECTED);
-    contractAttachment.setRejectedAt(Date.now());
-    await this.contractAttachmentRepository.getEntityManager().flush();
+  @Transactional()
+  public async acceptAttachment(
+    contractId: string,
+    attachmentId: string,
+  ): Promise<void> {
+    (await this.find(contractId)).acceptAttachment(attachmentId, Date.now());
+    await this.em.flush();
   }
 
-  public async acceptAttachment(attachmentId: string) {
-    const contractAttachment = await this.contractAttachmentRepository.findOne({
-      id: attachmentId,
-    });
-    if (!contractAttachment) {
-      throw new NotFoundException('Contract attachment does not exist');
-    }
-
-    if (
-      contractAttachment.getStatus() ===
-        ContractAttachmentStatus.ACCEPTED_BY_ONE_SIDE ||
-      contractAttachment.getStatus() ===
-        ContractAttachmentStatus.ACCEPTED_BY_BOTH_SIDES
-    ) {
-      contractAttachment.setStatus(
-        ContractAttachmentStatus.ACCEPTED_BY_BOTH_SIDES,
-      );
-    } else {
-      contractAttachment.setStatus(
-        ContractAttachmentStatus.ACCEPTED_BY_ONE_SIDE,
-      );
-    }
-
-    contractAttachment.setAcceptedAt(Date.now());
-
-    await this.contractAttachmentRepository.getEntityManager().flush();
+  @Transactional()
+  public async rejectAttachment(
+    contractId: string,
+    attachmentId: string,
+  ): Promise<void> {
+    (await this.find(contractId)).rejectAttachment(attachmentId, Date.now());
+    await this.em.flush();
   }
 
-  public async find(id: string) {
-    const contract = await this.contractRepository.findOne({ id });
-    if (!contract) {
-      throw new NotFoundException('Contract does not exist');
-    }
+  public async find(id: string): Promise<Contract> {
+    const contract = await this.contracts.findOne({ id });
+    if (!contract) throw new NotFoundException('Contract does not exist');
     return contract;
   }
 
-  public async findDto(id: string) {
+  public async findDto(id: string): Promise<ContractDto> {
     return new ContractDto(await this.find(id));
   }
 
+  @Transactional()
   public async proposeAttachment(
     contractId: string,
-    contractAttachmentDto: CreateContractAttachmentDto,
-  ) {
+    dto: CreateContractAttachmentDto,
+  ): Promise<ContractAttachmentDto> {
     const contract = await this.find(contractId);
-    const contractAttachment = new ContractAttachment();
-    contractAttachment.setContract(contract);
-    contractAttachment.setData(contractAttachmentDto.data);
-    await this.contractAttachmentRepository
-      .getEntityManager()
-      .persist(contractAttachment)
-      .flush();
-    contract.attachments.add(contractAttachment);
-    await this.contractRepository.getEntityManager().flush();
-    return new ContractAttachmentDto(contractAttachment);
+    const attachment = contract.proposeAttachment(dto.data);
+    await this.em.flush();
+    return new ContractAttachmentDto(attachment, contractId);
   }
 
-  public async removeAttachment(contractId: string, attachmentId: string) {
-    //TODO sprawdzenie czy nalezy do kontraktu (JIRA: II-14455)
-    const attachment = await this.contractAttachmentRepository.findOne({
-      id: attachmentId,
-    });
-    if (attachment) {
-      await this.contractAttachmentRepository
-        .getEntityManager()
-        .remove(attachment)
-        .flush();
-    }
+  @Transactional()
+  public async removeAttachment(
+    contractId: string,
+    attachmentId: string,
+  ): Promise<void> {
+    (await this.find(contractId)).removeAttachment(attachmentId);
+    await this.em.flush();
   }
 }

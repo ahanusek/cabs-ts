@@ -17,7 +17,7 @@ export enum ContractAttachmentStatus {
 
 @Entity({ repository: () => ContractAttachmentRepository })
 export class ContractAttachment extends BaseEntity {
-  @ManyToOne(() => Contract, { inversedBy: 'attachments' })
+  @ManyToOne(() => Contract)
   public contract!: Contract;
 
   @Property({ type: 'blob' })

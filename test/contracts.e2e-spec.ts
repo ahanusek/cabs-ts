@@ -60,7 +60,7 @@ describe('Contract lifecycle', () => {
     const attachment = await addAttachment();
     for (let acceptance = 0; acceptance < count; acceptance++) {
       await application.run(() =>
-        contracts.acceptAttachment(attachment.getId()),
+        contracts.acceptAttachment(contractId, attachment.getId()),
       );
     }
     expect((await load()).getAttachments()[0].getStatus()).toBe(status);
@@ -68,7 +68,9 @@ describe('Contract lifecycle', () => {
 
   it('rejects an attachment', async () => {
     const attachment = await addAttachment();
-    await application.run(() => contracts.rejectAttachment(attachment.getId()));
+    await application.run(() =>
+      contracts.rejectAttachment(contractId, attachment.getId()),
+    );
     expect((await load()).getAttachments()[0].getStatus()).toBe(
       ContractAttachmentStatus.REJECTED,
     );
@@ -77,8 +79,8 @@ describe('Contract lifecycle', () => {
   it('accepts a contract with all attachments agreed', async () => {
     const attachment = await addAttachment();
     await application.run(async () => {
-      await contracts.acceptAttachment(attachment.getId());
-      await contracts.acceptAttachment(attachment.getId());
+      await contracts.acceptAttachment(contractId, attachment.getId());
+      await contracts.acceptAttachment(contractId, attachment.getId());
       await contracts.acceptContract(contractId);
     });
     expect((await load()).getStatus()).toBe(ContractStatus.ACCEPTED);
@@ -102,6 +104,17 @@ describe('Contract lifecycle', () => {
   it('rejects a contract', async () => {
     await application.run(() => contracts.rejectContract(contractId));
     expect((await load()).getStatus()).toBe(ContractStatus.REJECTED);
+  });
+
+  it('cannot remove an attachment belonging to another contract', async () => {
+    const attachment = await addAttachment();
+    const other = await application.run(() =>
+      contracts.createContract({ partnerName: randomUUID(), subject: 'Other' }),
+    );
+    await application
+      .run(() => contracts.removeAttachment(other.id, attachment.getId()))
+      .catch(() => undefined);
+    expect((await load()).getAttachments()).toHaveLength(1);
   });
 
   function addAttachment() {
