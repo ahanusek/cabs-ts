@@ -1,3 +1,5 @@
+import { CompletedTransitEdge } from './transitanalyzer/completed-transit-edge.entity';
+import { GraphTransitAnalyzer } from './transitanalyzer/graph-transit-analyzer';
 import { ContractsModule } from './contracts/contracts.module';
 import { DocumentHeader } from './contracts/model/document-header.entity';
 import { DocumentContent } from './contracts/model/document-content.entity';
@@ -63,6 +65,7 @@ import { ClaimAttachment } from './entity/claim-attachment.entity';
 import { ContractAttachment } from './entity/contract-attachment.entity';
 
 const entities = [
+  CompletedTransitEdge,
   DocumentHeader,
   DocumentContent,
   Party,
@@ -111,6 +114,7 @@ const entities = [
     DriverReportController,
   ],
   providers: [
+    GraphTransitAnalyzer,
     TravelledDistanceService,
     SqlDriverReportCreator,
     DriverFinder,

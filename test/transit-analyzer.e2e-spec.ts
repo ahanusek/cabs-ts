@@ -83,7 +83,8 @@ describe('Analysis of consecutive transits', () => {
       const addresses = Array.from({ length: 5 }, (_, index) => {
         const address = anAddress();
         address.setName(`Address ${index}`);
-        // Keep the unique fixture hash while names describe the expected route.
+        address.setStreet(`${index}-${address.id}`);
+        address.setHash();
         return address;
       });
       application.orm.em.persist([...clients, ...addresses]);
