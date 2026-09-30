@@ -1,5 +1,5 @@
 import { Tariff } from './tariff';
-import { Distance } from '../distance/distance';
+import { Distance } from '../geolocation/distance';
 
 describe('Tariff', () => {
   it.each([

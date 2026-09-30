@@ -1,4 +1,4 @@
-import { TransitDto } from './transit.dto';
+import { TransitDto } from '../dto/transit.dto';
 
 describe('The distance presented to a passenger', () => {
   it.each([

@@ -2,7 +2,7 @@ import { EntityRepository } from '@mikro-orm/postgresql';
 import { Status, Transit } from '../entity/transit.entity';
 import { Driver } from '../driverfleet/driver.entity';
 import { Client } from '../entity/client.entity';
-import { Address } from '../entity/address.entity';
+import { Address } from '../geolocation/address/address.entity';
 
 export class TransitRepository extends EntityRepository<Transit> {
   public async findAllByDriverAndDateTimeBetween(

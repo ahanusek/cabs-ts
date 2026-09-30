@@ -2,8 +2,8 @@ import { TravelledDistance } from './travelled-distance.entity';
 import { TimeSlot, FIVE_MINUTES } from './time-slot';
 import { randomUUID } from 'node:crypto';
 import type { PositionSample } from './position-sample';
-import { DistanceCalculator } from '../../service/distance-calculator.service';
-import { Distance } from '../../distance/distance';
+import { DistanceCalculator } from '../../geolocation/distance-calculator.service';
+import { Distance } from '../../geolocation/distance';
 
 const origin = [53.32055555555556, -1.729722222222222] as const;
 const destination = [53.31861111111111, -1.699722222222222] as const;

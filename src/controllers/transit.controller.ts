@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { TransitService } from '../service/transit.service';
 import type { TransitView } from '../transitdetails/transit-view';
-import { CreateAddressDto } from '../dto/create-address.dto';
-import { AddressDto } from '../dto/address.dto';
+import { CreateAddressDto } from '../geolocation/address/create-address.dto';
+import { AddressDto } from '../geolocation/address/address.dto';
 import { CreateTransitDto } from '../dto/create-transit.dto';
 
 @Controller('transits')

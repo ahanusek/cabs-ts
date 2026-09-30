@@ -1,5 +1,5 @@
 import { EntityRepository } from '@mikro-orm/postgresql';
-import { Address } from '../entity/address.entity';
+import { Address } from './address.entity';
 
 export class AddressRepository extends EntityRepository<Address> {
   public async saveAddress(address: Address): Promise<Address> {

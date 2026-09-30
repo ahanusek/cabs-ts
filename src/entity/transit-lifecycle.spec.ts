@@ -1,7 +1,7 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';
 import { Transit, Status } from './transit.entity';
-import { Distance } from '../distance/distance';
+import { Distance } from '../geolocation/distance';
 import { anActiveDriver } from '../../test/support/driver.fixtures';
 import { anAddress } from '../../test/support/address.fixtures';
 

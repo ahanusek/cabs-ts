@@ -1,5 +1,5 @@
 import { Tariff } from '../pricing/tariff';
-import { Distance } from '../distance/distance';
+import { Distance } from '../geolocation/distance';
 import { Embedded } from '@mikro-orm/decorators/legacy';
 import { Money } from '../money/money';
 import { MoneyType } from '../money/money.type';
@@ -15,7 +15,7 @@ import {
 } from '@mikro-orm/decorators/legacy';
 import { Driver } from '../driverfleet/driver.entity';
 import { Client, PaymentType } from './client.entity';
-import { Address } from './address.entity';
+import { Address } from '../geolocation/address/address.entity';
 import { CarClass } from '../carfleet/car-type.entity';
 import { TransitRepository } from '../repository/transit.repository';
 

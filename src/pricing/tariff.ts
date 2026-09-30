@@ -1,5 +1,5 @@
 import { Embeddable, Property } from '@mikro-orm/decorators/legacy';
-import { Distance } from '../distance/distance';
+import { Distance } from '../geolocation/distance';
 import { Money } from '../money/money';
 
 @Embeddable()

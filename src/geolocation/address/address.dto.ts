@@ -1,4 +1,4 @@
-import { Address } from '../entity/address.entity';
+import { Address } from './address.entity';
 
 export class AddressDto {
   public country: string;

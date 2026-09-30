@@ -1,6 +1,6 @@
 import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
 import type { PositionSample } from './position-sample';
-import { DistanceCalculator } from '../../service/distance-calculator.service';
+import { DistanceCalculator } from '../../geolocation/distance-calculator.service';
 import { TimeSlot, FIVE_MINUTES } from './time-slot';
 
 @Entity()

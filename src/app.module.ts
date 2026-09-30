@@ -1,3 +1,4 @@
+import { GeolocationModule } from './geolocation/geolocation-module';
 import { LoyaltyModule } from './loyalty/loyalty-module';
 import { ClaimsQueriesModule } from './crm/claims/claims-queries-module';
 import { ClientAccessModule } from './crm/client-access-module';
@@ -34,9 +35,6 @@ import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ConfigModule } from '@nestjs/config';
 
-import { DistanceCalculator } from './service/distance-calculator.service';
-
-import { GeocodingService } from './service/geocoding.service';
 import { ClaimNumberGenerator } from './crm/claims/claim-number-generator.service';
 
 import { ClientController } from './controllers/client.controller';
@@ -61,7 +59,7 @@ import { Driver } from './driverfleet/driver.entity';
 import { CarType } from './carfleet/car-type.entity';
 import { Client } from './entity/client.entity';
 import { Transit } from './entity/transit.entity';
-import { Address } from './entity/address.entity';
+import { Address } from './geolocation/address/address.entity';
 import { Claim } from './crm/claims/claim.entity';
 import { Contract } from './agreements/contract.entity';
 import { DriverFee } from './driverfleet/driver-fee.entity';
@@ -105,6 +103,7 @@ const entities = [
 
 @Module({
   imports: [
+    GeolocationModule,
     LoyaltyModule,
     ClaimsQueriesModule,
     ClientAccessModule,
@@ -138,8 +137,6 @@ const entities = [
     TravelledDistanceService,
     SqlDriverReportCreator,
     DriverFinder,
-    DistanceCalculator,
-    GeocodingService,
     ClaimNumberGenerator,
     DriverSessionService,
     DriverTrackingService,

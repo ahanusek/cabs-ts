@@ -1,4 +1,4 @@
-import { Address } from '../../src/entity/address.entity';
+import { Address } from '../../src/geolocation/address/address.entity';
 
 export function anAddress(): Address {
   const address = new Address('Poland', 'Warsaw', 'Prosta', 1);

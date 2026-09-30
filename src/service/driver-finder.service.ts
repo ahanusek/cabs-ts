@@ -7,7 +7,7 @@ import { DriverSessionRepository } from '../repository/driver-session.repository
 import { DriverStatus } from '../driverfleet/driver.entity';
 import { Status, Transit } from '../entity/transit.entity';
 import { CarTypeService } from '../carfleet/car-type.service';
-import { GeocodingService } from './geocoding.service';
+import { GeocodingService } from '../geolocation/geocoding.service';
 import { DriverNotificationService } from '../notification/driver-notification.service';
 
 const EARTH_RADIUS_KM = 6371;

@@ -6,24 +6,24 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import { ClientRepository } from '../repository/client.repository';
 import { TransitRepository } from '../repository/transit.repository';
 import { DriverRepository } from '../driverfleet/driver.repository';
-import { AddressRepository } from '../repository/address.repository';
+import { AddressRepository } from '../geolocation/address/address.repository';
 import { AwardsService } from '../loyalty/awards.service';
 import { DriverFeeService } from '../driverfleet/driver-fee.service';
-import { GeocodingService } from './geocoding.service';
+import { GeocodingService } from '../geolocation/geocoding.service';
 import { InvoiceGenerator } from '../invoicing/invoice-generator.service';
-import { DistanceCalculator } from './distance-calculator.service';
+import { DistanceCalculator } from '../geolocation/distance-calculator.service';
 import { DriverFinder } from './driver-finder.service';
 import { TransitDetailsFacade } from '../transitdetails/transit-details.facade';
 import { transitSnapshot } from '../transitdetails/transit-snapshot';
-import { AddressDto } from '../dto/address.dto';
+import { AddressDto } from '../geolocation/address/address.dto';
 import { CarClass } from '../carfleet/car-type.entity';
-import { Address } from '../entity/address.entity';
+import { Address } from '../geolocation/address/address.entity';
 import { Status, Transit } from '../entity/transit.entity';
 import { DriverNotificationService } from '../notification/driver-notification.service';
 import { Driver } from '../driverfleet/driver.entity';
 import { CreateTransitDto } from '../dto/create-transit.dto';
 import { Client } from '../entity/client.entity';
-import { Distance } from '../distance/distance';
+import { Distance } from '../geolocation/distance';
 
 @Injectable()
 export class TransitService {

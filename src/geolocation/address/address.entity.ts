@@ -1,7 +1,7 @@
-import { BaseEntity } from '../common/base.entity';
+import { BaseEntity } from '../../common/base.entity';
 import { Entity, Property } from '@mikro-orm/decorators/legacy';
 import objectHash from 'object-hash';
-import { AddressRepository } from '../repository/address.repository';
+import { AddressRepository } from './address.repository';
 
 @Entity({ repository: () => AddressRepository })
 export class Address extends BaseEntity {
