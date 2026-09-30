@@ -1,3 +1,4 @@
+import { DomainEvents } from '../src/common/domain-events';
 import { TransitAnalyzerController } from '../src/controllers/transit-analyzer.controller';
 import { Money } from '../src/money/money';
 import { aClient, aCompletedTransit, anAddress } from './support/fixtures';
@@ -99,6 +100,15 @@ describe('Analysis of consecutive transits', () => {
         transit.started = started;
         transit.setCompleteAt(started + 10 * minute);
         application.orm.em.persist(transit);
+        await application.app.get(DomainEvents).publish({
+          type: 'transit-completed',
+          transitId: transit.id,
+          clientId: clients[owner].id,
+          fromHash: addresses[from].getHash(),
+          toHash: addresses[to].getHash(),
+          started,
+          completeAt: started + 10 * minute,
+        });
       }
       await application.orm.em.flush();
       return { clientId: clients[0].id, startAddressId: addresses[0].id };

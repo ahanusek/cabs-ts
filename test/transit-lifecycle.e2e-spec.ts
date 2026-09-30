@@ -1,3 +1,6 @@
+import { AwardsService } from '../src/service/awards.service';
+import { GraphTransitAnalyzer } from '../src/transitanalyzer/graph-transit-analyzer';
+import { DriverFee, FeeType } from '../src/entity/driver-fee.entity';
 import { TransitService } from '../src/service/transit.service';
 import { Status, Transit } from '../src/entity/transit.entity';
 import { Money } from '../src/money/money';
@@ -50,6 +53,36 @@ describe('Transit lifecycle through the application service', () => {
         service.startTransit(transit.getDriver()!.id, transit.id),
       ),
     ).rejects.toThrow();
+  });
+
+  it('updates the graph when an in-progress transit completes', async () => {
+    const transit = await givenTransit(Status.IN_TRANSIT);
+    await fixture.run(async () => {
+      const managed = await fixture.orm.em.findOneOrFail(Transit, transit.id);
+      managed.started = Date.now() - 1000;
+      const fee = new DriverFee(FeeType.FLAT, managed.getDriver()!, 10, 0);
+      managed.getDriver()!.setFee(fee);
+      await fixture.orm.em.persist(fee).flush();
+      await fixture.app
+        .get(AwardsService)
+        .registerToProgram(managed.getClient().id);
+    });
+    await fixture.run(() =>
+      service.completeTransit(
+        transit.getDriver()!.id,
+        transit.id,
+        transit.getTo(),
+      ),
+    );
+    const route = await fixture.run(() =>
+      fixture.app
+        .get(GraphTransitAnalyzer)
+        .analyze(transit.getClient().id, transit.getFrom().getHash()),
+    );
+    expect(route).toEqual([
+      transit.getFrom().getHash(),
+      transit.getTo().getHash(),
+    ]);
   });
 
   async function givenTransit(status: Status) {

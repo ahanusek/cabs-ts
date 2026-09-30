@@ -1,3 +1,4 @@
+import { DomainEvents } from '../common/domain-events';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Transactional } from '@mikro-orm/decorators/legacy';
@@ -38,6 +39,7 @@ export class TransitService {
     private readonly notifications: DriverNotificationService,
     private readonly finder: DriverFinder,
     private readonly em: EntityManager,
+    private readonly events: DomainEvents,
   ) {}
 
   @Transactional()
@@ -202,6 +204,15 @@ export class TransitService {
       `${transit.getClient().getName()} ${transit.getClient().getLastName()}`,
     );
     await this.em.flush();
+    await this.events.publish({
+      type: 'transit-completed',
+      transitId: transit.id,
+      clientId: transit.getClient().id,
+      fromHash: transit.getFrom().getHash(),
+      toHash: transit.getTo().getHash(),
+      started: transit.getStarted()!,
+      completeAt: transit.getCompleteAt()!,
+    });
   }
 
   public async loadTransit(transitId: string) {

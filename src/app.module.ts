@@ -1,3 +1,5 @@
+import { DomainEvents } from './common/domain-events';
+import { GraphTransitSubscriber } from './transitanalyzer/graph-transit.subscriber';
 import { CompletedTransitEdge } from './transitanalyzer/completed-transit-edge.entity';
 import { GraphTransitAnalyzer } from './transitanalyzer/graph-transit-analyzer';
 import { ContractsModule } from './contracts/contracts.module';
@@ -114,6 +116,8 @@ const entities = [
     DriverReportController,
   ],
   providers: [
+    DomainEvents,
+    GraphTransitSubscriber,
     GraphTransitAnalyzer,
     TravelledDistanceService,
     SqlDriverReportCreator,
