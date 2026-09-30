@@ -1,5 +1,5 @@
 import { Status, Transit } from '../../src/entity/transit.entity';
-import { CarClass } from '../../src/entity/car-type.entity';
+import { CarClass } from '../../src/carfleet/car-type.entity';
 import { Money } from '../../src/money/money';
 
 import { anActiveDriver } from './driver.fixtures';

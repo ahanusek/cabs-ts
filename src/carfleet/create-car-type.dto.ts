@@ -1,5 +1,5 @@
 import { IsEnum } from 'class-validator';
-import { CarClass } from '../entity/car-type.entity';
+import { CarClass } from './car-type.entity';
 
 export class CreateCarTypeDto {
   public description: string;

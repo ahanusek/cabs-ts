@@ -1,3 +1,5 @@
+import { CarFleetModule } from './carfleet/car-fleet-module';
+import { ConfigurationModule } from './config/configuration-module';
 import { AgreementsModule } from './agreements/agreements-module';
 import { ClaimRefundedSubscriber } from './loyalty/claim-refunded.subscriber';
 import { TransitDetails } from './transitdetails/transit-details.entity';
@@ -18,16 +20,14 @@ import { TravelledDistanceService } from './driverreport/travelled-distance/trav
 import { SqlDriverReportCreator } from './driverreport/sql-driver-report.creator';
 import { ContractAttachmentData } from './agreements/contract-attachment-data.entity';
 import { ClaimsResolver } from './crm/claims/claims-resolver.entity';
-import { CarTypeActiveCounter } from './entity/car-type-active-counter.entity';
+import { CarTypeActiveCounter } from './carfleet/car-type-active-counter.entity';
 import { DriverFinder } from './service/driver-finder.service';
 import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ConfigModule } from '@nestjs/config';
 import { DriverController } from './controllers/driver.controller';
 import { DriverService } from './service/driver.service';
-import { AppProperties } from './config/app-properties.config';
-import { CarTypeController } from './controllers/car-type.controller';
-import { CarTypeService } from './service/car-type.service';
+
 import { DistanceCalculator } from './service/distance-calculator.service';
 import { InvoiceGenerator } from './service/invoice-generator.service';
 import { DriverNotificationService } from './service/driver-notification.service';
@@ -54,7 +54,7 @@ import { DriverReportController } from './controllers/driver-report.controller';
 import ormConfig from './mikro-orm.config';
 
 import { Driver } from './entity/driver.entity';
-import { CarType } from './entity/car-type.entity';
+import { CarType } from './carfleet/car-type.entity';
 import { Client } from './entity/client.entity';
 import { Transit } from './entity/transit.entity';
 import { Address } from './entity/address.entity';
@@ -101,6 +101,8 @@ const entities = [
 
 @Module({
   imports: [
+    CarFleetModule,
+    ConfigurationModule,
     AgreementsModule,
     ContractsModule,
     RepairModule,
@@ -110,7 +112,6 @@ const entities = [
   ],
   controllers: [
     DriverController,
-    CarTypeController,
     ClientController,
     DriverSessionController,
     DriverTrackingController,
@@ -130,9 +131,7 @@ const entities = [
     TravelledDistanceService,
     SqlDriverReportCreator,
     DriverFinder,
-    AppProperties,
     DriverService,
-    CarTypeService,
     DistanceCalculator,
     InvoiceGenerator,
     DriverNotificationService,

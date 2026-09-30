@@ -1,11 +1,11 @@
-import { CarTypeActiveCounter } from '../entity/car-type-active-counter.entity';
+import { CarTypeActiveCounter } from './car-type-active-counter.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { CarTypeRepository } from '../repository/car-type.repository';
+import { CarTypeRepository } from './car-type.repository';
 import { AppProperties } from '../config/app-properties.config';
-import { CarClass, CarStatus, CarType } from '../entity/car-type.entity';
-import { CreateCarTypeDto } from '../dto/create-car-type.dto';
-import { CarTypeDto } from '../dto/car-type.dto';
+import { CarClass, CarStatus, CarType } from './car-type.entity';
+import { CreateCarTypeDto } from './create-car-type.dto';
+import { CarTypeDto } from './car-type.dto';
 
 @Injectable()
 export class CarTypeService {

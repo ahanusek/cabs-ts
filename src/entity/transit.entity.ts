@@ -16,7 +16,7 @@ import {
 import { Driver } from './driver.entity';
 import { Client, PaymentType } from './client.entity';
 import { Address } from './address.entity';
-import { CarClass } from './car-type.entity';
+import { CarClass } from '../carfleet/car-type.entity';
 import { TransitRepository } from '../repository/transit.repository';
 
 export enum Status {

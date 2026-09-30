@@ -6,7 +6,7 @@ import { DriverSession } from '../entity/driver-session.entity';
 import { DriverSessionRepository } from '../repository/driver-session.repository';
 import { DriverStatus } from '../entity/driver.entity';
 import { Status, Transit } from '../entity/transit.entity';
-import { CarTypeService } from './car-type.service';
+import { CarTypeService } from '../carfleet/car-type.service';
 import { GeocodingService } from './geocoding.service';
 import { DriverNotificationService } from './driver-notification.service';
 

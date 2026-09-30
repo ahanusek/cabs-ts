@@ -1,4 +1,4 @@
-import { CarClass } from '../../src/entity/car-type.entity';
+import { CarClass } from '../../src/carfleet/car-type.entity';
 import { TransitService } from '../../src/service/transit.service';
 import { aClient } from './client.fixtures';
 import { anAddress } from './address.fixtures';

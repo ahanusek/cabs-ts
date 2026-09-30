@@ -1,6 +1,6 @@
-import { CarTypeActiveCounter } from '../entity/car-type-active-counter.entity';
+import { CarTypeActiveCounter } from './car-type-active-counter.entity';
 import { EntityRepository, raw } from '@mikro-orm/postgresql';
-import { CarClass, CarStatus, CarType } from '../entity/car-type.entity';
+import { CarClass, CarStatus, CarType } from './car-type.entity';
 import { NotFoundException } from '@nestjs/common';
 
 export class CarTypeRepository extends EntityRepository<CarType> {

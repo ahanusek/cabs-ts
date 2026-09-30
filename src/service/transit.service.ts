@@ -16,7 +16,7 @@ import { DriverFinder } from './driver-finder.service';
 import { TransitDetailsFacade } from '../transitdetails/transit-details.facade';
 import { transitSnapshot } from '../transitdetails/transit-snapshot';
 import { AddressDto } from '../dto/address.dto';
-import { CarClass } from '../entity/car-type.entity';
+import { CarClass } from '../carfleet/car-type.entity';
 import { Address } from '../entity/address.entity';
 import { Status, Transit } from '../entity/transit.entity';
 import { DriverNotificationService } from './driver-notification.service';

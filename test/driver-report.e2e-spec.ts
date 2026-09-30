@@ -9,7 +9,7 @@ import {
   DriverAttributeName,
 } from '../src/entity/driver-attribute.entity';
 import { Claim, ClaimStatus } from '../src/crm/claims/claim.entity';
-import { CarClass } from '../src/entity/car-type.entity';
+import { CarClass } from '../src/carfleet/car-type.entity';
 import { Money } from '../src/money/money';
 import { aCompletedTransit } from './support/transit.fixtures';
 import { anActiveDriver } from './support/driver.fixtures';

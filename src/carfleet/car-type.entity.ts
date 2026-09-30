@@ -1,7 +1,7 @@
 import { NotAcceptableException } from '@nestjs/common';
 import { Entity, Property, Enum } from '@mikro-orm/decorators/legacy';
 import { BaseEntity } from '../common/base.entity';
-import { CarTypeRepository } from '../repository/car-type.repository';
+import { CarTypeRepository } from './car-type.repository';
 
 export enum CarClass {
   ECO = 'eco',

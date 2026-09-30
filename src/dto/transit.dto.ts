@@ -4,7 +4,7 @@ import { Status, Transit } from '../entity/transit.entity';
 import { DriverDto } from './driver.dto';
 import { ClaimDto } from '../crm/claims/claim.dto';
 import { AddressDto } from './address.dto';
-import { CarClass } from '../entity/car-type.entity';
+import { CarClass } from '../carfleet/car-type.entity';
 import { ClientDto } from './client.dto';
 import { NotAcceptableException } from '@nestjs/common';
 

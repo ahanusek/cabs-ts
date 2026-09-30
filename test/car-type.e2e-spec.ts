@@ -1,5 +1,5 @@
-import { CarTypeService } from '../src/service/car-type.service';
-import { CarClass, CarStatus } from '../src/entity/car-type.entity';
+import { CarTypeService } from '../src/carfleet/car-type.service';
+import { CarClass, CarStatus } from '../src/carfleet/car-type.entity';
 import { createTestApplication } from './support/test-application';
 
 describe('Car fleet behavior', () => {

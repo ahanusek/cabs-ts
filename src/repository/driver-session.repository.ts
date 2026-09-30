@@ -1,6 +1,6 @@
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { DriverSession } from '../entity/driver-session.entity';
-import { CarClass } from '../entity/car-type.entity';
+import { CarClass } from '../carfleet/car-type.entity';
 import { Driver } from '../entity/driver.entity';
 import { NotFoundException } from '@nestjs/common';
 

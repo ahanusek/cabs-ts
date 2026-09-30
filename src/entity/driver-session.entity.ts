@@ -6,7 +6,7 @@ import {
   Enum,
 } from '@mikro-orm/decorators/legacy';
 import { Driver } from './driver.entity';
-import { CarClass } from './car-type.entity';
+import { CarClass } from '../carfleet/car-type.entity';
 import { DriverSessionRepository } from '../repository/driver-session.repository';
 
 @Entity({ repository: () => DriverSessionRepository })

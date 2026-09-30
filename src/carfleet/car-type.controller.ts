@@ -10,10 +10,10 @@ import {
   Get,
 } from '@nestjs/common';
 import type { Response } from 'express';
-import { CarTypeService } from '../service/car-type.service';
-import { CreateCarTypeDto } from '../dto/create-car-type.dto';
-import { CarTypeDto } from '../dto/car-type.dto';
-import { CarClass } from '../entity/car-type.entity';
+import { CarTypeService } from './car-type.service';
+import { CreateCarTypeDto } from './create-car-type.dto';
+import { CarTypeDto } from './car-type.dto';
+import { CarClass } from './car-type.entity';
 
 @Controller('cartypes')
 export class CarTypeController {
