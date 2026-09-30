@@ -155,7 +155,10 @@ export class DriverService {
         this.driverFeeService.calculateDriverFee(t.getId()),
       ),
     );
-    const sum = fees.reduce((prev, curr) => (prev ?? 0) + (curr ?? 0), 0);
+    const sum = fees.reduce(
+      (prev, curr) => (prev ?? 0) + (curr?.toMajor() ?? 0),
+      0,
+    );
 
     return sum;
   }

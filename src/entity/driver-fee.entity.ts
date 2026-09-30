@@ -1,3 +1,5 @@
+import { Money } from '../money/money';
+import { MoneyType } from '../money/money.type';
 import { BaseEntity } from '../common/base.entity';
 import { Driver } from './driver.entity';
 import { Entity, Property, OneToOne, Enum } from '@mikro-orm/decorators/legacy';
@@ -16,8 +18,8 @@ export class DriverFee extends BaseEntity {
   @Property()
   private amount!: number;
 
-  @Property({ default: 0 })
-  private min: number = 0;
+  @Property({ type: MoneyType, defaultRaw: '0' })
+  private min: Money = Money.ZERO;
 
   @OneToOne(() => Driver, (driver) => driver.fee)
   public driver!: Driver;
@@ -32,7 +34,7 @@ export class DriverFee extends BaseEntity {
     if (feeType) this.feeType = feeType;
     if (driver) this.driver = driver;
     if (amount) this.amount = amount;
-    if (min) this.min = min;
+    if (min !== undefined) this.min = Money.fromMajor(min);
   }
 
   public getFeeType() {
@@ -63,7 +65,7 @@ export class DriverFee extends BaseEntity {
     return this.min;
   }
 
-  public setMin(min: number) {
+  public setMin(min: Money) {
     this.min = min;
   }
 }

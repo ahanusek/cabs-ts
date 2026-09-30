@@ -14,7 +14,7 @@ describe('Driver license behavior before extracting a value object', () => {
     drivers = fixture.app.get(DriverService);
   });
 
-  afterAll(() => fixture.close());
+  afterAll(() => fixture?.close());
 
   it('allows an inactive candidate to register with an unvalidated license', async () => {
     const driver = await fixture.run(() => register('invalid'));

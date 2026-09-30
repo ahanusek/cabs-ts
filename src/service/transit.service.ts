@@ -599,14 +599,14 @@ export class TransitService {
       transit.setCompleteAt(Date.now());
       const driverFee =
         await this.driverFeeService.calculateDriverFee(transitId);
-      transit.setDriversFee(driverFee ?? 0);
+      transit.setDriversFee(driverFee);
       await this.awardsService.registerMiles(
         transit.getClient().getId(),
         transitId,
       );
       await this.transitRepository.getEntityManager().flush();
       await this.invoiceGenerator.generate(
-        transit.getPrice() ?? 0,
+        transit.getPrice()?.toMajor() ?? 0,
         transit.getClient().getName() + ' ' + transit.getClient().getLastName(),
       );
     } else {

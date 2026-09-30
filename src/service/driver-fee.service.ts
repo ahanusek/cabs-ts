@@ -1,3 +1,4 @@
+import { Money } from '../money/money';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { DriverFeeRepository } from '../repository/driver-fee.repository';
@@ -20,9 +21,9 @@ export class DriverFeeService {
       throw new NotFoundException('transit does not exist, id = ' + transitId);
     }
     if (transit.getDriversFee() != null) {
-      return transit.getDriversFee();
+      return transit.getDriversFee()!;
     }
-    const transitPrice = transit.getPrice() ?? 0;
+    const transitPrice = transit.getPrice() ?? Money.ZERO;
 
     const driver = transit.getDriver();
 
@@ -39,14 +40,11 @@ export class DriverFeeService {
     }
     let finalFee;
     if (driverFee.getFeeType() === FeeType.FLAT) {
-      finalFee = transitPrice - driverFee.getAmount();
+      finalFee = transitPrice.subtract(Money.fromMajor(driverFee.getAmount()));
     } else {
-      finalFee = (transitPrice * driverFee.getAmount()) / 100;
+      finalFee = transitPrice.percentage(driverFee.getAmount());
     }
 
-    return Math.max(
-      finalFee,
-      driverFee.getMin() == null ? 0 : driverFee.getMin(),
-    );
+    return finalFee.max(driverFee.getMin());
   }
 }

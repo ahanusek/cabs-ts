@@ -15,7 +15,7 @@ describe('Transit pricing before extracting Money', () => {
     const transit = new Transit();
     transit.setStatus(Status.DRAFT);
     transit.setKm(km);
-    expect(transit.getEstimatedPrice()).toBe(price);
+    expect(transit.getEstimatedPrice()?.toMajor()).toBe(price);
   });
 
   it('rejects estimating an already completed ride', () => {

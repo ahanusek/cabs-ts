@@ -1,3 +1,5 @@
+import { Money } from '../money/money';
+import { MoneyType } from '../money/money.type';
 import { ForbiddenException } from '@nestjs/common';
 import { BaseEntity } from '../common/base.entity';
 import { Collection } from '@mikro-orm/core';
@@ -114,14 +116,14 @@ export class Transit extends BaseEntity {
   @Property({ default: 0 })
   public km: number = 0;
 
-  @Property({ nullable: true, type: 'integer' })
-  public price: number | null = null;
+  @Property({ nullable: true, type: MoneyType })
+  public price: Money | null = null;
 
-  @Property({ nullable: true, type: 'integer' })
-  public estimatedPrice: number | null = null;
+  @Property({ nullable: true, type: MoneyType })
+  public estimatedPrice: Money | null = null;
 
-  @Property({ nullable: true })
-  public driversFee?: number;
+  @Property({ nullable: true, type: MoneyType })
+  public driversFee?: Money;
 
   @Property({ type: 'bigint', nullable: true })
   public dateTime?: number;
@@ -154,7 +156,7 @@ export class Transit extends BaseEntity {
     return this.price;
   }
 
-  public setPrice(price: number) {
+  public setPrice(price: Money) {
     this.price = price;
   }
 
@@ -279,7 +281,7 @@ export class Transit extends BaseEntity {
     return this.driversFee;
   }
 
-  public setDriversFee(driversFee: number) {
+  public setDriversFee(driversFee: Money) {
     this.driversFee = driversFee;
   }
 
@@ -287,7 +289,7 @@ export class Transit extends BaseEntity {
     return this.estimatedPrice;
   }
 
-  public setEstimatedPrice(estimatedPrice: number) {
+  public setEstimatedPrice(estimatedPrice: Money) {
     this.estimatedPrice = estimatedPrice;
   }
 
@@ -306,7 +308,7 @@ export class Transit extends BaseEntity {
     return this.estimatedPrice;
   }
 
-  public calculateFinalCosts(): number {
+  public calculateFinalCosts(): Money {
     if (this.status === Status.COMPLETED) {
       return this.calculateCost();
     } else {
@@ -316,7 +318,7 @@ export class Transit extends BaseEntity {
     }
   }
 
-  private calculateCost(): number {
+  private calculateCost(): Money {
     let baseFee = Transit.BASE_FEE;
     let factorToCalculate = this.factor;
     if (factorToCalculate == null) {
@@ -363,7 +365,7 @@ export class Transit extends BaseEntity {
     const priceBigDecimal = Number(
       (this.km * kmRate * factorToCalculate + baseFee).toFixed(2),
     );
-    this.price = priceBigDecimal;
+    this.price = Money.fromMajor(priceBigDecimal);
     return this.price;
   }
 }
