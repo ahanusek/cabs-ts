@@ -1,8 +1,9 @@
+import { RequestTransitService } from './request-transit.service';
 import { Injectable, ForbiddenException } from '@nestjs/common';
 import { Transactional } from '@mikro-orm/decorators/legacy';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { DomainEvents } from '../common/domain-events';
-import { ClientService } from '../crm/client.service';
+
 import { AwardsService } from '../loyalty/awards.service';
 import { DriverService } from '../driverfleet/driver.service';
 import { DriverFeeService } from '../driverfleet/driver-fee.service';
@@ -20,8 +21,7 @@ import { Tariff } from '../pricing/tariff';
 import { CreateTransitDto } from './create-transit.dto';
 import { TransitDetailsFacade } from './details/transit-details.facade';
 import { Status } from './details/status';
-import { requestSnapshot } from './details/request-snapshot';
-import { RequestForTransit } from './request-for-transit.entity';
+
 import { TransitDemand } from './transit-demand.entity';
 import { Transit } from './transit.entity';
 import { RideStore } from './ride-store';
@@ -29,7 +29,6 @@ import { RideStore } from './ride-store';
 @Injectable()
 export class TransitService {
   constructor(
-    private readonly clients: ClientService,
     private readonly drivers: DriverService,
     private readonly awards: AwardsService,
     private readonly fees: DriverFeeService,
@@ -40,38 +39,19 @@ export class TransitService {
     private readonly events: DomainEvents,
     private readonly details: TransitDetailsFacade,
     private readonly store: RideStore,
+    private readonly requests: RequestTransitService,
   ) {}
-
-  @Transactional()
-  public async createTransit(dto: CreateTransitDto) {
-    return this._createTransit(
-      dto.clientId,
-      new AddressDto(dto.from).toAddressEntity(),
-      new AddressDto(dto.to).toAddressEntity(),
-      dto.carClass,
-    );
+  public createTransit(dto: CreateTransitDto) {
+    return this.requests.createTransit(dto);
   }
 
-  @Transactional()
-  public async _createTransit(
+  public _createTransit(
     clientId: string,
-    origin: Address,
-    destination: Address,
+    from: Address,
+    to: Address,
     carClass: CarClass,
   ) {
-    const client = await this.clients.load(clientId);
-    const from = await this.routes.save(origin);
-    const to = await this.routes.save(destination);
-    const now = Date.now();
-    const request = new RequestForTransit(
-      Tariff.ofTime(new Date(now)),
-      this.routes.distance(from, to),
-    );
-    await this.em.persist(request).flush();
-    await this.details.record(
-      requestSnapshot(request, { client, from, to, carClass, now }),
-    );
-    return request;
+    return this.requests._createTransit(clientId, from, to, carClass);
   }
 
   @Transactional()

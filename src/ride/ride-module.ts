@@ -1,3 +1,4 @@
+import { RequestTransitService } from './request-transit.service';
 import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { TransitService } from './transit.service';
@@ -27,7 +28,7 @@ import { TransitDetailsModule } from './details/transit-details-module';
     TransitDetailsModule,
     MikroOrmModule.forFeature([RequestForTransit, TransitDemand, Transit]),
   ],
-  providers: [TransitService, RideStore],
+  providers: [RequestTransitService, TransitService, RideStore],
   controllers: [TransitController],
   exports: [TransitService],
 })
