@@ -1,3 +1,6 @@
+import { RepairModule } from './repair/repair.module';
+import { Party } from './party/party.entity';
+import { PartyRelationship } from './party/party-relationship.entity';
 import { TravelledDistance } from './driverreport/travelled-distance/travelled-distance.entity';
 import { TravelledDistanceService } from './driverreport/travelled-distance/travelled-distance.service';
 import { SqlDriverReportCreator } from './driverreport/sql-driver-report.creator';
@@ -57,6 +60,8 @@ import { ClaimAttachment } from './entity/claim-attachment.entity';
 import { ContractAttachment } from './entity/contract-attachment.entity';
 
 const entities = [
+  Party,
+  PartyRelationship,
   TravelledDistance,
   ContractAttachmentData,
   ClaimsResolver,
@@ -81,6 +86,7 @@ const entities = [
 
 @Module({
   imports: [
+    RepairModule,
     ConfigModule.forRoot(),
     MikroOrmModule.forRoot({ ...ormConfig, entities }),
     MikroOrmModule.forFeature(entities),
