@@ -2,11 +2,15 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppProperties {
-  private noOfTransitsForClaimAutomaticRefund: number;
+  private noOfTransitsForClaimAutomaticRefund = Number(
+    process.env.CLAIM_AUTO_REFUND_TRANSITS ?? 10,
+  );
 
-  private automaticRefundForVipThreshold: number;
+  private automaticRefundForVipThreshold = Number(
+    process.env.CLAIM_VIP_REFUND_LIMIT ?? 100,
+  );
 
-  private minNoOfCarsForEcoClass: number;
+  private minNoOfCarsForEcoClass = Number(process.env.ECO_MIN_CARS ?? 3);
 
   private milesExpirationInDays = 365;
 

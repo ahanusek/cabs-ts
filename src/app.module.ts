@@ -1,3 +1,4 @@
+import { ClaimsResolver } from './claims/claims-resolver.entity';
 import { CarTypeActiveCounter } from './entity/car-type-active-counter.entity';
 import { DriverFinder } from './service/driver-finder.service';
 import { Module } from '@nestjs/common';
@@ -52,6 +53,7 @@ import { ClaimAttachment } from './entity/claim-attachment.entity';
 import { ContractAttachment } from './entity/contract-attachment.entity';
 
 const entities = [
+  ClaimsResolver,
   CarTypeActiveCounter,
   Driver,
   CarType,

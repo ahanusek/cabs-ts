@@ -1,3 +1,4 @@
+import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
 import { Claim, ClaimStatus } from '../entity/claim.entity';
 import { Type } from '../entity/client.entity';
 import { Money } from '../money/money';
@@ -18,11 +19,18 @@ export interface ClaimDecision {
   status: ClaimStatus;
 }
 
+@Entity()
 export class ClaimsResolver {
-  constructor(
-    public readonly clientId: string,
-    private claimedTransitIds: string[] = [],
-  ) {}
+  @PrimaryKey({ type: 'uuid' })
+  public readonly clientId: string;
+
+  @Property({ type: 'json' })
+  private claimedTransitIds: string[];
+
+  constructor(clientId: string, claimedTransitIds: string[] = []) {
+    this.clientId = clientId;
+    this.claimedTransitIds = claimedTransitIds;
+  }
 
   public resolve(
     claim: Claim,

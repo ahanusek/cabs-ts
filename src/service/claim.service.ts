@@ -1,3 +1,5 @@
+import { ClaimsResolver, WhoToAsk } from '../claims/claims-resolver.entity';
+import { Money } from '../money/money';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Transactional } from '@mikro-orm/decorators/legacy';
 import { Injectable, NotFoundException } from '@nestjs/common';
@@ -85,102 +87,58 @@ export class ClaimService {
   @Transactional()
   public async tryToResolveAutomatically(id: string): Promise<Claim> {
     const claim = await this.find(id);
-    if (
-      (
-        await this.claimRepository.findByOwnerAndTransit(
-          claim.getOwner(),
-          claim.getTransit(),
-        )
-      ).length > 1
-    ) {
-      claim.setStatus(ClaimStatus.ESCALATED);
-      claim.setCompletionDate(Date.now());
-      claim.setChangeDate(Date.now());
-      claim.setCompletionMode(CompletionMode.MANUAL);
-      return claim;
-    }
-    if (
-      (await this.claimRepository.findByOwner(claim.getOwner())).length <= 3
-    ) {
-      claim.setStatus(ClaimStatus.REFUNDED);
-      claim.setCompletionDate(Date.now());
-      claim.setChangeDate(Date.now());
-      claim.setCompletionMode(CompletionMode.AUTOMATIC);
-      await this.clientNotificationService.notifyClientAboutRefund(
-        claim.getClaimNo(),
-        claim.getOwner().getId(),
+    let resolver = await this.em.findOne(ClaimsResolver, {
+      clientId: claim.getOwner().id,
+    });
+    if (!resolver) {
+      const previousClaims = await this.claimRepository.find(
+        { owner: claim.getOwner(), id: { $ne: id } },
+        { populate: ['transit'] },
       );
-      return claim;
+      resolver = new ClaimsResolver(claim.getOwner().id, [
+        ...new Set(previousClaims.map((previous) => previous.getTransit().id)),
+      ]);
+      this.em.persist(resolver);
     }
-    if (claim.getOwner().getType() === Type.VIP) {
-      if (
-        (claim.getTransit().getPrice()?.toMajor() ?? 0) <
-        this.appProperties.getAutomaticRefundForVipThreshold()
-      ) {
-        claim.setStatus(ClaimStatus.REFUNDED);
-        claim.setCompletionDate(Date.now());
-        claim.setChangeDate(Date.now());
-        claim.setCompletionMode(CompletionMode.AUTOMATIC);
-        await this.clientNotificationService.notifyClientAboutRefund(
-          claim.getClaimNo(),
-          claim.getOwner().getId(),
-        );
-        await this.awardsService.registerSpecialMiles(
-          claim.getOwner().getId(),
-          10,
-        );
-      } else {
-        claim.setStatus(ClaimStatus.ESCALATED);
-        claim.setCompletionDate(Date.now());
-        claim.setChangeDate(Date.now());
-        claim.setCompletionMode(CompletionMode.MANUAL);
-        const driver = claim.getTransit().getDriver();
-        if (driver) {
-          await this.driverNotificationService.askDriverForDetailsAboutClaim(
-            claim.getClaimNo(),
-            driver.getId(),
-          );
-        }
-      }
-    } else {
-      if (
-        (await this.transitRepository.findByClient(claim.getOwner())).length >=
-        this.appProperties.getNoOfTransitsForClaimAutomaticRefund()
-      ) {
-        if (
-          (claim.getTransit().getPrice()?.toMajor() ?? 0) <
-          this.appProperties.getAutomaticRefundForVipThreshold()
-        ) {
-          claim.setStatus(ClaimStatus.REFUNDED);
-          claim.setCompletionDate(Date.now());
-          claim.setChangeDate(Date.now());
-          claim.setCompletionMode(CompletionMode.AUTOMATIC);
-          await this.clientNotificationService.notifyClientAboutRefund(
-            claim.getClaimNo(),
-            claim.getOwner().getId(),
-          );
-        } else {
-          claim.setStatus(ClaimStatus.ESCALATED);
-          claim.setCompletionDate(Date.now());
-          claim.setChangeDate(Date.now());
-          claim.setCompletionMode(CompletionMode.MANUAL);
-          await this.clientNotificationService.askForMoreInformation(
-            claim.getClaimNo(),
-            claim.getOwner().getId(),
-          );
-        }
-      } else {
-        claim.setStatus(ClaimStatus.ESCALATED);
-        claim.setCompletionDate(Date.now());
-        claim.setChangeDate(Date.now());
-        claim.setCompletionMode(CompletionMode.MANUAL);
-        await this.driverNotificationService.askDriverForDetailsAboutClaim(
-          claim.getClaimNo(),
-          claim.getOwner().getId(),
-        );
-      }
+    const count = await this.transitRepository.count({
+      client: claim.getOwner(),
+    });
+    const result = resolver.resolve(claim, count, {
+      vipThreshold: Money.fromMajor(
+        this.appProperties.getAutomaticRefundForVipThreshold(),
+      ),
+      minimumTransits:
+        this.appProperties.getNoOfTransitsForClaimAutomaticRefund(),
+    });
+    claim.setStatus(result.status);
+    claim.setChangeDate(Date.now());
+    claim.setCompletionDate(Date.now());
+    claim.setCompletionMode(
+      result.status === ClaimStatus.REFUNDED
+        ? CompletionMode.AUTOMATIC
+        : CompletionMode.MANUAL,
+    );
+    if (result.status === ClaimStatus.REFUNDED) {
+      this.clientNotificationService.notifyClientAboutRefund(
+        claim.getClaimNo(),
+        claim.getOwner().id,
+      );
+      if (claim.getOwner().getType() === Type.VIP)
+        await this.awardsService.registerSpecialMiles(claim.getOwner().id, 10);
     }
-
+    if (result.whoToAsk === WhoToAsk.DRIVER && claim.getTransit().getDriver()) {
+      this.driverNotificationService.askDriverForDetailsAboutClaim(
+        claim.getClaimNo(),
+        claim.getTransit().getDriver()!.id,
+      );
+    }
+    if (result.whoToAsk === WhoToAsk.CLIENT) {
+      this.clientNotificationService.askForMoreInformation(
+        claim.getClaimNo(),
+        claim.getOwner().id,
+      );
+    }
+    await this.em.flush();
     return claim;
   }
 }

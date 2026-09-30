@@ -28,7 +28,8 @@ export class ClaimDto {
 
   public constructor(claim: Claim | CreateClaimDto) {
     if (!(claim instanceof Claim)) {
-      this.setClaimID(claim.clientId);
+      this.setClientId(claim.clientId);
+      this.setTransitId(claim.transitId);
       this.setReason(claim.reason);
       this.setDraft(true);
       this.setIncidentDescription(claim.incidentDescription);

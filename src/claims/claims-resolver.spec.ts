@@ -1,4 +1,4 @@
-import { ClaimsResolver, WhoToAsk } from './claims-resolver';
+import { ClaimsResolver, WhoToAsk } from './claims-resolver.entity';
 import { Claim, ClaimStatus } from '../entity/claim.entity';
 import { Type } from '../entity/client.entity';
 import { Money } from '../money/money';
