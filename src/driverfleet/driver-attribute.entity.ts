@@ -6,7 +6,7 @@ import {
   Enum,
 } from '@mikro-orm/decorators/legacy';
 import { Driver } from './driver.entity';
-import { DriverAttributeRepository } from '../repository/driver-attribute.repository';
+import { DriverAttributeRepository } from './driver-attribute.repository';
 
 export enum DriverAttributeName {
   PENALTY_POINTS = 'penalty_points',

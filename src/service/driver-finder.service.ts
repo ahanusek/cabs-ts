@@ -4,7 +4,7 @@ import { DriverPosition } from '../entity/driver-position.entity';
 import { DriverPositionRepository } from '../repository/driver-position.repository';
 import { DriverSession } from '../entity/driver-session.entity';
 import { DriverSessionRepository } from '../repository/driver-session.repository';
-import { DriverStatus } from '../entity/driver.entity';
+import { DriverStatus } from '../driverfleet/driver.entity';
 import { Status, Transit } from '../entity/transit.entity';
 import { CarTypeService } from '../carfleet/car-type.service';
 import { GeocodingService } from './geocoding.service';

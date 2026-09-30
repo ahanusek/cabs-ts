@@ -3,7 +3,11 @@ import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { MikroORM } from '@mikro-orm/postgresql';
 import request from 'supertest';
-import { Driver, DriverStatus, DriverType } from '../src/entity/driver.entity';
+import {
+  Driver,
+  DriverStatus,
+  DriverType,
+} from '../src/driverfleet/driver.entity';
 import { DriverPosition } from '../src/entity/driver-position.entity';
 import { DriverPositionRepository } from '../src/repository/driver-position.repository';
 import { AppModule } from '../src/app.module';

@@ -3,7 +3,7 @@ import { MoneyType } from '../money/money.type';
 import { BaseEntity } from '../common/base.entity';
 import { Driver } from './driver.entity';
 import { Entity, Property, OneToOne, Enum } from '@mikro-orm/decorators/legacy';
-import { DriverFeeRepository } from '../repository/driver-fee.repository';
+import { DriverFeeRepository } from './driver-fee.repository';
 
 export enum FeeType {
   FLAT = 'flat',

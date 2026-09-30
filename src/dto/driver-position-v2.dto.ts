@@ -1,4 +1,4 @@
-import { Driver } from '../entity/driver.entity';
+import { Driver } from '../driverfleet/driver.entity';
 
 export class DriverPositionV2Dto {
   private driver: Driver;

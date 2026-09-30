@@ -2,7 +2,7 @@ import {
   Driver,
   DriverStatus,
   DriverType,
-} from '../../src/entity/driver.entity';
+} from '../../src/driverfleet/driver.entity';
 import { DriverLicense } from '../../src/driverfleet/driver-license';
 
 export function anActiveDriver(): Driver {

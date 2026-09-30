@@ -1,10 +1,10 @@
-import { DriverService } from '../src/service/driver.service';
+import { DriverService } from '../src/driverfleet/driver.service';
 import { TransitDetails } from '../src/transitdetails/transit-details.entity';
 import { transitSnapshot } from '../src/transitdetails/transit-snapshot';
 import { Money } from '../src/money/money';
 import { Transit } from '../src/entity/transit.entity';
-import { DriverFee, FeeType } from '../src/entity/driver-fee.entity';
-import { DriverFeeService } from '../src/service/driver-fee.service';
+import { DriverFee, FeeType } from '../src/driverfleet/driver-fee.entity';
+import { DriverFeeService } from '../src/driverfleet/driver-fee.service';
 import { createTestApplication } from './support/test-application';
 import { aCompletedTransit } from './support/transit.fixtures';
 

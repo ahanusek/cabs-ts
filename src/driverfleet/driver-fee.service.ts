@@ -1,9 +1,9 @@
 import { Money } from '../money/money';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { DriverFeeRepository } from '../repository/driver-fee.repository';
+import { DriverFeeRepository } from './driver-fee.repository';
 
-import { FeeType, DriverFee } from '../entity/driver-fee.entity';
+import { FeeType, DriverFee } from './driver-fee.entity';
 
 @Injectable()
 export class DriverFeeService {

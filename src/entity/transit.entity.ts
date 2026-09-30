@@ -13,7 +13,7 @@ import {
   ManyToMany,
   Enum,
 } from '@mikro-orm/decorators/legacy';
-import { Driver } from './driver.entity';
+import { Driver } from '../driverfleet/driver.entity';
 import { Client, PaymentType } from './client.entity';
 import { Address } from './address.entity';
 import { CarClass } from '../carfleet/car-type.entity';

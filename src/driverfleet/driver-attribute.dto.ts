@@ -2,7 +2,7 @@ import objectHash from 'object-hash';
 import {
   DriverAttribute,
   DriverAttributeName,
-} from '../entity/driver-attribute.entity';
+} from './driver-attribute.entity';
 
 export class DriverAttributeDto {
   public name: DriverAttributeName;

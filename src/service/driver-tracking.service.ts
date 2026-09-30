@@ -7,10 +7,10 @@ import {
   NotAcceptableException,
 } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { DriverRepository } from '../repository/driver.repository';
+import { DriverRepository } from '../driverfleet/driver.repository';
 import { DriverPositionRepository } from '../repository/driver-position.repository';
 import { DriverPosition } from '../entity/driver-position.entity';
-import { Driver, DriverStatus } from '../entity/driver.entity';
+import { Driver, DriverStatus } from '../driverfleet/driver.entity';
 
 @Injectable()
 export class DriverTrackingService {

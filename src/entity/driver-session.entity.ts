@@ -5,7 +5,7 @@ import {
   ManyToOne,
   Enum,
 } from '@mikro-orm/decorators/legacy';
-import { Driver } from './driver.entity';
+import { Driver } from '../driverfleet/driver.entity';
 import { CarClass } from '../carfleet/car-type.entity';
 import { DriverSessionRepository } from '../repository/driver-session.repository';
 

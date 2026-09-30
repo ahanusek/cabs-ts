@@ -7,10 +7,10 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { DriverService } from '../service/driver.service';
-import { CreateDriverDto } from '../dto/create-driver.dto';
-import { DriverDto } from '../dto/driver.dto';
-import { DriverStatus } from '../entity/driver.entity';
+import { DriverService } from './driver.service';
+import { CreateDriverDto } from './create-driver.dto';
+import { DriverDto } from './driver.dto';
+import { DriverStatus } from './driver.entity';
 
 @Controller('drivers')
 export class DriverController {

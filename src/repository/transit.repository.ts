@@ -1,6 +1,6 @@
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { Status, Transit } from '../entity/transit.entity';
-import { Driver } from '../entity/driver.entity';
+import { Driver } from '../driverfleet/driver.entity';
 import { Client } from '../entity/client.entity';
 import { Address } from '../entity/address.entity';
 

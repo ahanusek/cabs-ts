@@ -1,5 +1,5 @@
-import { DriverService } from '../src/service/driver.service';
-import { DriverStatus } from '../src/entity/driver.entity';
+import { DriverService } from '../src/driverfleet/driver.service';
+import { DriverStatus } from '../src/driverfleet/driver.entity';
 import { createTestApplication } from './support/test-application';
 
 const VALID_LICENSE = 'FARME100165AB5EW';

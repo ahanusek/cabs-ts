@@ -1,6 +1,6 @@
 import { EntityRepository, raw } from '@mikro-orm/postgresql';
 import { DriverPosition } from '../entity/driver-position.entity';
-import { Driver } from '../entity/driver.entity';
+import { Driver } from '../driverfleet/driver.entity';
 import { DriverPositionV2Dto } from '../dto/driver-position-v2.dto';
 
 export class DriverPositionRepository extends EntityRepository<DriverPosition> {

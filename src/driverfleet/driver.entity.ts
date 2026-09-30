@@ -1,5 +1,5 @@
-import { DriverLicense } from '../driverfleet/driver-license';
-import { DriverLicenseType } from '../driverfleet/driver-license.type';
+import { DriverLicense } from './driver-license';
+import { DriverLicenseType } from './driver-license.type';
 import { Collection } from '@mikro-orm/core';
 import {
   Entity,
@@ -12,7 +12,7 @@ import { BaseEntity } from '../common/base.entity';
 
 import { DriverAttribute } from './driver-attribute.entity';
 import { DriverFee } from './driver-fee.entity';
-import { DriverRepository } from '../repository/driver.repository';
+import { DriverRepository } from './driver.repository';
 
 export enum DriverStatus {
   INACTIVE = 'inactive',

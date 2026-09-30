@@ -1,4 +1,4 @@
-import { Driver, DriverStatus, DriverType } from '../entity/driver.entity';
+import { Driver, DriverStatus, DriverType } from './driver.entity';
 
 export class DriverDto {
   private id: string;

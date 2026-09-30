@@ -1,20 +1,20 @@
 import { TransitDetailsFacade } from '../transitdetails/transit-details.facade';
-import { DriverLicense } from '../driverfleet/driver-license';
+import { DriverLicense } from './driver-license';
 import {
   Injectable,
   NotAcceptableException,
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { Driver, DriverStatus, DriverType } from '../entity/driver.entity';
-import { DriverDto } from '../dto/driver.dto';
-import { CreateDriverDto } from '../dto/create-driver.dto';
-import { DriverRepository } from '../repository/driver.repository';
+import { Driver, DriverStatus, DriverType } from './driver.entity';
+import { DriverDto } from './driver.dto';
+import { CreateDriverDto } from './create-driver.dto';
+import { DriverRepository } from './driver.repository';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { DriverAttributeRepository } from '../repository/driver-attribute.repository';
+import { DriverAttributeRepository } from './driver-attribute.repository';
 
 import dayjs from 'dayjs';
-import { DriverAttribute } from '../entity/driver-attribute.entity';
+import { DriverAttribute } from './driver-attribute.entity';
 
 @Injectable()
 export class DriverService {

@@ -1,7 +1,7 @@
 import { TravelledDistanceService } from '../src/driverreport/travelled-distance/travelled-distance.service';
 import { NotAcceptableException } from '@nestjs/common';
 import { DriverTrackingService } from '../src/service/driver-tracking.service';
-import { DriverStatus } from '../src/entity/driver.entity';
+import { DriverStatus } from '../src/driverfleet/driver.entity';
 import { anActiveDriver } from './support/driver.fixtures';
 import { createTestApplication } from './support/test-application';
 

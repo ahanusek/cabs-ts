@@ -1,6 +1,6 @@
 import { BaseEntity } from '../common/base.entity';
 import { Entity, Property, ManyToOne } from '@mikro-orm/decorators/legacy';
-import { Driver } from './driver.entity';
+import { Driver } from '../driverfleet/driver.entity';
 import { DriverPositionRepository } from '../repository/driver-position.repository';
 
 @Entity({ repository: () => DriverPositionRepository })

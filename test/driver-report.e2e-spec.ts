@@ -7,7 +7,7 @@ import { DriverSession } from '../src/entity/driver-session.entity';
 import {
   DriverAttribute,
   DriverAttributeName,
-} from '../src/entity/driver-attribute.entity';
+} from '../src/driverfleet/driver-attribute.entity';
 import { Claim, ClaimStatus } from '../src/crm/claims/claim.entity';
 import { CarClass } from '../src/carfleet/car-type.entity';
 import { Money } from '../src/money/money';
